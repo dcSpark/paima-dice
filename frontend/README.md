@@ -8,16 +8,9 @@ Based on React Webpack Typescript [template](https://github.com/codesbiome/react
 
 <br>
 
-Install dependencies using Yarn or NPM or PNPM :
+Install dependencies:
 
 ```bash
-# using pnpm
-pnpm install
-
-# or using yarn
-yarn install
-
-# or using npm
 npm install
 ```
 
@@ -28,7 +21,7 @@ npm install
 To develop and run your web application, you need to run following command :
 
 ```bash
-yarn start
+npm run start
 ```
 
 <br />
@@ -38,7 +31,7 @@ yarn start
 To lint application source code using ESLint via this command :
 
 ```bash
-yarn lint
+npm run lint
 ```
 
 <br />
@@ -50,7 +43,7 @@ Distribution files output will be generated in `dist/` directory by default.
 To build the production ready files for distribution, use the following command :
 
 ```bash
-yarn build
+npm run build
 ```
 
 <br />
@@ -60,7 +53,7 @@ yarn build
 Serve helps you serve a static site, single page application or just a static file. It also provides a neat interface for listing the directory's contents. This command serves build files from `dist/` directory.
 
 ```bash
-yarn serve
+npm run serve
 ```
 
 <br />
@@ -78,3 +71,7 @@ tools/webpack/webpack.config.prod.js
 ```
 
 For further information, you can visit [Webpack Configuration](https://webpack.js.org/configuration/)
+
+## Middleware
+`frontend/src/paima/middleware.js` is copied from `middleware/packaged/middleware.js` (after packing).
+Types are added manually.
