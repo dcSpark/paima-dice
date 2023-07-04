@@ -13,7 +13,7 @@ import {
   postConciselyEncodedData,
 } from 'paima-sdk/paima-mw-core';
 
-import { gameBackendVersion, GAME_NAME } from '@chess/utils';
+import { gameBackendVersion, GAME_NAME } from '@dice/utils';
 
 import { queryEndpoints } from './endpoints/queries';
 import { writeEndpoints } from './endpoints/write';

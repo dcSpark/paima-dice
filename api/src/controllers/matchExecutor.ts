@@ -1,6 +1,6 @@
 import { Controller, Get, Path, Post, Query, Route, SuccessResponse } from 'tsoa';
-import { requirePool, getLobbyById, getMatchSeeds, getMovesByLobby } from '@chess/db';
-import type { MatchExecutorData } from '@chess/utils';
+import { requirePool, getLobbyById, getMatchSeeds, getMovesByLobby } from '@dice/db';
+import type { MatchExecutorData } from '@dice/utils';
 
 type Response = MatchExecutorData | null;
 

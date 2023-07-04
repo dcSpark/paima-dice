@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Path, Post, Query, Route, SuccessResponse } from 'tsoa';
-import { requirePool, getUserStats } from '@chess/db';
-import type { UserStats } from '@chess/utils';
+import { requirePool, getUserStats } from '@dice/db';
+import type { UserStats } from '@dice/utils';
 
 interface Response {
   stats: UserStats;

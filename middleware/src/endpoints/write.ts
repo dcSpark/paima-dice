@@ -11,7 +11,7 @@ import {
 import { buildEndpointErrorFxn, MiddlewareErrorCode } from '../errors';
 import { getLobbyStateWithUser, getNonemptyNewLobbies } from '../helpers/auxiliary-queries';
 import { lobbyWasClosed, userCreatedLobby, userJoinedLobby } from '../helpers/utility-functions';
-import type { MatchMove } from '@chess/game-logic';
+import type { MatchMove } from '@dice/game-logic';
 import type { CreateLobbySuccessfulResponse } from '../types';
 
 const RETRY_PERIOD = 1000;

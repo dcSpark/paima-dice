@@ -1,4 +1,4 @@
-import type { ConciseResult } from '@chess/utils';
+import type { ConciseResult } from '@dice/utils';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
 
 export type ParsedSubmittedInput =

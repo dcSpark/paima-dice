@@ -1,7 +1,7 @@
 {
-  "name": "@chess/utils",
+  "name": "@dice/utils",
   "version": "1.0.0",
-  "description": "Helper library for Paima Chess",
+  "description": "Helper library for Paima Dice game",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "type": "module",

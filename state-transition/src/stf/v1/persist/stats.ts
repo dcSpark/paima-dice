@@ -1,9 +1,9 @@
-import type { IGetUserStatsResult, INewStatsParams, IUpdateStatsParams } from '@chess/db';
-import { newStats, updateStats } from '@chess/db';
+import type { IGetUserStatsResult, INewStatsParams, IUpdateStatsParams } from '@dice/db';
+import { newStats, updateStats } from '@dice/db';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
 import { createScheduledData } from 'paima-sdk/paima-db';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
-import type { ConciseResult } from '@chess/utils';
+import type { ConciseResult } from '@dice/utils';
 
 // Generate blank/empty user stats
 export function blankStats(wallet: string): SQLUpdate {

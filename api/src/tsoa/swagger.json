@@ -318,7 +318,7 @@
     "securitySchemes": {}
   },
   "info": {
-    "title": "@chess/api",
+    "title": "@dice/api",
     "version": "1.0.0",
     "description": "REST API for middleware",
     "license": {

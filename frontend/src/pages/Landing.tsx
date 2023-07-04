@@ -2,7 +2,7 @@ import { Button, Container } from "@mui/material";
 import { AppContext } from "@src/main";
 import MainController from "@src/MainController";
 import React, { useContext, useState } from "react";
-import * as Paima from "@chess/middleware";
+import * as Paima from "@dice/middleware";
 import "./Landing.scss";
 
 const LandingPage: React.FC = () => {
@@ -27,7 +27,7 @@ const LandingPage: React.FC = () => {
   return (
     <Container>
       <div className="landing-page">
-        <h1 className="title">Chess</h1>
+        <h1 className="title">Dice</h1>
         <h2 className="subtitle">Running on Paima Engine</h2>
         {/* <button onClick={logMiddleware}>i</button>
         <button onClick={statusMiddleware}>s</button>

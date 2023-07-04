@@ -4,7 +4,7 @@ import type {
   IGetUserStatsResult,
   IGetNewLobbiesByUserAndBlockHeightResult,
   IGetPaginatedUserLobbiesResult,
-} from '@chess/db';
+} from '@dice/db';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
 import type { IGetBlockHeightResult } from 'paima-sdk/paima-db';
 

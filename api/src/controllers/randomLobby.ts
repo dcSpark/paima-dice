@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Path, Post, Query, Route, SuccessResponse } from 'tsoa';
-import type { IGetRandomLobbyResult } from '@chess/db';
-import { requirePool, getRandomLobby, getPaginatedOpenLobbies } from '@chess/db';
+import type { IGetRandomLobbyResult } from '@dice/db';
+import { requirePool, getRandomLobby, getPaginatedOpenLobbies } from '@dice/db';
 
 interface RandomLobbyResponse {
   lobby: IGetRandomLobbyResult | null;

@@ -1,8 +1,8 @@
 import { Controller, Get, Query, Route, ValidateError } from 'tsoa';
-import { requirePool, getLobbyById, getRoundData, getRoundMoves } from '@chess/db';
+import { requirePool, getLobbyById, getRoundData, getRoundMoves } from '@dice/db';
 import { isLeft } from 'fp-ts/Either';
 import { psqlNum } from '../validation.js';
-import type { RoundExecutorData } from '@chess/utils';
+import type { RoundExecutorData } from '@dice/utils';
 import { getBlockHeight } from 'paima-sdk/paima-db';
 
 type Response = RoundExecutorData | Error;

@@ -1,7 +1,7 @@
 import { Body, Controller, Get, Query, Route } from 'tsoa';
-import type { IGetFinalStateResult } from '@chess/db';
-import { requirePool, getLobbyById, getFinalState } from '@chess/db';
-import type { MatchWinnerResponse } from '@chess/utils';
+import type { IGetFinalStateResult } from '@dice/db';
+import { requirePool, getLobbyById, getFinalState } from '@dice/db';
+import type { MatchWinnerResponse } from '@dice/utils';
 
 const getWinner = (finalState: IGetFinalStateResult): string => {
   switch (finalState.player_one_result) {

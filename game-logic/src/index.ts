@@ -3,7 +3,7 @@ import { roundExecutor } from 'paima-sdk/paima-executors';
 import type Prando from 'paima-sdk/paima-prando';
 import type { MatchState, MatchEnvironment, TickEvent } from './types';
 import { processTick } from './tick';
-import type { IGetLobbyByIdResult, IGetCachedMovesResult } from '@chess/db';
+import type { IGetLobbyByIdResult, IGetCachedMovesResult } from '@dice/db';
 import { WHITE, BLACK } from 'chess.js';
 
 export * from './types';

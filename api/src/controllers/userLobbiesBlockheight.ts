@@ -1,8 +1,8 @@
 import { Controller, Get, Query, Route, ValidateError } from 'tsoa';
-import { requirePool, getNewLobbiesByUserAndBlockHeight } from '@chess/db';
+import { requirePool, getNewLobbiesByUserAndBlockHeight } from '@dice/db';
 import { psqlNum } from '../validation.js';
 import { isLeft } from 'fp-ts/Either';
-import type { NewLobby } from '@chess/utils';
+import type { NewLobby } from '@dice/utils';
 
 interface Response {
   lobbies: NewLobby[];

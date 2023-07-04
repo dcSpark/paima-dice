@@ -1,5 +1,5 @@
 {
-  "name": "@chess/game-logic",
+  "name": "@dice/game-logic",
   "version": "1.0.0",
   "description": "",
   "main": "build/index.js",

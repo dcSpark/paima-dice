@@ -1,5 +1,5 @@
 import * as React from "react";
-import logo from "@assets/images/chess_logo.png";
+import logo from "@assets/images/dice_logo.png";
 import "./Logo.scss";
 import clsx from "clsx";
 
@@ -12,9 +12,9 @@ interface LogoProps {
 const Logo: React.FC<LogoProps> = ({ width, height, mainMenu = false }) => {
   return (
     <img
-      className={clsx("chess-logo", mainMenu && "chess-logo--main")}
+      className={clsx("dice-logo", mainMenu && "dice-logo--main")}
       src={logo}
-      alt="Paima Chess"
+      alt="Paima Dice"
       width={width}
       height={height}
     />

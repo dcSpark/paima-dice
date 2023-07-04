@@ -2,7 +2,7 @@ import type Prando from 'paima-sdk/paima-prando';
 import { Chess } from 'chess.js';
 import { gameOverFromChess, updateBoard } from './chess-logic';
 import type { MatchState, MatchEnvironment, TickEvent } from './types';
-import type { IGetCachedMovesResult } from '@chess/db';
+import type { IGetCachedMovesResult } from '@dice/db';
 
 // Executes a round executor tick and generates a tick event as a result
 export function processTick(

@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@mui/material";
 import MainController from "@src/MainController";
-import { LobbyState, LobbyStateQuery } from "@chess/utils";
+import { LobbyState, LobbyStateQuery } from "@dice/utils";
 import Navbar from "@src/components/Navbar";
 import SearchBar from "@src/components/SearchBar";
 import { AppContext } from "@src/main";

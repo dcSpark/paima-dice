@@ -6,19 +6,19 @@ import type {
   INewMatchMoveParams,
   IExecutedRoundParams,
   IUpdateLatestMatchStateParams,
-} from '@chess/db';
+} from '@dice/db';
 import {
   newMatchMove,
   newRound,
   updateLatestMatchState,
   newFinalState,
   executedRound,
-} from '@chess/db';
-import type { MatchEnvironment, MatchState } from '@chess/game-logic';
+} from '@dice/db';
+import type { MatchEnvironment, MatchState } from '@dice/game-logic';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
-import type { ConciseResult, ExpandedResult, MatchResult } from '@chess/utils';
+import type { ConciseResult, ExpandedResult, MatchResult } from '@dice/utils';
 import { scheduleZombieRound, deleteZombieRound } from './zombie.js';
-import type { INewFinalStateParams } from '@chess/db/src/insert.queries.js';
+import type { INewFinalStateParams } from '@dice/db/src/insert.queries.js';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
 
 // This function inserts a new empty round in the database.

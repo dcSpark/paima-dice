@@ -1,5 +1,5 @@
 {
-  "name": "@chess/db",
+  "name": "@dice/db",
   "version": "1.0.0",
   "description": "",
   "main": "build/index.js",

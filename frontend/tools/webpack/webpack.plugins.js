@@ -9,7 +9,7 @@ const ReactRefreshWebpackPlugin = require("@pmmmwh/react-refresh-webpack-plugin"
 module.exports = [
   new NodePolyfillPlugin(),
   new webpack.ProvidePlugin({
-    process: 'process/browser',
+    process: "process/browser",
   }),
   new webpack.DefinePlugin({
     "process.env": JSON.stringify(process.env),
@@ -19,7 +19,7 @@ module.exports = [
   inDev() && new ReactRefreshWebpackPlugin(),
   new HtmlWebpackPlugin({
     template: "src/index.html",
-    favicon: "assets/images/chess_logo.png",
+    favicon: "assets/images/dice_logo.png",
     inject: true,
   }),
   new MiniCssExtractPlugin({

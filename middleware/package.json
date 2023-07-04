@@ -1,7 +1,7 @@
 {
-  "name": "@chess/middleware",
+  "name": "@dice/middleware",
   "version": "1.0.0",
-  "description": "Middleware for Chess game, to be imported into any frontend",
+  "description": "Middleware for Dice game, to be imported into any frontend",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "type": "module",
@@ -15,8 +15,8 @@
   "keywords": [],
   "author": "PaimaStudios",
   "dependencies": {
-    "@chess/game-logic": "1.0.0",
-    "@chess/utils": "1.0.0"
+    "@dice/game-logic": "1.0.0",
+    "@dice/utils": "1.0.0"
   },
   "devDependencies": {
     "@esbuild-plugins/node-globals-polyfill": "^0.1.1",

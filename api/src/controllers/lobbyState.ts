@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Path, Post, Query, Route, SuccessResponse } from 'tsoa';
-import { getLobbyById, getRoundData, requirePool } from '@chess/db';
-import type { LobbyStateQuery } from '@chess/utils';
+import { getLobbyById, getRoundData, requirePool } from '@dice/db';
+import type { LobbyStateQuery } from '@dice/utils';
 
 interface Response {
   lobby: LobbyStateQuery | null;

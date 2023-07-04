@@ -1,4 +1,4 @@
-# Chess Demo
+# Dice Demo
 
 Based on React Webpack Typescript [template](https://github.com/codesbiome/react-webpack-typescript-2023).
 

@@ -11,7 +11,7 @@ import type {
   LobbyState,
   LobbyStateQuery,
   UserLobby,
-} from '@chess/utils';
+} from '@dice/utils';
 
 import { buildEndpointErrorFxn, MiddlewareErrorCode } from '../errors';
 import { getRawLobbyState, getRawNewLobbies } from '../helpers/auxiliary-queries';
@@ -36,8 +36,8 @@ import type {
   PackedUserLobbies,
   PackedUserStats,
 } from '../types';
-import type { MatchState, TickEvent } from '@chess/game-logic';
-import { isPlayersTurn } from '@chess/game-logic';
+import type { MatchState, TickEvent } from '@dice/game-logic';
+import { isPlayersTurn } from '@dice/game-logic';
 
 async function getLobbyState(lobbyID: string): Promise<PackedLobbyState | FailedResult> {
   const errorFxn = buildEndpointErrorFxn('getLobbyState');

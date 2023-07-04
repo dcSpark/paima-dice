@@ -2,10 +2,10 @@ import type { MatchExecutor, RoundExecutor } from 'paima-sdk/paima-executors';
 import { matchExecutor } from 'paima-sdk/paima-executors';
 import Prando from 'paima-sdk/paima-prando';
 
-import type { MatchState, TickEvent } from '@chess/game-logic';
-import { initialState } from '@chess/game-logic';
-import { extractMatchEnvironment, initRoundExecutor, processTick } from '@chess/game-logic';
-import type { MatchExecutorData, RoundExecutorData } from '@chess/utils';
+import type { MatchState, TickEvent } from '@dice/game-logic';
+import { initialState } from '@dice/game-logic';
+import { extractMatchEnvironment, initRoundExecutor, processTick } from '@dice/game-logic';
+import type { MatchExecutorData, RoundExecutorData } from '@dice/utils';
 
 export function buildRoundExecutor(
   data: RoundExecutorData,

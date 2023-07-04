@@ -1,5 +1,5 @@
-import { LobbyState } from "@chess/utils";
-import * as Paima from "@chess/middleware";
+import { LobbyState } from "@dice/utils";
+import * as Paima from "@dice/middleware";
 import * as ChessJS from "chess.js";
 import { OldResult } from "paima-sdk/paima-mw-core";
 

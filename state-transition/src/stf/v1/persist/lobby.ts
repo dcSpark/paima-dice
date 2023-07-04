@@ -1,15 +1,15 @@
 import type { CreatedLobbyInput, JoinedLobbyInput } from '../types.js';
-import type { IGetLobbyByIdResult, IStartMatchParams, ICloseLobbyParams } from '@chess/db';
-import { createLobby, startMatch, closeLobby, ICreateLobbyParams } from '@chess/db';
+import type { IGetLobbyByIdResult, IStartMatchParams, ICloseLobbyParams } from '@dice/db';
+import { createLobby, startMatch, closeLobby, ICreateLobbyParams } from '@dice/db';
 import type Prando from 'paima-sdk/paima-prando';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
-import type { LobbyStatus } from '@chess/utils';
-import { PRACTICE_BOT_ADDRESS } from '@chess/utils';
+import type { LobbyStatus } from '@dice/utils';
+import { PRACTICE_BOT_ADDRESS } from '@dice/utils';
 import { Chess } from 'chess.js';
 import { blankStats } from './stats';
 import { persistNewRound } from './match.js';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
-import { initialState } from '@chess/game-logic';
+import { initialState } from '@dice/game-logic';
 
 // Persist creation of a lobby
 export function persistLobbyCreation(

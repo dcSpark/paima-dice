@@ -1,6 +1,6 @@
 import { Controller, Get, Query, Route, ValidateError } from 'tsoa';
-import type { IGetPaginatedOpenLobbiesResult } from '@chess/db';
-import { requirePool, getPaginatedOpenLobbies } from '@chess/db';
+import type { IGetPaginatedOpenLobbiesResult } from '@dice/db';
+import { requirePool, getPaginatedOpenLobbies } from '@dice/db';
 import { isLeft } from 'fp-ts/Either';
 import { psqlNum } from '../validation.js';
 

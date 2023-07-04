@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import "./ChessGame.scss";
 import { Box, CircularProgress, Typography } from "@mui/material";
-import { LobbyState } from "@chess/utils";
-import { TickEvent } from "@chess/game-logic";
+import { LobbyState } from "@dice/utils";
+import { TickEvent } from "@dice/game-logic";
 import { ChessLogic, ChessService } from "./GameLogic";
 
 import { Chessboard } from "react-chessboard";

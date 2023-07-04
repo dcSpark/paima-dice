@@ -5,7 +5,7 @@ import { buildEndpointErrorFxn } from '../errors';
 import type { NewLobbies, PackedLobbyState } from '../types';
 import { userCreatedLobby, userJoinedLobby } from './utility-functions';
 import { backendQueryLobbyState, backendQueryUserLobbiesBlockheight } from './query-constructors';
-import type { LobbyState, NewLobby } from '@chess/utils';
+import type { LobbyState, NewLobby } from '@dice/utils';
 
 export async function getRawLobbyState(lobbyID: string): Promise<PackedLobbyState | FailedResult> {
   const errorFxn = buildEndpointErrorFxn('getRawLobbyState');

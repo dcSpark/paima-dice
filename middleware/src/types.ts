@@ -8,7 +8,7 @@ import type {
   NewLobby,
   UserLobby,
   UserStats,
-} from '@chess/utils';
+} from '@dice/utils';
 
 export interface RoundEnd {
   blocks: number;

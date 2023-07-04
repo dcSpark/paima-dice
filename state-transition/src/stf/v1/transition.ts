@@ -1,15 +1,15 @@
 import type { Pool } from 'pg';
 import type Prando from 'paima-sdk/paima-prando';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
-import type { IGetLobbyByIdResult, IGetRoundDataResult, IGetRoundMovesResult } from '@chess/db';
-import { getCachedMoves, getLobbyById, getRoundData, getUserStats, endMatch } from '@chess/db';
-import type { MatchState } from '@chess/game-logic';
+import type { IGetLobbyByIdResult, IGetRoundDataResult, IGetRoundMovesResult } from '@dice/db';
+import { getCachedMoves, getLobbyById, getRoundData, getUserStats, endMatch } from '@dice/db';
+import type { MatchState } from '@dice/game-logic';
 import {
   gameOver,
   initRoundExecutor,
   extractMatchEnvironment,
   matchResults,
-} from '@chess/game-logic';
+} from '@dice/game-logic';
 import {
   persistUpdateMatchState,
   persistCloseLobby,
@@ -23,7 +23,7 @@ import {
   persistMatchResults,
   schedulePracticeMove,
 } from './persist';
-import { isValidMove } from '@chess/game-logic';
+import { isValidMove } from '@dice/game-logic';
 import type {
   ClosedLobbyInput,
   CreatedLobbyInput,
@@ -32,7 +32,7 @@ import type {
   SubmittedMovesInput,
 } from './types.js';
 import { isUserStats, isZombieRound } from './types.js';
-import type { ConciseResult } from '@chess/utils';
+import type { ConciseResult } from '@dice/utils';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
 import { PracticeAI } from './persist/practice-ai';
 

@@ -8,7 +8,7 @@ import ChessGame from "./ChessGame/ChessGame";
 import CreateLobby from "./CreateLobby";
 import { CircularProgress } from "@mui/material";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import { LobbyState } from "@chess/utils";
+import { LobbyState } from "@dice/utils";
 import "./PageCoordinator.scss";
 import { AppContext } from "@src/main";
 
@@ -42,7 +42,7 @@ const PageCoordinator: React.FC = () => {
   }, []);
 
   return (
-    <div className="chess-app">
+    <div className="dice-app">
       {loading && (
         <div className="overlay">
           <CircularProgress sx={{ ml: 2 }} />

@@ -1,4 +1,4 @@
-import { gameOver } from '@chess/game-logic';
+import { gameOver } from '@dice/game-logic';
 import { Chess } from 'chess.js';
 import type Prando from 'paima-sdk/paima-prando';
 

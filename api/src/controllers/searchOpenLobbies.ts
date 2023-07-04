@@ -1,8 +1,8 @@
 import { Controller, Get, Query, Route, ValidateError } from 'tsoa';
-import { requirePool, searchPaginatedOpenLobbies, getOpenLobbyById } from '@chess/db';
+import { requirePool, searchPaginatedOpenLobbies, getOpenLobbyById } from '@dice/db';
 import { psqlNum } from '../validation';
 import { isLeft } from 'fp-ts/lib/Either';
-import type { IGetOpenLobbyByIdResult, ISearchPaginatedOpenLobbiesResult } from '@chess/db';
+import type { IGetOpenLobbyByIdResult, ISearchPaginatedOpenLobbiesResult } from '@dice/db';
 
 interface SearchOpenLobbiesResponse {
   lobbies: IGetOpenLobbyByIdResult[] | ISearchPaginatedOpenLobbiesResult[];

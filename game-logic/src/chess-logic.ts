@@ -1,6 +1,6 @@
 import type Prando from 'paima-sdk/paima-prando';
 import type { MatchMove, MatchEnvironment, MatchState } from './types';
-import type { ConciseResult, MatchResult, UserLobby } from '@chess/utils';
+import type { ConciseResult, MatchResult, UserLobby } from '@dice/utils';
 import { Chess } from 'chess.js';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
 
