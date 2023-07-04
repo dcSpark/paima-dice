@@ -2,7 +2,7 @@ import { Button, Container } from "@mui/material";
 import { AppContext } from "@src/main";
 import MainController from "@src/MainController";
 import React, { useContext, useState } from "react";
-import * as Paima from "../paima/middleware.js";
+import * as Paima from "@chess/middleware";
 import "./Landing.scss";
 
 const LandingPage: React.FC = () => {

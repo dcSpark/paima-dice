@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@mui/material";
 import MainController from "@src/MainController";
-import { LobbyStatus, UserLobby } from "../paima/types.d";
+import { LobbyStatus, UserLobby } from "@chess/utils";
 import Navbar from "@src/components/Navbar";
 import SearchBar from "@src/components/SearchBar";
 import { AppContext } from "@src/main";

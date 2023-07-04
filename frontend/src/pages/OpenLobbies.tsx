@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@mui/material";
 import MainController from "@src/MainController";
-import { LobbyState } from "../paima/types.d";
+import { LobbyState, LobbyStateQuery } from "@chess/utils";
 import Navbar from "@src/components/Navbar";
 import SearchBar from "@src/components/SearchBar";
 import { AppContext } from "@src/main";
@@ -18,7 +18,7 @@ import Button from "@src/components/Button";
 import { formatDate } from "@src/utils";
 
 type Column = {
-  id: keyof LobbyState | "action";
+  id: keyof LobbyStateQuery | "action";
   label: string;
   minWidth: number;
 };
@@ -45,7 +45,7 @@ const expandValue = (id: keyof LobbyState, value: unknown) => {
 
 const OpenLobbies: React.FC = () => {
   const mainController: MainController = useContext(AppContext);
-  const [lobbies, setLobbies] = useState<LobbyState[]>([]);
+  const [lobbies, setLobbies] = useState<LobbyStateQuery[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchText, setSearchText] = useState("");

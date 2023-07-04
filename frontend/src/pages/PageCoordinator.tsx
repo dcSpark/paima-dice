@@ -8,7 +8,7 @@ import ChessGame from "./ChessGame/ChessGame";
 import CreateLobby from "./CreateLobby";
 import { CircularProgress } from "@mui/material";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import { LobbyState } from "../paima/types.d";
+import { LobbyState } from "@chess/utils";
 import "./PageCoordinator.scss";
 import { AppContext } from "@src/main";
 

@@ -26,8 +26,7 @@ const global = g.NodeGlobalsPolyfillPlugin({
 const esbuild = require("esbuild");
 const { dtsPlugin } = require("esbuild-plugin-d.ts");
 const config = {
-  // JS output from previous compilation step used here instead of index.ts to have more control over the TS build process
-  entryPoints: ["build/index.js"],
+  entryPoints: ["./src/index.js"],
   bundle: true,
   format: "esm",
   define,

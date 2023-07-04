@@ -1,3 +1,6 @@
+const dotenv = require('dotenv')
+dotenv.config({ path: './../../.env.development' });
+
 module.exports = {
   mode: 'development',
   entry: ['./src/main.tsx'],
@@ -12,6 +15,9 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.ts', '.jsx', '.tsx', '.css'],
     alias: require('./webpack.aliases'),
+    fallback: {
+      fs: false,
+    },
   },
   stats: 'errors-warnings',
   devtool: 'eval-source-map',

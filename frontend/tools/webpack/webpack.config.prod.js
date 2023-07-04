@@ -1,3 +1,6 @@
+const dotenv = require('dotenv')
+dotenv.config({ path: './../../.env.production' });
+
 module.exports = {
   mode: 'production',
   entry: ['./src/main.tsx'],
@@ -15,6 +18,9 @@ module.exports = {
     alias: {
       // Custom Aliases
       ...require('./webpack.aliases'),
+    },
+    fallback: {
+      fs: false,
     },
   },
   stats: 'errors-warnings',

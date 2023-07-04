@@ -1,14 +1,15 @@
-import { OldResult, LobbyState } from "../../paima/types.d";
-import * as Paima from "../../paima/middleware.js";
+import { LobbyState } from "@chess/utils";
+import * as Paima from "@chess/middleware";
 import * as ChessJS from "chess.js";
+import { OldResult } from "paima-sdk/paima-mw-core";
 
 export class ChessService {
   // Get Lobby State
   static async getLobbyState(lobbyId: string): Promise<LobbyState | null> {
     const result = await Paima.default.getLobbyState(lobbyId);
 
-    if (result.error) {
-      console.error(result);
+    if (result.success === false) {
+      console.error(result.errorMessage);
       return null;
     }
 

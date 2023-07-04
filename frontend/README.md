@@ -73,5 +73,4 @@ tools/webpack/webpack.config.prod.js
 For further information, you can visit [Webpack Configuration](https://webpack.js.org/configuration/)
 
 ## Middleware
-`frontend/src/paima/middleware.js` is copied from `middleware/packaged/middleware.js` (after packing).
-Types are added manually.
+Middleware is automatically loaded by webpack, you just need to pack it again if you make changes.
