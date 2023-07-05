@@ -23,7 +23,7 @@ export function initRoundExecutor(
 ): RoundExecutor<MatchState, TickEvent> {
   return roundExecutor.initialize(
     extractMatchEnvironment(lobby),
-    buildMatchState(matchState, randomnessGenerator),
+    buildMatchState(matchState),
     moves,
     randomnessGenerator,
     processTick
@@ -49,12 +49,8 @@ export function extractMatchEnvironment(lobby: IGetLobbyByIdResult): MatchEnviro
 // From a given round, construct the match state which will be used by the round executor.
 // A match state is comprised of mutable data which the round executor will
 // update, and in the end return a final new match state upon completion.
-export const buildMatchState = (
-  matchState: MatchState,
-  randomnessGenerator: Prando
-): MatchState => ({
+export const buildMatchState = (matchState: MatchState): MatchState => ({
   ...matchState,
-  randomSeed: genRandomSeed(randomnessGenerator),
 });
 
 // initial board state in fen notation

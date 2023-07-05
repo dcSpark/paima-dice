@@ -6,6 +6,7 @@ export type ParsedSubmittedInput =
   | JoinedLobbyInput
   | ClosedLobbyInput
   | SubmittedMovesInput
+  | PracticeMovesInput
   | ScheduledDataInput
   | InvalidInput;
 
@@ -38,6 +39,12 @@ export interface SubmittedMovesInput {
   lobbyID: string;
   roundNumber: number;
   isPoint: boolean;
+}
+
+export interface PracticeMovesInput {
+  input: 'practiceMoves';
+  lobbyID: string;
+  roundNumber: number;
 }
 
 export interface ScheduledDataInput {

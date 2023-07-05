@@ -5,6 +5,7 @@ import type {
   CreatedLobbyInput,
   JoinedLobbyInput,
   ParsedSubmittedInput,
+  PracticeMovesInput,
   SubmittedMovesInput,
   UserStats,
   ZombieRound,
@@ -15,6 +16,7 @@ createdLobby        = c|numOfRounds|roundLength|playTimePerPlayer|isHidden?|isPr
 joinedLobby         = j|*lobbyID
 closedLobby         = cs|*lobbyID
 submittedMoves      = s|*lobbyID|roundNumber|isPoint?
+practiceMoves       = p|*lobbyID|roundNumber
 zombieScheduledData = z|*lobbyID
 userScheduledData   = u|*user|result
 `;
@@ -38,6 +40,10 @@ const submittedMoves: ParserRecord<SubmittedMovesInput> = {
   roundNumber: PaimaParser.NumberParser(1, 10000),
   isPoint: PaimaParser.TrueFalseParser(false),
 };
+const practiceMoves: ParserRecord<PracticeMovesInput> = {
+  lobbyID: PaimaParser.NCharsParser(12, 12),
+  roundNumber: PaimaParser.NumberParser(1, 10000),
+};
 const zombieScheduledData: ParserRecord<ZombieRound> = {
   renameCommand: 'scheduledData',
   effect: 'zombie',
@@ -55,6 +61,7 @@ const parserCommands: Record<string, ParserRecord<ParsedSubmittedInput>> = {
   joinedLobby,
   closedLobby,
   submittedMoves,
+  practiceMoves,
   zombieScheduledData,
   userScheduledData,
 };

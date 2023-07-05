@@ -9,6 +9,7 @@ import {
   closedLobby,
   submittedMoves,
   scheduledData,
+  practiceMoves,
 } from './transition';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
 
@@ -33,6 +34,8 @@ export default async function (
       return closedLobby(user, parsed, dbConn);
     case 'submittedMoves':
       return submittedMoves(user, blockHeight, parsed, dbConn, randomnessGenerator);
+    case 'practiceMoves':
+      return practiceMoves(user, blockHeight, parsed, dbConn, randomnessGenerator);
     case 'scheduledData': {
       if (!inputData.scheduled) return [];
       return scheduledData(blockHeight, parsed, dbConn, randomnessGenerator);

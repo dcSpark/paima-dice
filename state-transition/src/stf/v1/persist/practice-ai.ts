@@ -1,16 +1,13 @@
 import type { IGetLobbyByIdResult } from '@dice/db';
-import { genDiceRolls, genRandomSeed, isPoint } from '@dice/game-logic';
-import type Prando from 'paima-sdk/paima-prando';
+import { genDiceRolls, isPoint } from '@dice/game-logic';
 
 //
 // PracticeAI generates a move based on the current game state and prando.
 //
 export class PracticeAI {
   lobby: IGetLobbyByIdResult;
-  randomnessGenerator: Prando;
 
-  constructor(lobby: IGetLobbyByIdResult, randomnessGenerator: Prando) {
-    this.randomnessGenerator = randomnessGenerator;
+  constructor(lobby: IGetLobbyByIdResult) {
     this.lobby = lobby;
   }
 
@@ -18,8 +15,8 @@ export class PracticeAI {
   //
   // Return next move
   // Return null to not send next move.
-  public getNextMove(): boolean | null {
-    const dice = genDiceRolls(genRandomSeed(this.randomnessGenerator));
+  public getNextMove(): boolean {
+    const dice = genDiceRolls(this.lobby.current_random_seed);
     const point = isPoint(dice);
     return point;
   }

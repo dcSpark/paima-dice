@@ -3,6 +3,7 @@ import type { Color } from 'chess.js';
 export interface TickEvent {
   user: string;
   isPoint: boolean;
+  newRandomSeed: number;
 }
 
 export interface MatchEnvironment {

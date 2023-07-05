@@ -42,7 +42,7 @@ export function persistNewRound(
   const zombie_block_height = blockHeight + roundLength;
   const zombieRoundUpdate: SQLUpdate = scheduleZombieRound(lobbyId, zombie_block_height);
 
-  return [newRoundTuple, zombieRoundUpdate];
+  return [newRoundTuple /* , zombieRoundUpdate TODO */];
 }
 
 // Persist moves sent by player to an active match
@@ -75,11 +75,12 @@ export function persistExecutedRound(
   };
   const executedRoundTuple: SQLUpdate = [executedRound, exParams];
 
+  // TODO: zombie rounds are disabled ATM
   // We remove the scheduled zombie round input
-  if (lobby.round_length) {
-    const block_height = roundData.starting_block_height + lobby.round_length;
-    return [executedRoundTuple, deleteZombieRound(lobby.lobby_id, block_height)];
-  }
+  // if (lobby.round_length) {
+  //   const block_height = roundData.starting_block_height + lobby.round_length;
+  //   return [executedRoundTuple, deleteZombieRound(lobby.lobby_id, block_height)];
+  // }
   return [executedRoundTuple];
 }
 

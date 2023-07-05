@@ -23,6 +23,7 @@ import type {
   ClosedLobbyInput,
   CreatedLobbyInput,
   JoinedLobbyInput,
+  PracticeMovesInput,
   ScheduledDataInput,
   SubmittedMovesInput,
 } from './types.js';
@@ -101,20 +102,38 @@ export const submittedMoves = async (
 
   // In practice mode we will submit a move for the AI
   if (lobby.practice && player !== PRACTICE_BOT_ADDRESS) {
-    const practiceAI = new PracticeAI(lobby, randomnessGenerator);
-    const practiceMove = practiceAI.getNextMove();
-    if (practiceMove) {
-      const practiceMoveSchedule = schedulePracticeMove(
-        lobby.lobby_id,
-        lobby.current_round + 1,
-        practiceMove,
-        blockHeight + 1
-      );
-      return [persistMoveTuple, ...roundExecutionTuples, practiceMoveSchedule];
-    }
+    const practiceMoveSchedule = schedulePracticeMove(
+      lobby.lobby_id,
+      lobby.current_round + 1,
+      blockHeight + 1
+    );
+    return [persistMoveTuple, ...roundExecutionTuples, practiceMoveSchedule];
   }
 
   return [persistMoveTuple, ...roundExecutionTuples];
+};
+
+// State transition when a practice moves input is processed
+export const practiceMoves = async (
+  player: WalletAddress,
+  blockHeight: number,
+  input: PracticeMovesInput,
+  dbConn: Pool,
+  randomnessGenerator: Prando
+): Promise<SQLUpdate[]> => {
+  // Perform DB read queries to get needed data
+  const [lobby] = await getLobbyById.run({ lobby_id: input.lobbyID }, dbConn);
+  if (!lobby) return [];
+
+  const practiceAI = new PracticeAI(lobby);
+  const practiceMove = practiceAI.getNextMove();
+  const regularInput: SubmittedMovesInput = {
+    ...input,
+    input: 'submittedMoves',
+    isPoint: practiceMove,
+  };
+
+  return submittedMoves(player, blockHeight, regularInput, dbConn, randomnessGenerator);
 };
 
 // Validate submitted moves in relation to player/lobby/round state
