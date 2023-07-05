@@ -1,18 +1,27 @@
-import seedrandom from 'seedrandom';
 import type { MatchEnvironment, MatchState } from './types';
 import type { ConciseResult, MatchResult } from '@dice/utils';
+import type { IGetBlockHeightResult } from 'paima-sdk/paima-db';
+import Prando from 'paima-sdk/paima-prando';
 
-export function genDiceRolls(seed: number): [number, number] {
-  const rng = seedrandom(seed.toString());
-  return [genDiceRoll(rng), genDiceRoll(rng)];
+/**
+ * This function is mostly just a reminder that we seed Prando
+ * from block_heights rows (same as stf, but we also need to do it on frontend).
+ */
+export function buildPrando(block: IGetBlockHeightResult): Prando {
+  return new Prando(block.seed);
 }
 
-function genDiceRoll(rng: seedrandom.PRNG) {
-  return Math.floor(rng() * 6) + 1;
+export function genDiceRolls(randomnessGenerator: Prando): [number, number] {
+  return [randomnessGenerator.nextInt(1, 6), randomnessGenerator.nextInt(1, 6)];
 }
 
 export function isPoint(dice: [number, number]): boolean {
   return dice[0] + dice[1] >= 7; // TODO
+}
+
+export function isValidMove(randomnessGenerator: Prando, point: boolean): boolean {
+  const dice = genDiceRolls(randomnessGenerator);
+  return isPoint(dice) === point;
 }
 
 export function matchResults(

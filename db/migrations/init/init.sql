@@ -13,7 +13,7 @@ CREATE TABLE lobbies (
   round_length INTEGER NOT NULL,
   play_time_per_player INTEGER NOT NULL,
   current_round INTEGER NOT NULL DEFAULT 0,
-  current_random_seed INTEGER NOT NULL,
+  initial_random_seed TEXT NOT NULL,
   player_one_points INTEGER NOT NULL DEFAULT 0,
   player_two_points INTEGER NOT NULL DEFAULT 0,
   created_at TIMESTAMP NOT NULL,

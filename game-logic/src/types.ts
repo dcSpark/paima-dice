@@ -3,7 +3,7 @@ import type { Color } from 'chess.js';
 export interface TickEvent {
   user: string;
   isPoint: boolean;
-  newRandomSeed: number;
+  dice: [number, number];
 }
 
 export interface MatchEnvironment {
@@ -19,7 +19,6 @@ export interface PlayerInfo {
 export interface MatchState {
   player1Points: number;
   player2Points: number;
-  randomSeed: number;
 }
 
 export type MatchMove = boolean;

@@ -16,7 +16,6 @@ export * from './dice-logic';
 // and the chess `processTick` function
 export function initRoundExecutor(
   lobby: IGetLobbyByIdResult,
-  round: number,
   matchState: MatchState,
   moves: IGetCachedMovesResult[],
   randomnessGenerator: Prando
@@ -55,6 +54,3 @@ export const buildMatchState = (matchState: MatchState): MatchState => ({
 
 // initial board state in fen notation
 export const initialState = () => 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
-
-export const genRandomSeed = (randomnessGenerator: Prando): number =>
-  randomnessGenerator.nextInt(0, 2 ** 31 - 1); // limited by integer size in postgres

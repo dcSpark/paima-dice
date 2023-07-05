@@ -28,7 +28,7 @@ export class DiceService {
   }
 }
 
-export class ChessLogic {
+export class DiceLogic {
   userAddress: string;
 
   constructor(userAddress: string) {
@@ -40,7 +40,7 @@ export class ChessLogic {
       throw new Error("Lobby state is null");
     }
 
-    if (!this.isThisPlayersTurn(lobbyState)) {
+    if (!this.isThisPlayersTurn(lobbyState, lobbyState.current_round)) {
       console.log("It's the other player's turn");
       return;
     }
@@ -57,8 +57,8 @@ export class ChessLogic {
     }
   }
 
-  isThisPlayersTurn(lobbyState: LobbyState): boolean {
-    const isWhiteTurn = lobbyState.current_round % 2 === 1;
+  isThisPlayersTurn(lobbyState: LobbyState, round: number): boolean {
+    const isWhiteTurn = round % 2 === 1;
     const isPlayerWhite = this.isThisPlayerWhite(lobbyState);
     return isWhiteTurn === isPlayerWhite;
   }

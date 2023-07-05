@@ -1,7 +1,7 @@
 import type Prando from 'paima-sdk/paima-prando';
 import type { MatchState, MatchEnvironment, TickEvent } from './types';
 import type { IGetCachedMovesResult } from '@dice/db';
-import { genRandomSeed } from '.';
+import { genDiceRolls } from '.';
 
 // Executes a round executor tick and generates a tick event as a result
 export function processTick(
@@ -23,8 +23,8 @@ export function processTick(
   // Required for frontend visualization and applying match state updates.
   const event: TickEvent = {
     user: move.wallet,
+    dice: genDiceRolls(randomnessGenerator),
     isPoint: move.is_point,
-    newRandomSeed: genRandomSeed(randomnessGenerator),
   };
 
   // We then call `applyEvents` to mutate the `matchState` based off of the event.
@@ -49,6 +49,5 @@ function applyEvents(
       matchState.player2Points = matchState.player2Points + 1;
     }
   }
-  matchState.randomSeed = event.newRandomSeed;
   return;
 }

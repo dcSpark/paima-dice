@@ -1,5 +1,5 @@
 import type { Pool } from 'pg';
-import type Prando from 'paima-sdk/paima-prando';
+import Prando from 'paima-sdk/paima-prando';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
 import type { IGetLobbyByIdResult, IGetRoundDataResult, IGetRoundMovesResult } from '@dice/db';
 import { getCachedMoves, getLobbyById, getRoundData, getUserStats, endMatch } from '@dice/db';
@@ -29,7 +29,7 @@ import type {
 } from './types.js';
 import { isUserStats, isZombieRound } from './types.js';
 import { PRACTICE_BOT_ADDRESS, type ConciseResult } from '@dice/utils';
-import type { SQLUpdate } from 'paima-sdk/paima-db';
+import { getBlockHeight, type SQLUpdate } from 'paima-sdk/paima-db';
 import { PracticeAI } from './persist/practice-ai';
 
 // State transition when a create lobby input is processed
@@ -37,9 +37,10 @@ export const createdLobby = async (
   player: WalletAddress,
   blockHeight: number,
   input: CreatedLobbyInput,
-  randomnessGenerator: Prando
+  dbConn: Pool
 ): Promise<SQLUpdate[]> => {
-  return persistLobbyCreation(player, blockHeight, input, randomnessGenerator);
+  const [block] = await getBlockHeight.run({ block_height: blockHeight }, dbConn);
+  return persistLobbyCreation(player, blockHeight, input, block.seed);
 };
 
 // State transition when a join lobby input is processed
@@ -74,8 +75,7 @@ export const submittedMoves = async (
   player: WalletAddress,
   blockHeight: number,
   input: SubmittedMovesInput,
-  dbConn: Pool,
-  randomnessGenerator: Prando
+  dbConn: Pool
 ): Promise<SQLUpdate[]> => {
   // Perform DB read queries to get needed data
   const [lobby] = await getLobbyById.run({ lobby_id: input.lobbyID }, dbConn);
@@ -84,8 +84,11 @@ export const submittedMoves = async (
     { lobby_id: lobby.lobby_id, round_number: input.roundNumber },
     dbConn
   );
+  const prandoSeed = await fetchPrandoSeed(lobby, dbConn);
+  if (prandoSeed == null) return [];
+
   // If the submitted moves are usable/all validation passes, continue
-  if (!validateSubmittedMoves(lobby, round, input, player)) return [];
+  if (!validateSubmittedMoves(lobby, round, input, player, new Prando(prandoSeed))) return [];
   // Generate update to persist the moves
   const persistMoveTuple = persistMoveSubmission(player, input, lobby);
   // We generated an SQL update for persisting the moves.
@@ -97,7 +100,7 @@ export const submittedMoves = async (
     lobby,
     [newMove],
     round,
-    randomnessGenerator
+    new Prando(prandoSeed)
   );
 
   // In practice mode we will submit a move for the AI
@@ -118,14 +121,16 @@ export const practiceMoves = async (
   player: WalletAddress,
   blockHeight: number,
   input: PracticeMovesInput,
-  dbConn: Pool,
-  randomnessGenerator: Prando
+  dbConn: Pool
 ): Promise<SQLUpdate[]> => {
   // Perform DB read queries to get needed data
   const [lobby] = await getLobbyById.run({ lobby_id: input.lobbyID }, dbConn);
   if (!lobby) return [];
+  // note: do not try to give this Prando to submittedMoves, it has to create it again
+  const prandoSeed = await fetchPrandoSeed(lobby, dbConn);
+  if (prandoSeed == null) return [];
 
-  const practiceAI = new PracticeAI(lobby);
+  const practiceAI = new PracticeAI(new Prando(prandoSeed));
   const practiceMove = practiceAI.getNextMove();
   const regularInput: SubmittedMovesInput = {
     ...input,
@@ -133,7 +138,7 @@ export const practiceMoves = async (
     isPoint: practiceMove,
   };
 
-  return submittedMoves(player, blockHeight, regularInput, dbConn, randomnessGenerator);
+  return submittedMoves(player, blockHeight, regularInput, dbConn);
 };
 
 // Validate submitted moves in relation to player/lobby/round state
@@ -141,7 +146,8 @@ function validateSubmittedMoves(
   lobby: IGetLobbyByIdResult,
   round: IGetRoundDataResult,
   input: SubmittedMovesInput,
-  player: WalletAddress
+  player: WalletAddress,
+  randomnessGenerator: Prando
 ): boolean {
   // If lobby not active or existing
   if (!lobby || lobby.lobby_state !== 'active') return false;
@@ -159,7 +165,7 @@ function validateSubmittedMoves(
   if (input.roundNumber !== lobby.current_round) return false;
 
   // If a move is sent that doesn't fit in the lobby grid size or is strictly invalid
-  if (!isValidMove(lobby.current_random_seed, input.isPoint)) return false;
+  if (!isValidMove(randomnessGenerator, input.isPoint)) return false;
 
   return true;
 }
@@ -232,11 +238,9 @@ export function executeRound(
   // We initialize the round executor object and run it/get the new match state via `.endState()`
   const executor = initRoundExecutor(
     lobby,
-    roundData.round_within_match,
     {
       player1Points: lobby.player_one_points,
       player2Points: lobby.player_two_points,
-      randomSeed: lobby.current_random_seed,
     },
     moves,
     randomnessGenerator
@@ -310,4 +314,32 @@ function finalizeMatch(
 function isFinalRound(lobby: IGetLobbyByIdResult): boolean {
   if (lobby.num_of_rounds && lobby.current_round >= lobby.num_of_rounds) return true;
   return false;
+}
+
+/**
+ * We have to seed our own Prando, because we need to use randomness from
+ * last round in the execution of current round.
+ * Player throws dice, and then decides moves, i.e. dice throw has to be
+ * decided before he decides and submits his moves.
+ */
+async function fetchPrandoSeed(
+  lobby: IGetLobbyByIdResult,
+  dbConn: Pool
+): Promise<undefined | string> {
+  // TODO: why does lobby start at 1?
+  if (lobby.current_round === 1) {
+    return lobby.initial_random_seed;
+  }
+
+  const [lastRound] = await getRoundData.run(
+    { lobby_id: lobby.lobby_id, round_number: lobby.current_round - 1 },
+    dbConn
+  );
+  if (lastRound == null) return;
+  const [lastRoundBlock] = await getBlockHeight.run(
+    { block_height: lastRound.starting_block_height },
+    dbConn
+  );
+  if (lastRoundBlock == null) return;
+  return lastRoundBlock.seed;
 }

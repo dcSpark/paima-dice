@@ -32,7 +32,7 @@
 					"hidden": {
 						"type": "boolean"
 					},
-					"latest_match_state": {
+					"initial_random_seed": {
 						"type": "string"
 					},
 					"lobby_creator": {
@@ -55,9 +55,17 @@
 					"player_one_iswhite": {
 						"type": "boolean"
 					},
+					"player_one_points": {
+						"type": "number",
+						"format": "double"
+					},
 					"player_two": {
 						"type": "string",
 						"nullable": true
+					},
+					"player_two_points": {
+						"type": "number",
+						"format": "double"
 					},
 					"practice": {
 						"type": "boolean"
@@ -69,6 +77,9 @@
 					"round_start_height": {
 						"type": "number",
 						"format": "double"
+					},
+					"round_seed": {
+						"type": "string"
 					}
 				},
 				"required": [
@@ -76,17 +87,20 @@
 					"creation_block_height",
 					"current_round",
 					"hidden",
-					"latest_match_state",
+					"initial_random_seed",
 					"lobby_creator",
 					"lobby_id",
 					"lobby_state",
 					"num_of_rounds",
 					"play_time_per_player",
 					"player_one_iswhite",
+					"player_one_points",
 					"player_two",
+					"player_two_points",
 					"practice",
 					"round_length",
-					"round_start_height"
+					"round_start_height",
+					"round_seed"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -147,7 +161,7 @@
 					"hidden": {
 						"type": "boolean"
 					},
-					"latest_match_state": {
+					"initial_random_seed": {
 						"type": "string"
 					},
 					"lobby_creator": {
@@ -170,6 +184,14 @@
 					"player_one_iswhite": {
 						"type": "boolean"
 					},
+					"player_one_points": {
+						"type": "number",
+						"format": "double"
+					},
+					"player_two_points": {
+						"type": "number",
+						"format": "double"
+					},
 					"round_length": {
 						"type": "number",
 						"format": "double"
@@ -180,13 +202,15 @@
 					"creation_block_height",
 					"current_round",
 					"hidden",
-					"latest_match_state",
+					"initial_random_seed",
 					"lobby_creator",
 					"lobby_id",
 					"lobby_state",
 					"num_of_rounds",
 					"play_time_per_player",
 					"player_one_iswhite",
+					"player_one_points",
+					"player_two_points",
 					"round_length"
 				],
 				"type": "object",
@@ -225,7 +249,7 @@
 					"hidden": {
 						"type": "boolean"
 					},
-					"latest_match_state": {
+					"initial_random_seed": {
 						"type": "string"
 					},
 					"lobby_creator": {
@@ -248,9 +272,17 @@
 					"player_one_iswhite": {
 						"type": "boolean"
 					},
+					"player_one_points": {
+						"type": "number",
+						"format": "double"
+					},
 					"player_two": {
 						"type": "string",
 						"nullable": true
+					},
+					"player_two_points": {
+						"type": "number",
+						"format": "double"
 					},
 					"practice": {
 						"type": "boolean"
@@ -265,14 +297,16 @@
 					"creation_block_height",
 					"current_round",
 					"hidden",
-					"latest_match_state",
+					"initial_random_seed",
 					"lobby_creator",
 					"lobby_id",
 					"lobby_state",
 					"num_of_rounds",
 					"play_time_per_player",
 					"player_one_iswhite",
+					"player_one_points",
 					"player_two",
+					"player_two_points",
 					"practice",
 					"round_length"
 				],
@@ -314,7 +348,7 @@
 					"hidden": {
 						"type": "boolean"
 					},
-					"latest_match_state": {
+					"initial_random_seed": {
 						"type": "string"
 					},
 					"lobby_creator": {
@@ -337,6 +371,14 @@
 					"player_one_iswhite": {
 						"type": "boolean"
 					},
+					"player_one_points": {
+						"type": "number",
+						"format": "double"
+					},
+					"player_two_points": {
+						"type": "number",
+						"format": "double"
+					},
 					"round_length": {
 						"type": "number",
 						"format": "double"
@@ -347,13 +389,15 @@
 					"creation_block_height",
 					"current_round",
 					"hidden",
-					"latest_match_state",
+					"initial_random_seed",
 					"lobby_creator",
 					"lobby_id",
 					"lobby_state",
 					"num_of_rounds",
 					"play_time_per_player",
 					"player_one_iswhite",
+					"player_one_points",
+					"player_two_points",
 					"round_length"
 				],
 				"type": "object",
@@ -394,7 +438,7 @@
 					"hidden": {
 						"type": "boolean"
 					},
-					"latest_match_state": {
+					"initial_random_seed": {
 						"type": "string"
 					},
 					"lobby_creator": {
@@ -417,6 +461,14 @@
 					"player_one_iswhite": {
 						"type": "boolean"
 					},
+					"player_one_points": {
+						"type": "number",
+						"format": "double"
+					},
+					"player_two_points": {
+						"type": "number",
+						"format": "double"
+					},
 					"round_length": {
 						"type": "number",
 						"format": "double"
@@ -427,13 +479,15 @@
 					"creation_block_height",
 					"current_round",
 					"hidden",
-					"latest_match_state",
+					"initial_random_seed",
 					"lobby_creator",
 					"lobby_id",
 					"lobby_state",
 					"num_of_rounds",
 					"play_time_per_player",
 					"player_one_iswhite",
+					"player_one_points",
+					"player_two_points",
 					"round_length"
 				],
 				"type": "object",
@@ -457,7 +511,7 @@
 					"hidden": {
 						"type": "boolean"
 					},
-					"latest_match_state": {
+					"initial_random_seed": {
 						"type": "string"
 					},
 					"lobby_creator": {
@@ -480,6 +534,14 @@
 					"player_one_iswhite": {
 						"type": "boolean"
 					},
+					"player_one_points": {
+						"type": "number",
+						"format": "double"
+					},
+					"player_two_points": {
+						"type": "number",
+						"format": "double"
+					},
 					"round_length": {
 						"type": "number",
 						"format": "double"
@@ -490,13 +552,15 @@
 					"creation_block_height",
 					"current_round",
 					"hidden",
-					"latest_match_state",
+					"initial_random_seed",
 					"lobby_creator",
 					"lobby_id",
 					"lobby_state",
 					"num_of_rounds",
 					"play_time_per_player",
 					"player_one_iswhite",
+					"player_one_points",
+					"player_two_points",
 					"round_length"
 				],
 				"type": "object",

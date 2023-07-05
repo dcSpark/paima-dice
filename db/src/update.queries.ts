@@ -13,9 +13,9 @@ export interface IStartMatchParams {
 export interface IStartMatchResult {
   created_at: Date;
   creation_block_height: number;
-  current_random_seed: number;
   current_round: number;
   hidden: boolean;
+  initial_random_seed: string;
   lobby_creator: string;
   lobby_id: string;
   lobby_state: lobby_status;
@@ -111,7 +111,6 @@ export const updateRound = new PreparedQuery<IUpdateRoundParams,IUpdateRoundResu
 
 /** 'UpdateLatestMatchState' parameters type */
 export interface IUpdateLatestMatchStateParams {
-  current_random_seed: number;
   lobby_id: string;
   player_one_points: number;
   player_two_points: number;
@@ -126,14 +125,13 @@ export interface IUpdateLatestMatchStateQuery {
   result: IUpdateLatestMatchStateResult;
 }
 
-const updateLatestMatchStateIR: any = {"usedParamSet":{"current_random_seed":true,"player_one_points":true,"player_two_points":true,"lobby_id":true},"params":[{"name":"current_random_seed","required":true,"transform":{"type":"scalar"},"locs":[{"a":44,"b":64}]},{"name":"player_one_points","required":true,"transform":{"type":"scalar"},"locs":[{"a":89,"b":107}]},{"name":"player_two_points","required":true,"transform":{"type":"scalar"},"locs":[{"a":132,"b":150}]},{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":169,"b":178}]}],"statement":"UPDATE lobbies\nSET \n  current_random_seed = :current_random_seed!,\n  player_one_points = :player_one_points!,\n  player_two_points = :player_two_points!\nWHERE lobby_id = :lobby_id!"};
+const updateLatestMatchStateIR: any = {"usedParamSet":{"player_one_points":true,"player_two_points":true,"lobby_id":true},"params":[{"name":"player_one_points","required":true,"transform":{"type":"scalar"},"locs":[{"a":41,"b":59}]},{"name":"player_two_points","required":true,"transform":{"type":"scalar"},"locs":[{"a":84,"b":102}]},{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":121,"b":130}]}],"statement":"UPDATE lobbies\nSET\n  player_one_points = :player_one_points!,\n  player_two_points = :player_two_points!\nWHERE lobby_id = :lobby_id!"};
 
 /**
  * Query generated from SQL:
  * ```
  * UPDATE lobbies
- * SET 
- *   current_random_seed = :current_random_seed!,
+ * SET
  *   player_one_points = :player_one_points!,
  *   player_two_points = :player_two_points!
  * WHERE lobby_id = :lobby_id!

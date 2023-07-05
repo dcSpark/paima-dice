@@ -26,20 +26,23 @@ export class RoundExecutorController extends Controller {
       return { error: 'lobby not found' };
     }
 
-    const [round_data] = await getRoundData.run({ lobby_id: lobbyID, round_number: round }, pool);
-    if (!round_data) {
-      return { error: 'round not found' };
-    }
-
-    const [block_height] = await getBlockHeight.run(
-      { block_height: round_data.execution_block_height },
+    // null if this is first round
+    const [last_round_data] = await getRoundData.run(
+      { lobby_id: lobbyID, round_number: round - 1 },
       pool
     );
+
+    const [last_block_height] =
+      last_round_data == null
+        ? [undefined]
+        : await getBlockHeight.run({ block_height: last_round_data.execution_block_height }, pool);
+    const seed = last_block_height?.seed ?? lobby.initial_random_seed;
+
     const moves = await getRoundMoves.run({ lobby_id: lobbyID, round: round }, pool);
     return {
       lobby,
       moves,
-      block_height,
+      seed,
     };
   }
 }

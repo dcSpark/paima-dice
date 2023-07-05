@@ -1,7 +1,6 @@
 import type { UserLobby } from '@dice/utils';
 import { Chess } from 'chess.js';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
-import { genDiceRolls, isPoint } from './dice-logic';
 
 export function detectWin(chess: Chess): boolean {
   return chess.isCheckmate();
@@ -45,9 +44,4 @@ export function updateBoard(fenBoard: string, move: string): string {
   chess.load(fenBoard);
   chess.move(move);
   return chess.fen();
-}
-
-export function isValidMove(randomSeed: number, point: boolean): boolean {
-  const dice = genDiceRolls(randomSeed);
-  return isPoint(dice) === point;
 }

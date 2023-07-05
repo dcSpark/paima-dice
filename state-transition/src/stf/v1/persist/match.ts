@@ -119,7 +119,6 @@ export function persistUpdateMatchState(lobbyId: string, newMatchState: MatchSta
     lobby_id: lobbyId,
     player_one_points: newMatchState.player1Points,
     player_two_points: newMatchState.player2Points,
-    current_random_seed: newMatchState.randomSeed,
   };
   return [updateLatestMatchState, params];
 }

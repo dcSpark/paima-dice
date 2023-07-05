@@ -27,15 +27,15 @@ export default async function (
 
   switch (parsed.input) {
     case 'createdLobby':
-      return createdLobby(user, blockHeight, parsed, randomnessGenerator);
+      return createdLobby(user, blockHeight, parsed, dbConn);
     case 'joinedLobby':
       return joinedLobby(user, blockHeight, parsed, dbConn);
     case 'closedLobby':
       return closedLobby(user, parsed, dbConn);
     case 'submittedMoves':
-      return submittedMoves(user, blockHeight, parsed, dbConn, randomnessGenerator);
+      return submittedMoves(user, blockHeight, parsed, dbConn);
     case 'practiceMoves':
-      return practiceMoves(user, blockHeight, parsed, dbConn, randomnessGenerator);
+      return practiceMoves(user, blockHeight, parsed, dbConn);
     case 'scheduledData': {
       if (!inputData.scheduled) return [];
       return scheduledData(blockHeight, parsed, dbConn, randomnessGenerator);

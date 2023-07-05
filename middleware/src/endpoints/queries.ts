@@ -304,7 +304,7 @@ async function getRoundExecutor(
 
   // Process data:
   try {
-    const executor = buildRoundExecutor(data, roundNumber);
+    const executor = buildRoundExecutor(data);
     return {
       success: true,
       result: executor,

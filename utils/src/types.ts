@@ -6,7 +6,6 @@ import type {
   IGetPaginatedUserLobbiesResult,
 } from '@dice/db';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
-import type { IGetBlockHeightResult } from 'paima-sdk/paima-db';
 
 export type LobbyStatus = 'open' | 'active' | 'finished' | 'closed';
 export type ConciseResult = 'w' | 't' | 'l';
@@ -21,7 +20,7 @@ export interface MatchWinnerResponse {
 export interface RoundExecutorData {
   lobby: IGetLobbyByIdResult;
   moves: IGetMovesByLobbyResult[];
-  block_height: IGetBlockHeightResult;
+  seed: string;
 }
 
 interface ExecutorDataSeed {
@@ -57,6 +56,7 @@ export interface LobbyState extends LobbyStateQuery {
 
 export interface LobbyStateQuery extends IGetLobbyByIdResult {
   round_start_height: number;
+  round_seed: string;
 }
 
 export interface UserLobby extends IGetPaginatedUserLobbiesResult {

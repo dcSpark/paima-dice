@@ -1,4 +1,4 @@
-import { Controller, Get, Path, Post, Query, Route, SuccessResponse } from 'tsoa';
+import { Controller, Get, Query, Route } from 'tsoa';
 import { requirePool, getLobbyById, getMatchSeeds, getMovesByLobby } from '@dice/db';
 import type { MatchExecutorData } from '@dice/utils';
 
@@ -14,9 +14,10 @@ export class MatchExecutorController extends Controller {
       return null;
     }
 
+    // sorted
     const rounds = await getMatchSeeds.run({ lobby_id: lobbyID }, pool);
-    const seeds = rounds.map(round => ({
-      seed: round.seed,
+    const seeds = rounds.map((round, i) => ({
+      seed: i === 0 ? lobby.initial_random_seed : rounds[i - 1].seed,
       block_height: round.block_height,
       round: round.round_within_match,
     }));
