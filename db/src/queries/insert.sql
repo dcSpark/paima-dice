@@ -7,6 +7,7 @@ INSERT INTO lobbies(
    round_length,
    play_time_per_player,
    current_round,
+   current_random_seed,
    creation_block_height,
    created_at,
    hidden,
@@ -14,14 +15,14 @@ INSERT INTO lobbies(
    lobby_creator,
    player_one_iswhite,
    lobby_state,
-   player_two,
-   latest_match_state)
+   player_two)
 VALUES(
  :lobby_id!,
  :num_of_rounds!,
  :round_length!,
  :play_time_per_player!,
  :current_round,
+ :current_random_seed!,
  :creation_block_height!,
  :created_at!,
  :hidden!,
@@ -29,22 +30,21 @@ VALUES(
  :lobby_creator!,
  :player_one_iswhite!,
  :lobby_state!,
- :player_two,
- :latest_match_state!
+ :player_two
 );
 
 /* 
   @name newRound
 */
-INSERT INTO rounds(lobby_id, round_within_match, match_state, starting_block_height, execution_block_height)
-VALUES (:lobby_id!, :round_within_match!, :match_state!, :starting_block_height!, :execution_block_height)
+INSERT INTO rounds(lobby_id, round_within_match, starting_block_height, execution_block_height)
+VALUES (:lobby_id!, :round_within_match!, :starting_block_height!, :execution_block_height)
 RETURNING *;
 
 /* 
   @name newMatchMove
-  @param new_move -> (lobby_id!, wallet!, round!, move_pgn)
+  @param new_move -> (lobby_id!, wallet!, round!, is_point!)
 */
-INSERT INTO match_moves(lobby_id, wallet, round, move_pgn)
+INSERT INTO match_moves(lobby_id, wallet, round, is_point)
 VALUES :new_move;
 
 /* @name newFinalState

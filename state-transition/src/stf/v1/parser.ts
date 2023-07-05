@@ -14,7 +14,7 @@ const myGrammar = `
 createdLobby        = c|numOfRounds|roundLength|playTimePerPlayer|isHidden?|isPractice?|playerOneIsWhite?
 joinedLobby         = j|*lobbyID
 closedLobby         = cs|*lobbyID
-submittedMoves      = s|*lobbyID|roundNumber|pgnMove
+submittedMoves      = s|*lobbyID|roundNumber|isPoint?
 zombieScheduledData = z|*lobbyID
 userScheduledData   = u|*user|result
 `;
@@ -36,7 +36,7 @@ const closedLobby: ParserRecord<ClosedLobbyInput> = {
 const submittedMoves: ParserRecord<SubmittedMovesInput> = {
   lobbyID: PaimaParser.NCharsParser(12, 12),
   roundNumber: PaimaParser.NumberParser(1, 10000),
-  pgnMove: PaimaParser.RegexParser(/^[a-zA-Z0-9 ]+$/),
+  isPoint: PaimaParser.TrueFalseParser(false),
 };
 const zombieScheduledData: ParserRecord<ZombieRound> = {
   renameCommand: 'scheduledData',

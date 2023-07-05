@@ -13,6 +13,9 @@ CREATE TABLE lobbies (
   round_length INTEGER NOT NULL,
   play_time_per_player INTEGER NOT NULL,
   current_round INTEGER NOT NULL DEFAULT 0,
+  current_random_seed INTEGER NOT NULL,
+  player_one_points INTEGER NOT NULL DEFAULT 0,
+  player_two_points INTEGER NOT NULL DEFAULT 0,
   created_at TIMESTAMP NOT NULL,
   creation_block_height INTEGER NOT NULL,
   hidden BOOLEAN NOT NULL DEFAULT false,
@@ -20,15 +23,13 @@ CREATE TABLE lobbies (
   lobby_creator TEXT NOT NULL,
   player_one_iswhite BOOLEAN NOT NULL,
   player_two TEXT,
-  lobby_state lobby_status NOT NULL,
-  latest_match_state TEXT NOT NULL
+  lobby_state lobby_status NOT NULL
 );
 
 CREATE TABLE rounds(
   id SERIAL PRIMARY KEY,
   lobby_id TEXT NOT NULL references lobbies(lobby_id),
   round_within_match INTEGER NOT NULL,
-  match_state TEXT NOT NULL,
   starting_block_height INTEGER NOT NULL references block_heights(block_height),
   execution_block_Height INTEGER references block_heights(block_height)
 );
@@ -51,7 +52,7 @@ CREATE TABLE match_moves (
    lobby_id TEXT NOT NULL references lobbies(lobby_id),
    wallet TEXT NOT NULL,
    round INTEGER NOT NULL,
-   move_pgn TEXT NOT NULL
+   is_point BOOLEAN NOT NULL
 );
 
 CREATE TABLE global_user_state (

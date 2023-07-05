@@ -19,11 +19,15 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
 
   .game-board {
     width: 450px;
     height: 450px;
+  }
+
+  .game-score {
+    display: flex;
+    justify-content: space-between;
   }
 
   .game-info {

@@ -5,11 +5,10 @@ import type Prando from 'paima-sdk/paima-prando';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
 import type { LobbyStatus } from '@dice/utils';
 import { PRACTICE_BOT_ADDRESS } from '@dice/utils';
-import { Chess } from 'chess.js';
 import { blankStats } from './stats';
 import { persistNewRound } from './match.js';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
-import { initialState } from '@dice/game-logic';
+import { genRandomSeed } from '@dice/game-logic';
 
 // Persist creation of a lobby
 export function persistLobbyCreation(
@@ -25,6 +24,7 @@ export function persistLobbyCreation(
     round_length: inputData.roundLength,
     play_time_per_player: inputData.playTimePerPlayer,
     current_round: 0,
+    current_random_seed: genRandomSeed(randomnessGenerator),
     created_at: new Date(),
     creation_block_height: blockHeight,
     hidden: inputData.isHidden,
@@ -33,7 +33,6 @@ export function persistLobbyCreation(
     player_one_iswhite: inputData.playerOneIsWhite,
     player_two: null,
     lobby_state: 'open' as LobbyStatus,
-    latest_match_state: new Chess().fen(),
   } satisfies ICreateLobbyParams;
 
   console.log(`Created lobby ${lobby_id}`);
@@ -58,7 +57,7 @@ export function persistLobbyJoin(
   blockHeight: number,
   joiningPlayer: WalletAddress,
   inputData: JoinedLobbyInput,
-  lobby: IGetLobbyByIdResult
+  lobby: ICreateLobbyParams
 ): SQLUpdate[] {
   // First we validate if the lobby is actually open for users to join, before applying.
   // If not, just output an empty list of updates (meaning no state transition is applied)
@@ -88,7 +87,7 @@ export function persistCloseLobby(
 // Convert lobby from `open` to `active`, meaning the match has now started.
 function persistActivateLobby(
   joiningPlayer: WalletAddress,
-  lobby: IGetLobbyByIdResult,
+  lobby: ICreateLobbyParams,
   blockHeight: number,
   _: JoinedLobbyInput
 ): SQLUpdate[] {
@@ -104,13 +103,7 @@ function persistActivateLobby(
 }
 
 // Create initial match state, used when a player joins a lobby to init the match.
-function persistInitialMatchState(lobby: IGetLobbyByIdResult, blockHeight: number): SQLUpdate[] {
-  const newRoundTuples = persistNewRound(
-    lobby.lobby_id,
-    0,
-    initialState(),
-    lobby.round_length,
-    blockHeight
-  );
+function persistInitialMatchState(lobby: ICreateLobbyParams, blockHeight: number): SQLUpdate[] {
+  const newRoundTuples = persistNewRound(lobby.lobby_id, 0, lobby.round_length, blockHeight);
   return newRoundTuples;
 }

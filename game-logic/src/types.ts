@@ -2,7 +2,7 @@ import type { Color } from 'chess.js';
 
 export interface TickEvent {
   user: string;
-  pgn_move: string;
+  isPoint: boolean;
 }
 
 export interface MatchEnvironment {
@@ -16,7 +16,9 @@ export interface PlayerInfo {
 }
 
 export interface MatchState {
-  fenBoard: string;
+  player1Points: number;
+  player2Points: number;
+  randomSeed: number;
 }
 
-export type MatchMove = string;
+export type MatchMove = boolean;

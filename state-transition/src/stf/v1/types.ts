@@ -37,7 +37,7 @@ export interface SubmittedMovesInput {
   input: 'submittedMoves';
   lobbyID: string;
   roundNumber: number;
-  pgnMove: string;
+  isPoint: boolean;
 }
 
 export interface ScheduledDataInput {

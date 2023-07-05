@@ -26,7 +26,6 @@ import type { SQLUpdate } from 'paima-sdk/paima-db';
 export function persistNewRound(
   lobbyId: string,
   currentRound: number,
-  currentMatchState: string,
   roundLength: number,
   blockHeight: number
 ): SQLUpdate[] {
@@ -34,7 +33,6 @@ export function persistNewRound(
   const nrParams: INewRoundParams = {
     lobby_id: lobbyId,
     round_within_match: currentRound + 1,
-    match_state: currentMatchState,
     starting_block_height: blockHeight,
     execution_block_height: null,
   };
@@ -58,7 +56,7 @@ export function persistMoveSubmission(
       lobby_id: inputData.lobbyID,
       wallet: player,
       round: lobby.current_round,
-      move_pgn: inputData.pgnMove,
+      is_point: inputData.isPoint,
     },
   };
   return [newMatchMove, mmParams];
@@ -108,7 +106,7 @@ export function persistMatchResults(
       player_two_wallet: matchEnvironment.user2.wallet,
       player_two_result: expandResult(results[1]),
       player_two_elapsed_time: 0, // Example TODO
-      positions: newState.fenBoard,
+      positions: '',
     },
   };
   return [newFinalState, params];
@@ -118,7 +116,9 @@ export function persistMatchResults(
 export function persistUpdateMatchState(lobbyId: string, newMatchState: MatchState): SQLUpdate {
   const params: IUpdateLatestMatchStateParams = {
     lobby_id: lobbyId,
-    latest_match_state: newMatchState.fenBoard,
+    player_one_points: newMatchState.player1Points,
+    player_two_points: newMatchState.player2Points,
+    current_random_seed: newMatchState.randomSeed,
   };
   return [updateLatestMatchState, params];
 }

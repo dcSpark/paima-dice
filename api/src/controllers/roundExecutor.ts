@@ -38,7 +38,6 @@ export class RoundExecutorController extends Controller {
     const moves = await getRoundMoves.run({ lobby_id: lobbyID, round: round }, pool);
     return {
       lobby,
-      match_state: round_data.match_state,
       moves,
       block_height,
     };

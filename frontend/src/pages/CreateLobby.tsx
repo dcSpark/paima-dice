@@ -26,7 +26,7 @@ const CreateLobby: React.FC = () => {
       roundLengthNum,
       playersTimeNum,
       isHidden,
-      false
+      true
     );
   };
 

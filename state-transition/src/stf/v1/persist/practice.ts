@@ -5,12 +5,12 @@ import { createScheduledData } from 'paima-sdk/paima-db';
 export function schedulePracticeMove(
   lobbyId: string,
   round: number,
-  move: string,
+  point: boolean,
   block_height: number
 ): SQLUpdate {
-  return createScheduledData(createPracticeInput(lobbyId, round, move), block_height);
+  return createScheduledData(createPracticeInput(lobbyId, round, point), block_height);
 }
 
-function createPracticeInput(lobbyId: string, round: number, move: string) {
-  return `s|*${lobbyId}|${round}|${move}`;
+function createPracticeInput(lobbyId: string, round: number, point: boolean) {
+  return `s|*${lobbyId}|${round}|${point ? 'T' : ''}`;
 }

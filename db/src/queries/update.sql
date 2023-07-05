@@ -22,7 +22,10 @@ WHERE lobby_id = :lobby_id!;
 
 /* @name updateLatestMatchState */
 UPDATE lobbies
-SET latest_match_state = :latest_match_state!
+SET 
+  current_random_seed = :current_random_seed!,
+  player_one_points = :player_one_points!,
+  player_two_points = :player_two_points!
 WHERE lobby_id = :lobby_id!;
 
 /* @name endMatch */

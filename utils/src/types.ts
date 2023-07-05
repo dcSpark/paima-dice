@@ -20,7 +20,6 @@ export interface MatchWinnerResponse {
 
 export interface RoundExecutorData {
   lobby: IGetLobbyByIdResult;
-  match_state: string;
   moves: IGetMovesByLobbyResult[];
   block_height: IGetBlockHeightResult;
 }

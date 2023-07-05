@@ -5,13 +5,15 @@ lobbies.num_of_rounds,
 lobbies.round_length,
 lobbies.play_time_per_player,
 lobbies.current_round,
+lobbies.current_random_seed,
+lobbies.player_one_points,
+lobbies.player_two_points,
 lobbies.created_at,
 lobbies.creation_block_height,
 lobbies.hidden,
 lobbies.lobby_creator,
 lobbies.player_one_iswhite,
-lobbies.lobby_state,
-lobbies.latest_match_state
+lobbies.lobby_state
 FROM lobbies
 WHERE lobbies.lobby_state = 'open' AND lobbies.hidden IS FALSE AND lobbies.lobby_creator != :wallet
 ORDER BY created_at DESC
@@ -25,13 +27,15 @@ lobbies.num_of_rounds,
 lobbies.round_length,
 lobbies.play_time_per_player,
 lobbies.current_round,
+lobbies.current_random_seed,
+lobbies.player_one_points,
+lobbies.player_two_points,
 lobbies.created_at,
 lobbies.creation_block_height,
 lobbies.hidden,
 lobbies.lobby_creator,
 lobbies.player_one_iswhite,
-lobbies.lobby_state,
-lobbies.latest_match_state
+lobbies.lobby_state
 FROM lobbies
 WHERE lobbies.lobby_state = 'open' AND lobbies.hidden IS FALSE AND lobbies.lobby_creator != :wallet AND lobbies.lobby_id LIKE :searchQuery
 ORDER BY created_at DESC
@@ -45,13 +49,15 @@ lobbies.num_of_rounds,
 lobbies.round_length,
 lobbies.play_time_per_player,
 lobbies.current_round,
+lobbies.current_random_seed,
+lobbies.player_one_points,
+lobbies.player_two_points,
 lobbies.created_at,
 lobbies.creation_block_height,
 lobbies.hidden,
 lobbies.lobby_creator,
 lobbies.player_one_iswhite,
-lobbies.lobby_state,
-lobbies.latest_match_state
+lobbies.lobby_state
 FROM lobbies
 WHERE lobbies.lobby_state = 'open' AND lobbies.lobby_id = :searchQuery AND lobbies.lobby_creator != :wallet;
 
@@ -62,13 +68,15 @@ lobbies.num_of_rounds,
 lobbies.round_length,
 lobbies.play_time_per_player,
 lobbies.current_round,
+lobbies.current_random_seed,
+lobbies.player_one_points,
+lobbies.player_two_points,
 lobbies.created_at,
 lobbies.creation_block_height,
 lobbies.hidden,
 lobbies.lobby_creator,
 lobbies.player_one_iswhite,
-lobbies.lobby_state,
-lobbies.latest_match_state
+lobbies.lobby_state
 FROM lobbies
 WHERE random() < 0.1
 AND lobbies.lobby_state = 'open' AND lobbies.hidden is FALSE
@@ -145,7 +153,7 @@ SELECT
 match_moves.id,
 match_moves.lobby_id,
 match_moves.wallet,
-match_moves.move_pgn,
+match_moves.is_point,
 match_moves.round
 FROM match_moves
 INNER JOIN rounds

@@ -9,6 +9,7 @@ import { WHITE, BLACK } from 'chess.js';
 export * from './types';
 export * from './tick';
 export * from './chess-logic';
+export * from './dice-logic';
 
 // We initialize the round executor object using lobby data + submitted moves + randomness generator.
 // This function extracts the match environment and match state from the lobby.
@@ -16,13 +17,13 @@ export * from './chess-logic';
 export function initRoundExecutor(
   lobby: IGetLobbyByIdResult,
   round: number,
-  matchState: string,
+  matchState: MatchState,
   moves: IGetCachedMovesResult[],
   randomnessGenerator: Prando
 ): RoundExecutor<MatchState, TickEvent> {
   return roundExecutor.initialize(
     extractMatchEnvironment(lobby),
-    buildMatchState(matchState),
+    buildMatchState(matchState, randomnessGenerator),
     moves,
     randomnessGenerator,
     processTick
@@ -48,7 +49,16 @@ export function extractMatchEnvironment(lobby: IGetLobbyByIdResult): MatchEnviro
 // From a given round, construct the match state which will be used by the round executor.
 // A match state is comprised of mutable data which the round executor will
 // update, and in the end return a final new match state upon completion.
-export const buildMatchState = (board: string): MatchState => ({ fenBoard: board });
+export const buildMatchState = (
+  matchState: MatchState,
+  randomnessGenerator: Prando
+): MatchState => ({
+  ...matchState,
+  randomSeed: genRandomSeed(randomnessGenerator),
+});
 
 // initial board state in fen notation
 export const initialState = () => 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+
+export const genRandomSeed = (randomnessGenerator: Prando): number =>
+  randomnessGenerator.nextInt(0, 2 ** 31 - 1); // limited by integer size in postgres

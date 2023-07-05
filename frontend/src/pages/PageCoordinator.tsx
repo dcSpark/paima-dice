@@ -4,13 +4,13 @@ import LandingPage from "./Landing";
 import MainMenu from "./MainMenu";
 import OpenLobbies from "./OpenLobbies";
 import MyGames from "./MyGames";
-import ChessGame from "./ChessGame/ChessGame";
 import CreateLobby from "./CreateLobby";
 import { CircularProgress } from "@mui/material";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { LobbyState } from "@dice/utils";
 import "./PageCoordinator.scss";
 import { AppContext } from "@src/main";
+import DiceGame from "./DiceGame/DiceGame";
 
 const PageCoordinator: React.FC = () => {
   const mainController: MainController = useContext(AppContext);
@@ -58,7 +58,7 @@ const PageCoordinator: React.FC = () => {
         <Route
           path={Page.Game}
           element={
-            <ChessGame lobby={lobby} address={mainController.userAddress} />
+            <DiceGame lobby={lobby} address={mainController.userAddress} />
           }
         />
         <Route path={Page.CreateLobby} element={<CreateLobby />} />

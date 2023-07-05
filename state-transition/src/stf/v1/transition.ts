@@ -4,12 +4,7 @@ import type { WalletAddress } from 'paima-sdk/paima-utils';
 import type { IGetLobbyByIdResult, IGetRoundDataResult, IGetRoundMovesResult } from '@dice/db';
 import { getCachedMoves, getLobbyById, getRoundData, getUserStats, endMatch } from '@dice/db';
 import type { MatchState } from '@dice/game-logic';
-import {
-  gameOver,
-  initRoundExecutor,
-  extractMatchEnvironment,
-  matchResults,
-} from '@dice/game-logic';
+import { initRoundExecutor, extractMatchEnvironment, matchResults } from '@dice/game-logic';
 import {
   persistUpdateMatchState,
   persistCloseLobby,
@@ -32,7 +27,7 @@ import type {
   SubmittedMovesInput,
 } from './types.js';
 import { isUserStats, isZombieRound } from './types.js';
-import type { ConciseResult } from '@dice/utils';
+import { PRACTICE_BOT_ADDRESS, type ConciseResult } from '@dice/utils';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
 import { PracticeAI } from './persist/practice-ai';
 
@@ -105,16 +100,13 @@ export const submittedMoves = async (
   );
 
   // In practice mode we will submit a move for the AI
-  if (lobby.practice) {
-    // This is an example implementation of AI/Practice mode
-    // Chess does not have a practice mode implemented.
-    if (1) throw new Error('Practice AI : NYI');
-    const practiceAI = new PracticeAI(lobby.latest_match_state, input.pgnMove, randomnessGenerator);
+  if (lobby.practice && player !== PRACTICE_BOT_ADDRESS) {
+    const practiceAI = new PracticeAI(lobby, randomnessGenerator);
     const practiceMove = practiceAI.getNextMove();
     if (practiceMove) {
       const practiceMoveSchedule = schedulePracticeMove(
         lobby.lobby_id,
-        lobby.current_round,
+        lobby.current_round + 1,
         practiceMove,
         blockHeight + 1
       );
@@ -139,6 +131,8 @@ function validateSubmittedMoves(
   const lobby_players = [lobby.lobby_creator, lobby.player_two];
   if (!lobby_players.includes(player)) return false;
 
+  // TODO: it is this player's turn
+
   // Verify fetched round exists
   if (!round) return false;
 
@@ -146,7 +140,7 @@ function validateSubmittedMoves(
   if (input.roundNumber !== lobby.current_round) return false;
 
   // If a move is sent that doesn't fit in the lobby grid size or is strictly invalid
-  if (!isValidMove(lobby.latest_match_state, input.pgnMove)) return false;
+  if (!isValidMove(lobby.current_random_seed, input.isPoint)) return false;
 
   return true;
 }
@@ -220,7 +214,11 @@ export function executeRound(
   const executor = initRoundExecutor(
     lobby,
     roundData.round_within_match,
-    roundData.match_state,
+    {
+      player1Points: lobby.player_one_points,
+      player2Points: lobby.player_two_points,
+      randomSeed: lobby.current_random_seed,
+    },
     moves,
     randomnessGenerator
   );
@@ -234,7 +232,7 @@ export function executeRound(
 
   // Finalize match if game is over or we have reached the final round
   let roundResultUpdate: SQLUpdate[];
-  if (gameOver(newState.fenBoard) || isFinalRound(lobby)) {
+  if (isFinalRound(lobby)) {
     console.log(lobby.lobby_id, 'match ended, finalizing');
     roundResultUpdate = finalizeMatch(blockHeight, lobby, newState);
   }
@@ -243,7 +241,6 @@ export function executeRound(
     roundResultUpdate = persistNewRound(
       lobby.lobby_id,
       lobby.current_round,
-      newState.fenBoard,
       lobby.round_length,
       blockHeight
     );

@@ -16,15 +16,17 @@ export interface IGetPaginatedOpenLobbiesParams {
 export interface IGetPaginatedOpenLobbiesResult {
   created_at: Date;
   creation_block_height: number;
+  current_random_seed: number;
   current_round: number;
   hidden: boolean;
-  latest_match_state: string;
   lobby_creator: string;
   lobby_id: string;
   lobby_state: lobby_status;
   num_of_rounds: number;
   play_time_per_player: number;
   player_one_iswhite: boolean;
+  player_one_points: number;
+  player_two_points: number;
   round_length: number;
 }
 
@@ -34,7 +36,7 @@ export interface IGetPaginatedOpenLobbiesQuery {
   result: IGetPaginatedOpenLobbiesResult;
 }
 
-const getPaginatedOpenLobbiesIR: any = {"usedParamSet":{"wallet":true,"count":true,"page":true},"params":[{"name":"wallet","required":false,"transform":{"type":"scalar"},"locs":[{"a":395,"b":401}]},{"name":"count","required":false,"transform":{"type":"scalar"},"locs":[{"a":434,"b":439}]},{"name":"page","required":false,"transform":{"type":"scalar"},"locs":[{"a":448,"b":452}]}],"statement":"SELECT \nlobbies.lobby_id,\nlobbies.num_of_rounds,\nlobbies.round_length,\nlobbies.play_time_per_player,\nlobbies.current_round,\nlobbies.created_at,\nlobbies.creation_block_height,\nlobbies.hidden,\nlobbies.lobby_creator,\nlobbies.player_one_iswhite,\nlobbies.lobby_state,\nlobbies.latest_match_state\nFROM lobbies\nWHERE lobbies.lobby_state = 'open' AND lobbies.hidden IS FALSE AND lobbies.lobby_creator != :wallet\nORDER BY created_at DESC\nLIMIT :count\nOFFSET :page"};
+const getPaginatedOpenLobbiesIR: any = {"usedParamSet":{"wallet":true,"count":true,"page":true},"params":[{"name":"wallet","required":false,"transform":{"type":"scalar"},"locs":[{"a":450,"b":456}]},{"name":"count","required":false,"transform":{"type":"scalar"},"locs":[{"a":489,"b":494}]},{"name":"page","required":false,"transform":{"type":"scalar"},"locs":[{"a":503,"b":507}]}],"statement":"SELECT \nlobbies.lobby_id,\nlobbies.num_of_rounds,\nlobbies.round_length,\nlobbies.play_time_per_player,\nlobbies.current_round,\nlobbies.current_random_seed,\nlobbies.player_one_points,\nlobbies.player_two_points,\nlobbies.created_at,\nlobbies.creation_block_height,\nlobbies.hidden,\nlobbies.lobby_creator,\nlobbies.player_one_iswhite,\nlobbies.lobby_state\nFROM lobbies\nWHERE lobbies.lobby_state = 'open' AND lobbies.hidden IS FALSE AND lobbies.lobby_creator != :wallet\nORDER BY created_at DESC\nLIMIT :count\nOFFSET :page"};
 
 /**
  * Query generated from SQL:
@@ -45,13 +47,15 @@ const getPaginatedOpenLobbiesIR: any = {"usedParamSet":{"wallet":true,"count":tr
  * lobbies.round_length,
  * lobbies.play_time_per_player,
  * lobbies.current_round,
+ * lobbies.current_random_seed,
+ * lobbies.player_one_points,
+ * lobbies.player_two_points,
  * lobbies.created_at,
  * lobbies.creation_block_height,
  * lobbies.hidden,
  * lobbies.lobby_creator,
  * lobbies.player_one_iswhite,
- * lobbies.lobby_state,
- * lobbies.latest_match_state
+ * lobbies.lobby_state
  * FROM lobbies
  * WHERE lobbies.lobby_state = 'open' AND lobbies.hidden IS FALSE AND lobbies.lobby_creator != :wallet
  * ORDER BY created_at DESC
@@ -74,15 +78,17 @@ export interface ISearchPaginatedOpenLobbiesParams {
 export interface ISearchPaginatedOpenLobbiesResult {
   created_at: Date;
   creation_block_height: number;
+  current_random_seed: number;
   current_round: number;
   hidden: boolean;
-  latest_match_state: string;
   lobby_creator: string;
   lobby_id: string;
   lobby_state: lobby_status;
   num_of_rounds: number;
   play_time_per_player: number;
   player_one_iswhite: boolean;
+  player_one_points: number;
+  player_two_points: number;
   round_length: number;
 }
 
@@ -92,7 +98,7 @@ export interface ISearchPaginatedOpenLobbiesQuery {
   result: ISearchPaginatedOpenLobbiesResult;
 }
 
-const searchPaginatedOpenLobbiesIR: any = {"usedParamSet":{"wallet":true,"searchQuery":true,"count":true,"page":true},"params":[{"name":"wallet","required":false,"transform":{"type":"scalar"},"locs":[{"a":395,"b":401}]},{"name":"searchQuery","required":false,"transform":{"type":"scalar"},"locs":[{"a":429,"b":440}]},{"name":"count","required":false,"transform":{"type":"scalar"},"locs":[{"a":473,"b":478}]},{"name":"page","required":false,"transform":{"type":"scalar"},"locs":[{"a":487,"b":491}]}],"statement":"SELECT \nlobbies.lobby_id,\nlobbies.num_of_rounds,\nlobbies.round_length,\nlobbies.play_time_per_player,\nlobbies.current_round,\nlobbies.created_at,\nlobbies.creation_block_height,\nlobbies.hidden,\nlobbies.lobby_creator,\nlobbies.player_one_iswhite,\nlobbies.lobby_state,\nlobbies.latest_match_state\nFROM lobbies\nWHERE lobbies.lobby_state = 'open' AND lobbies.hidden IS FALSE AND lobbies.lobby_creator != :wallet AND lobbies.lobby_id LIKE :searchQuery\nORDER BY created_at DESC\nLIMIT :count\nOFFSET :page"};
+const searchPaginatedOpenLobbiesIR: any = {"usedParamSet":{"wallet":true,"searchQuery":true,"count":true,"page":true},"params":[{"name":"wallet","required":false,"transform":{"type":"scalar"},"locs":[{"a":450,"b":456}]},{"name":"searchQuery","required":false,"transform":{"type":"scalar"},"locs":[{"a":484,"b":495}]},{"name":"count","required":false,"transform":{"type":"scalar"},"locs":[{"a":528,"b":533}]},{"name":"page","required":false,"transform":{"type":"scalar"},"locs":[{"a":542,"b":546}]}],"statement":"SELECT \nlobbies.lobby_id,\nlobbies.num_of_rounds,\nlobbies.round_length,\nlobbies.play_time_per_player,\nlobbies.current_round,\nlobbies.current_random_seed,\nlobbies.player_one_points,\nlobbies.player_two_points,\nlobbies.created_at,\nlobbies.creation_block_height,\nlobbies.hidden,\nlobbies.lobby_creator,\nlobbies.player_one_iswhite,\nlobbies.lobby_state\nFROM lobbies\nWHERE lobbies.lobby_state = 'open' AND lobbies.hidden IS FALSE AND lobbies.lobby_creator != :wallet AND lobbies.lobby_id LIKE :searchQuery\nORDER BY created_at DESC\nLIMIT :count\nOFFSET :page"};
 
 /**
  * Query generated from SQL:
@@ -103,13 +109,15 @@ const searchPaginatedOpenLobbiesIR: any = {"usedParamSet":{"wallet":true,"search
  * lobbies.round_length,
  * lobbies.play_time_per_player,
  * lobbies.current_round,
+ * lobbies.current_random_seed,
+ * lobbies.player_one_points,
+ * lobbies.player_two_points,
  * lobbies.created_at,
  * lobbies.creation_block_height,
  * lobbies.hidden,
  * lobbies.lobby_creator,
  * lobbies.player_one_iswhite,
- * lobbies.lobby_state,
- * lobbies.latest_match_state
+ * lobbies.lobby_state
  * FROM lobbies
  * WHERE lobbies.lobby_state = 'open' AND lobbies.hidden IS FALSE AND lobbies.lobby_creator != :wallet AND lobbies.lobby_id LIKE :searchQuery
  * ORDER BY created_at DESC
@@ -130,15 +138,17 @@ export interface IGetOpenLobbyByIdParams {
 export interface IGetOpenLobbyByIdResult {
   created_at: Date;
   creation_block_height: number;
+  current_random_seed: number;
   current_round: number;
   hidden: boolean;
-  latest_match_state: string;
   lobby_creator: string;
   lobby_id: string;
   lobby_state: lobby_status;
   num_of_rounds: number;
   play_time_per_player: number;
   player_one_iswhite: boolean;
+  player_one_points: number;
+  player_two_points: number;
   round_length: number;
 }
 
@@ -148,7 +158,7 @@ export interface IGetOpenLobbyByIdQuery {
   result: IGetOpenLobbyByIdResult;
 }
 
-const getOpenLobbyByIdIR: any = {"usedParamSet":{"searchQuery":true,"wallet":true},"params":[{"name":"searchQuery","required":false,"transform":{"type":"scalar"},"locs":[{"a":361,"b":372}]},{"name":"wallet","required":false,"transform":{"type":"scalar"},"locs":[{"a":403,"b":409}]}],"statement":"SELECT \nlobbies.lobby_id,\nlobbies.num_of_rounds,\nlobbies.round_length,\nlobbies.play_time_per_player,\nlobbies.current_round,\nlobbies.created_at,\nlobbies.creation_block_height,\nlobbies.hidden,\nlobbies.lobby_creator,\nlobbies.player_one_iswhite,\nlobbies.lobby_state,\nlobbies.latest_match_state\nFROM lobbies\nWHERE lobbies.lobby_state = 'open' AND lobbies.lobby_id = :searchQuery AND lobbies.lobby_creator != :wallet"};
+const getOpenLobbyByIdIR: any = {"usedParamSet":{"searchQuery":true,"wallet":true},"params":[{"name":"searchQuery","required":false,"transform":{"type":"scalar"},"locs":[{"a":416,"b":427}]},{"name":"wallet","required":false,"transform":{"type":"scalar"},"locs":[{"a":458,"b":464}]}],"statement":"SELECT \nlobbies.lobby_id,\nlobbies.num_of_rounds,\nlobbies.round_length,\nlobbies.play_time_per_player,\nlobbies.current_round,\nlobbies.current_random_seed,\nlobbies.player_one_points,\nlobbies.player_two_points,\nlobbies.created_at,\nlobbies.creation_block_height,\nlobbies.hidden,\nlobbies.lobby_creator,\nlobbies.player_one_iswhite,\nlobbies.lobby_state\nFROM lobbies\nWHERE lobbies.lobby_state = 'open' AND lobbies.lobby_id = :searchQuery AND lobbies.lobby_creator != :wallet"};
 
 /**
  * Query generated from SQL:
@@ -159,13 +169,15 @@ const getOpenLobbyByIdIR: any = {"usedParamSet":{"searchQuery":true,"wallet":tru
  * lobbies.round_length,
  * lobbies.play_time_per_player,
  * lobbies.current_round,
+ * lobbies.current_random_seed,
+ * lobbies.player_one_points,
+ * lobbies.player_two_points,
  * lobbies.created_at,
  * lobbies.creation_block_height,
  * lobbies.hidden,
  * lobbies.lobby_creator,
  * lobbies.player_one_iswhite,
- * lobbies.lobby_state,
- * lobbies.latest_match_state
+ * lobbies.lobby_state
  * FROM lobbies
  * WHERE lobbies.lobby_state = 'open' AND lobbies.lobby_id = :searchQuery AND lobbies.lobby_creator != :wallet
  * ```
@@ -180,15 +192,17 @@ export type IGetRandomLobbyParams = void;
 export interface IGetRandomLobbyResult {
   created_at: Date;
   creation_block_height: number;
+  current_random_seed: number;
   current_round: number;
   hidden: boolean;
-  latest_match_state: string;
   lobby_creator: string;
   lobby_id: string;
   lobby_state: lobby_status;
   num_of_rounds: number;
   play_time_per_player: number;
   player_one_iswhite: boolean;
+  player_one_points: number;
+  player_two_points: number;
   round_length: number;
 }
 
@@ -198,7 +212,7 @@ export interface IGetRandomLobbyQuery {
   result: IGetRandomLobbyResult;
 }
 
-const getRandomLobbyIR: any = {"usedParamSet":{},"params":[],"statement":"SELECT\nlobbies.lobby_id,\nlobbies.num_of_rounds,\nlobbies.round_length,\nlobbies.play_time_per_player,\nlobbies.current_round,\nlobbies.created_at,\nlobbies.creation_block_height,\nlobbies.hidden,\nlobbies.lobby_creator,\nlobbies.player_one_iswhite,\nlobbies.lobby_state,\nlobbies.latest_match_state\nFROM lobbies\nWHERE random() < 0.1\nAND lobbies.lobby_state = 'open' AND lobbies.hidden is FALSE\nLIMIT 1"};
+const getRandomLobbyIR: any = {"usedParamSet":{},"params":[],"statement":"SELECT\nlobbies.lobby_id,\nlobbies.num_of_rounds,\nlobbies.round_length,\nlobbies.play_time_per_player,\nlobbies.current_round,\nlobbies.current_random_seed,\nlobbies.player_one_points,\nlobbies.player_two_points,\nlobbies.created_at,\nlobbies.creation_block_height,\nlobbies.hidden,\nlobbies.lobby_creator,\nlobbies.player_one_iswhite,\nlobbies.lobby_state\nFROM lobbies\nWHERE random() < 0.1\nAND lobbies.lobby_state = 'open' AND lobbies.hidden is FALSE\nLIMIT 1"};
 
 /**
  * Query generated from SQL:
@@ -209,13 +223,15 @@ const getRandomLobbyIR: any = {"usedParamSet":{},"params":[],"statement":"SELECT
  * lobbies.round_length,
  * lobbies.play_time_per_player,
  * lobbies.current_round,
+ * lobbies.current_random_seed,
+ * lobbies.player_one_points,
+ * lobbies.player_two_points,
  * lobbies.created_at,
  * lobbies.creation_block_height,
  * lobbies.hidden,
  * lobbies.lobby_creator,
  * lobbies.player_one_iswhite,
- * lobbies.lobby_state,
- * lobbies.latest_match_state
+ * lobbies.lobby_state
  * FROM lobbies
  * WHERE random() < 0.1
  * AND lobbies.lobby_state = 'open' AND lobbies.hidden is FALSE
@@ -232,16 +248,18 @@ export type IGetRandomActiveLobbyParams = void;
 export interface IGetRandomActiveLobbyResult {
   created_at: Date;
   creation_block_height: number;
+  current_random_seed: number;
   current_round: number;
   hidden: boolean;
-  latest_match_state: string;
   lobby_creator: string;
   lobby_id: string;
   lobby_state: lobby_status;
   num_of_rounds: number;
   play_time_per_player: number;
   player_one_iswhite: boolean;
+  player_one_points: number;
   player_two: string | null;
+  player_two_points: number;
   practice: boolean;
   round_length: number;
 }
@@ -275,16 +293,18 @@ export interface IGetUserLobbiesParams {
 export interface IGetUserLobbiesResult {
   created_at: Date;
   creation_block_height: number;
+  current_random_seed: number;
   current_round: number;
   hidden: boolean;
-  latest_match_state: string;
   lobby_creator: string;
   lobby_id: string;
   lobby_state: lobby_status;
   num_of_rounds: number;
   play_time_per_player: number;
   player_one_iswhite: boolean;
+  player_one_points: number;
   player_two: string | null;
+  player_two_points: number;
   practice: boolean;
   round_length: number;
 }
@@ -322,16 +342,18 @@ export interface IGetPaginatedUserLobbiesParams {
 export interface IGetPaginatedUserLobbiesResult {
   created_at: Date;
   creation_block_height: number;
+  current_random_seed: number;
   current_round: number;
   hidden: boolean;
-  latest_match_state: string;
   lobby_creator: string;
   lobby_id: string;
   lobby_state: lobby_status;
   num_of_rounds: number;
   play_time_per_player: number;
   player_one_iswhite: boolean;
+  player_one_points: number;
   player_two: string | null;
+  player_two_points: number;
   practice: boolean;
   round_length: number;
 }
@@ -371,16 +393,18 @@ export interface IGetAllPaginatedUserLobbiesParams {
 export interface IGetAllPaginatedUserLobbiesResult {
   created_at: Date;
   creation_block_height: number;
+  current_random_seed: number;
   current_round: number;
   hidden: boolean;
-  latest_match_state: string;
   lobby_creator: string;
   lobby_id: string;
   lobby_state: lobby_status;
   num_of_rounds: number;
   play_time_per_player: number;
   player_one_iswhite: boolean;
+  player_one_points: number;
   player_two: string | null;
+  player_two_points: number;
   practice: boolean;
   round_length: number;
 }
@@ -417,16 +441,18 @@ export type IGetActiveLobbiesParams = void;
 export interface IGetActiveLobbiesResult {
   created_at: Date;
   creation_block_height: number;
+  current_random_seed: number;
   current_round: number;
   hidden: boolean;
-  latest_match_state: string;
   lobby_creator: string;
   lobby_id: string;
   lobby_state: lobby_status;
   num_of_rounds: number;
   play_time_per_player: number;
   player_one_iswhite: boolean;
+  player_one_points: number;
   player_two: string | null;
+  player_two_points: number;
   practice: boolean;
   round_length: number;
 }
@@ -458,16 +484,18 @@ export interface IGetLobbyByIdParams {
 export interface IGetLobbyByIdResult {
   created_at: Date;
   creation_block_height: number;
+  current_random_seed: number;
   current_round: number;
   hidden: boolean;
-  latest_match_state: string;
   lobby_creator: string;
   lobby_id: string;
   lobby_state: lobby_status;
   num_of_rounds: number;
   play_time_per_player: number;
   player_one_iswhite: boolean;
+  player_one_points: number;
   player_two: string | null;
+  player_two_points: number;
   practice: boolean;
   round_length: number;
 }
@@ -564,9 +592,9 @@ export interface IGetMatchUserStatsParams {
 export interface IGetMatchUserStatsResult {
   created_at: Date;
   creation_block_height: number;
+  current_random_seed: number;
   current_round: number;
   hidden: boolean;
-  latest_match_state: string;
   lobby_creator: string;
   lobby_id: string;
   lobby_state: lobby_status;
@@ -574,7 +602,9 @@ export interface IGetMatchUserStatsResult {
   num_of_rounds: number;
   play_time_per_player: number;
   player_one_iswhite: boolean;
+  player_one_points: number;
   player_two: string | null;
+  player_two_points: number;
   practice: boolean;
   round_length: number;
   ties: number;
@@ -612,8 +642,8 @@ export interface IGetRoundMovesParams {
 /** 'GetRoundMoves' return type */
 export interface IGetRoundMovesResult {
   id: number;
+  is_point: boolean;
   lobby_id: string;
-  move_pgn: string;
   round: number;
   wallet: string;
 }
@@ -645,8 +675,8 @@ export interface IGetCachedMovesParams {
 /** 'GetCachedMoves' return type */
 export interface IGetCachedMovesResult {
   id: number;
+  is_point: boolean;
   lobby_id: string;
-  move_pgn: string;
   round: number;
   wallet: string;
 }
@@ -657,7 +687,7 @@ export interface IGetCachedMovesQuery {
   result: IGetCachedMovesResult;
 }
 
-const getCachedMovesIR: any = {"usedParamSet":{"lobby_id":true},"params":[{"name":"lobby_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":303,"b":311}]}],"statement":"SELECT\nmatch_moves.id,\nmatch_moves.lobby_id,\nmatch_moves.wallet,\nmatch_moves.move_pgn,\nmatch_moves.round\nFROM match_moves\nINNER JOIN rounds\nON match_moves.lobby_id = rounds.lobby_id\nAND match_moves.round = rounds.round_within_match\nWHERE rounds.execution_block_height IS NULL\nAND match_moves.lobby_id = :lobby_id"};
+const getCachedMovesIR: any = {"usedParamSet":{"lobby_id":true},"params":[{"name":"lobby_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":303,"b":311}]}],"statement":"SELECT\nmatch_moves.id,\nmatch_moves.lobby_id,\nmatch_moves.wallet,\nmatch_moves.is_point,\nmatch_moves.round\nFROM match_moves\nINNER JOIN rounds\nON match_moves.lobby_id = rounds.lobby_id\nAND match_moves.round = rounds.round_within_match\nWHERE rounds.execution_block_height IS NULL\nAND match_moves.lobby_id = :lobby_id"};
 
 /**
  * Query generated from SQL:
@@ -666,7 +696,7 @@ const getCachedMovesIR: any = {"usedParamSet":{"lobby_id":true},"params":[{"name
  * match_moves.id,
  * match_moves.lobby_id,
  * match_moves.wallet,
- * match_moves.move_pgn,
+ * match_moves.is_point,
  * match_moves.round
  * FROM match_moves
  * INNER JOIN rounds
@@ -687,8 +717,8 @@ export interface IGetMovesByLobbyParams {
 /** 'GetMovesByLobby' return type */
 export interface IGetMovesByLobbyResult {
   id: number;
+  is_point: boolean;
   lobby_id: string;
-  move_pgn: string;
   round: number;
   wallet: string;
 }
@@ -753,7 +783,6 @@ export interface IGetRoundDataResult {
   execution_block_height: number | null;
   id: number;
   lobby_id: string;
-  match_state: string;
   round_within_match: number;
   starting_block_height: number;
 }
@@ -789,7 +818,6 @@ export interface IGetMatchSeedsResult {
   execution_block_height: number | null;
   id: number;
   lobby_id: string;
-  match_state: string;
   round_within_match: number;
   seed: string;
   starting_block_height: number;

@@ -1,6 +1,4 @@
 import type Prando from 'paima-sdk/paima-prando';
-import { Chess } from 'chess.js';
-import { gameOverFromChess, updateBoard } from './chess-logic';
 import type { MatchState, MatchEnvironment, TickEvent } from './types';
 import type { IGetCachedMovesResult } from '@dice/db';
 
@@ -13,24 +11,22 @@ export function processTick(
   __: Prando
 ): TickEvent[] | null {
   // Every tick we intend to process a single move.
-  // In chess, there is only one move per round, so there will only be one tick with events.
   const move = moves[currentTick - 1];
-  const chess = new Chess();
 
   // Round ends (by returning null) if no more moves in round or game is finished.
   // This is nearly identical to writing a recursive function, where you want to check
   // the base/halt case before running the rest of the logic.
-  if (!move || !move.move_pgn || gameOverFromChess(chess)) return null;
+  if (!move) return null;
 
   // If a move does exist, we continue processing the tick by generating the event.
   // Required for frontend visualization and applying match state updates.
   const event: TickEvent = {
     user: move.wallet,
-    pgn_move: move.move_pgn,
+    isPoint: move.is_point,
   };
 
   // We then call `applyEvents` to mutate the `matchState` based off of the event.
-  applyEvents(matchState, event);
+  applyEvents(matchEnvironment, matchState, event);
 
   // We return the tick event which gets emitted by the round executor. This is explicitly
   // for the frontend to know what happened during the current tick.
@@ -38,9 +34,18 @@ export function processTick(
 }
 
 // Apply events to match state for the roundExecutor.
-// In our case we only have a single event ever emitted in chess
-// which simply updates the board state by mutating `matchState` directly.
-function applyEvents(matchState: MatchState, event: TickEvent): void {
-  const newBoard = updateBoard(matchState.fenBoard, event.pgn_move);
-  matchState.fenBoard = newBoard;
+function applyEvents(
+  matchEnvironment: MatchEnvironment,
+  matchState: MatchState,
+  event: TickEvent
+): void {
+  if (event.isPoint) {
+    if (event.user === matchEnvironment.user1.wallet) {
+      matchState.player1Points = matchState.player1Points + 1;
+    }
+    if (event.user === matchEnvironment.user2.wallet) {
+      matchState.player1Points = matchState.player2Points + 1;
+    }
+  }
+  return;
 }

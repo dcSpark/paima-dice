@@ -214,11 +214,7 @@ async function submitMoves(
   conciseBuilder.setPrefix('s');
   conciseBuilder.addValue({ value: lobbyID, isStateIdentifier: true });
   conciseBuilder.addValue({ value: roundNumber.toString(10) });
-  try {
-    conciseBuilder.addValue({ value: move });
-  } catch (err) {
-    return errorFxn(MiddlewareErrorCode.SUBMIT_MOVES_INVALID_MOVES, err);
-  }
+  conciseBuilder.addValue({ value: move ? 'T' : '' });
 
   try {
     const result = await postConciselyEncodedData(conciseBuilder.build());
