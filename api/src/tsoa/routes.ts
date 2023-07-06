@@ -9,6 +9,8 @@ import { MatchExecutorController } from './../controllers/matchExecutor';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { MatchWinnerController } from './../controllers/matchWinner';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { LobbyNFTController } from './../controllers/nfts';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { OpenLobbiesController } from './../controllers/openLobbies';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { RandomActiveLobbyController } from './../controllers/randomActiveLobby';
@@ -302,6 +304,31 @@ export function RegisterRoutes(app: express.Router) {
 
 
               const promise = controller.get.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/nfts/wallet',
+            ...(fetchMiddlewares<RequestHandler>(LobbyNFTController)),
+            ...(fetchMiddlewares<RequestHandler>(LobbyNFTController.prototype.getWalletNFTs)),
+
+            function LobbyNFTController_getWalletNFTs(request: any, response: any, next: any) {
+            const args = {
+                    wallet: {"in":"query","name":"wallet","required":true,"dataType":"string"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new LobbyNFTController();
+
+
+              const promise = controller.getWalletNFTs.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);

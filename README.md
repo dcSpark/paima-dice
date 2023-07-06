@@ -16,6 +16,10 @@ This does the following:
 - install dependencies of this template
 - copies `.env.example` as `.env.development` to the parent folder
 
+To deploy contracts, mostly just follow the docs. There is just one nft type, `NULL`, with string `null` (you can change this, but frontend is currently set up like this when selling nfts).
+
+Edit `extensions.yml` and copy it to `..`.
+
 ### MacOS specific
 
 If you're using Mac and run into installation issues you can add `--target=esbuild-darwin-arm64` as a workaround to `npm install`. This installs the correct version of a problematic package. For example:

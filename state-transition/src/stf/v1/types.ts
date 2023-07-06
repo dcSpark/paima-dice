@@ -14,6 +14,13 @@ export interface InvalidInput {
   input: 'invalidString';
 }
 
+export interface NftMintInput {
+  input: 'nftMint';
+  tokenId: string;
+  // contract address
+  address: WalletAddress;
+}
+
 export interface CreatedLobbyInput {
   input: 'createdLobby';
   numOfRounds: number;

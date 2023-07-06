@@ -22,6 +22,7 @@ import { buildMatchExecutor, buildRoundExecutor } from '../helpers/executors';
 import {
   backendQueryMatchExecutor,
   backendQueryMatchWinner,
+  backendQueryNftsForWallet,
   backendQueryOpenLobbies,
   backendQueryRandomLobby,
   backendQueryRoundExecutor,
@@ -39,6 +40,7 @@ import type {
   PackedUserStats,
 } from '../types';
 import { isPlayersTurn } from '@dice/game-logic';
+import type { WalletAddress } from 'paima-sdk/paima-utils';
 
 async function getLobbyState(lobbyID: string): Promise<PackedLobbyState | FailedResult> {
   const errorFxn = buildEndpointErrorFxn('getLobbyState');
@@ -352,6 +354,28 @@ async function getMatchExecutor(
   }
 }
 
+async function getNftsForWallet(wallet: WalletAddress): Promise<Result<number[]>> {
+  const errorFxn = buildEndpointErrorFxn('getNftsForLobby');
+
+  let res: Response;
+  try {
+    const query = backendQueryNftsForWallet(wallet);
+    res = await fetch(query);
+  } catch (err) {
+    return errorFxn(PaimaMiddlewareErrorCode.ERROR_QUERYING_BACKEND_ENDPOINT, err);
+  }
+
+  try {
+    const nfts = (await res.json()) as number[];
+    return {
+      success: true,
+      result: nfts,
+    };
+  } catch (err) {
+    return errorFxn(PaimaMiddlewareErrorCode.INVALID_RESPONSE_FROM_BACKEND, err);
+  }
+}
+
 export const queryEndpoints = {
   getUserStats,
   getLobbyState,
@@ -364,4 +388,5 @@ export const queryEndpoints = {
   getMatchWinner,
   getRoundExecutor,
   getMatchExecutor,
+  getNftsForWallet,
 };

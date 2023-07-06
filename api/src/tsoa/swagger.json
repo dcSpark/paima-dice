@@ -689,6 +689,38 @@
 				]
 			}
 		},
+		"/nfts/wallet": {
+			"get": {
+				"operationId": "GetWalletNFTs",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"type": "number",
+										"format": "double"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "wallet",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
 		"/open_lobbies": {
 			"get": {
 				"operationId": "Get",

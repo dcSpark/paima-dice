@@ -4,6 +4,7 @@ import type {
   ClosedLobbyInput,
   CreatedLobbyInput,
   JoinedLobbyInput,
+  NftMintInput,
   ParsedSubmittedInput,
   PracticeMovesInput,
   SubmittedMovesInput,
@@ -12,6 +13,7 @@ import type {
 } from './types';
 
 const myGrammar = `
+nftMint             = nftmint|address|tokenId
 createdLobby        = c|numOfRounds|roundLength|playTimePerPlayer|isHidden?|isPractice?|playerOneIsWhite?
 joinedLobby         = j|*lobbyID
 closedLobby         = cs|*lobbyID
@@ -21,6 +23,10 @@ zombieScheduledData = z|*lobbyID
 userScheduledData   = u|*user|result
 `;
 
+const nftMint: ParserRecord<NftMintInput> = {
+  address: PaimaParser.WalletAddress(),
+  tokenId: PaimaParser.NumberParser(),
+};
 const createdLobby: ParserRecord<CreatedLobbyInput> = {
   numOfRounds: PaimaParser.NumberParser(3, 1000),
   roundLength: PaimaParser.DefaultRoundLength(),
@@ -57,6 +63,7 @@ const userScheduledData: ParserRecord<UserStats> = {
 };
 
 const parserCommands: Record<string, ParserRecord<ParsedSubmittedInput>> = {
+  nftMint,
   createdLobby,
   joinedLobby,
   closedLobby,

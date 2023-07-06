@@ -120,3 +120,11 @@ export function backendQueryMatchWinner(lobbyID: string): string {
   };
   return buildBackendQuery(endpoint, options);
 }
+
+export function backendQueryNftsForWallet(wallet: WalletAddress): string {
+  const endpoint = 'nfts/wallet';
+  const options = {
+    wallet,
+  };
+  return buildBackendQuery(endpoint, options);
+}
