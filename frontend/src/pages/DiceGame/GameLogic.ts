@@ -58,6 +58,7 @@ export class DiceLogic {
   }
 
   isThisPlayersTurn(lobbyState: LobbyState, round: number): boolean {
+    // Note: match starts at round 1, because we use persistNewRound to start it
     const isWhiteTurn = round % 2 === 1;
     const isPlayerWhite = this.isThisPlayerWhite(lobbyState);
     return isWhiteTurn === isPlayerWhite;

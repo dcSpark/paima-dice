@@ -10,7 +10,7 @@ import { Routes, Route, useNavigate } from "react-router-dom";
 import { LobbyState } from "@dice/utils";
 import "./PageCoordinator.scss";
 import { AppContext } from "@src/main";
-import DiceGame from "./DiceGame/DiceGame";
+import { Lobby } from "./DiceGame/Lobby";
 
 const PageCoordinator: React.FC = () => {
   const mainController: MainController = useContext(AppContext);
@@ -58,7 +58,10 @@ const PageCoordinator: React.FC = () => {
         <Route
           path={Page.Game}
           element={
-            <DiceGame lobby={lobby} address={mainController.userAddress} />
+            <Lobby
+              initialLobbyState={lobby}
+              address={mainController.userAddress}
+            />
           }
         />
         <Route path={Page.CreateLobby} element={<CreateLobby />} />

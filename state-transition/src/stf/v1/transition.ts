@@ -326,7 +326,7 @@ async function fetchPrandoSeed(
   lobby: IGetLobbyByIdResult,
   dbConn: Pool
 ): Promise<undefined | string> {
-  // TODO: why does lobby start at 1?
+  // Note: match starts at round 1, because we use persistNewRound to start it
   if (lobby.current_round === 1) {
     return lobby.initial_random_seed;
   }

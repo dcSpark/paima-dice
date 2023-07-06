@@ -15,6 +15,7 @@ const CreateLobby: React.FC = () => {
   const [roundLength, setRoundLength] = useState("100");
   const [playersTime, setPlayersTime] = useState("100");
   const [isHidden, setIsHidden] = useState(false);
+  const [isPractice, setIsPractice] = useState(false);
 
   const handleCreateLobby = async () => {
     const numberOfRoundsNum = parseInt(numberOfRounds);
@@ -26,7 +27,7 @@ const CreateLobby: React.FC = () => {
       roundLengthNum,
       playersTimeNum,
       isHidden,
-      true
+      isPractice
     );
   };
 
@@ -62,6 +63,16 @@ const CreateLobby: React.FC = () => {
                 />
               }
               label="Is Hidden?"
+            />
+            <FormControlLabel
+              sx={{ flex: "1" }}
+              control={
+                <Checkbox
+                  checked={isPractice}
+                  onChange={(event) => setIsPractice(event.target.checked)}
+                />
+              }
+              label="Single-Player vs. Bots"
             />
           </Box>
         </Box>

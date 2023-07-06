@@ -55,7 +55,7 @@ export function persistLobbyCreation(
 export function persistLobbyJoin(
   blockHeight: number,
   joiningPlayer: WalletAddress,
-  inputData: JoinedLobbyInput,
+  _inputData: JoinedLobbyInput,
   lobby: ICreateLobbyParams
 ): SQLUpdate[] {
   // First we validate if the lobby is actually open for users to join, before applying.
@@ -63,7 +63,7 @@ export function persistLobbyJoin(
   if (!lobby.player_two && lobby.lobby_state === 'open' && lobby.lobby_creator !== joiningPlayer) {
     // Save user metadata, like in the lobby creation flow,
     // then convert lobby into active and create empty round and user states
-    const updateLobbyTuple = persistActivateLobby(joiningPlayer, lobby, blockHeight, inputData);
+    const updateLobbyTuple = persistActivateLobby(joiningPlayer, lobby, blockHeight);
     const blankStatsTuple: SQLUpdate = blankStats(joiningPlayer);
     return [...updateLobbyTuple, blankStatsTuple];
   } else return [];
@@ -87,8 +87,7 @@ export function persistCloseLobby(
 function persistActivateLobby(
   joiningPlayer: WalletAddress,
   lobby: ICreateLobbyParams,
-  blockHeight: number,
-  _: JoinedLobbyInput
+  blockHeight: number
 ): SQLUpdate[] {
   // First update lobby row, marking its state as now 'active', and saving the joining player's wallet address
   const smParams: IStartMatchParams = {
