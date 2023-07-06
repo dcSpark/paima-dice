@@ -3,7 +3,7 @@ import Prando from 'paima-sdk/paima-prando';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
 import type { IGetLobbyByIdResult, IGetRoundDataResult, IGetRoundMovesResult } from '@dice/db';
 import { getCachedMoves, getLobbyById, getRoundData, getUserStats, endMatch } from '@dice/db';
-import type { MatchState } from '@dice/game-logic';
+import type { ConciseResult, MatchState } from '@dice/utils';
 import { initRoundExecutor, extractMatchEnvironment, matchResults } from '@dice/game-logic';
 import {
   persistUpdateMatchState,
@@ -28,7 +28,7 @@ import type {
   SubmittedMovesInput,
 } from './types.js';
 import { isUserStats, isZombieRound } from './types.js';
-import { PRACTICE_BOT_ADDRESS, type ConciseResult } from '@dice/utils';
+import { PRACTICE_BOT_ADDRESS } from '@dice/utils';
 import { getBlockHeight, type SQLUpdate } from 'paima-sdk/paima-db';
 import { PracticeAI } from './persist/practice-ai';
 
@@ -337,7 +337,7 @@ async function fetchPrandoSeed(
   );
   if (lastRound == null) return;
   const [lastRoundBlock] = await getBlockHeight.run(
-    { block_height: lastRound.starting_block_height },
+    { block_height: lastRound.execution_block_height },
     dbConn
   );
   if (lastRoundBlock == null) return;

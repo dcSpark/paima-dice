@@ -5,12 +5,14 @@ import type { MatchExecutor, RoundExecutor } from 'paima-sdk/paima-executors';
 import type {
   MatchWinnerResponse,
   MatchExecutorData,
-  RoundExecutorData,
   RoundStatusData,
   UserStats,
   LobbyState,
   LobbyStateQuery,
   UserLobby,
+  RoundExecutorBackendData,
+  MatchState,
+  TickEvent,
 } from '@dice/utils';
 
 import { buildEndpointErrorFxn, MiddlewareErrorCode } from '../errors';
@@ -36,7 +38,6 @@ import type {
   PackedUserLobbies,
   PackedUserStats,
 } from '../types';
-import type { MatchState, TickEvent } from '@dice/game-logic';
 import { isPlayersTurn } from '@dice/game-logic';
 
 async function getLobbyState(lobbyID: string): Promise<PackedLobbyState | FailedResult> {
@@ -282,7 +283,8 @@ async function getMatchWinner(lobbyId: string): Promise<Result<MatchWinnerRespon
 
 async function getRoundExecutor(
   lobbyId: string,
-  roundNumber: number
+  roundNumber: number,
+  matchState: MatchState
 ): Promise<Result<RoundExecutor<MatchState, TickEvent>>> {
   const errorFxn = buildEndpointErrorFxn('getRoundExecutor');
 
@@ -295,16 +297,19 @@ async function getRoundExecutor(
     return errorFxn(PaimaMiddlewareErrorCode.ERROR_QUERYING_BACKEND_ENDPOINT, err);
   }
 
-  let data: RoundExecutorData;
+  let backendData: RoundExecutorBackendData;
   try {
-    data = (await res.json()) as RoundExecutorData;
+    backendData = (await res.json()) as RoundExecutorBackendData;
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.INVALID_RESPONSE_FROM_BACKEND, err);
   }
 
   // Process data:
   try {
-    const executor = buildRoundExecutor(data);
+    const executor = buildRoundExecutor({
+      ...backendData,
+      matchState,
+    });
     return {
       success: true,
       result: executor,

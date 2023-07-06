@@ -1,4 +1,4 @@
-import type { MatchEnvironment, MatchState } from './types';
+import type { MatchEnvironment, MatchState } from '@dice/utils';
 import type { ConciseResult, MatchResult } from '@dice/utils';
 import type { IGetBlockHeightResult } from 'paima-sdk/paima-db';
 import Prando from 'paima-sdk/paima-prando';

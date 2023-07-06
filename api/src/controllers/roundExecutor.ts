@@ -2,10 +2,10 @@ import { Controller, Get, Query, Route, ValidateError } from 'tsoa';
 import { requirePool, getLobbyById, getRoundData, getRoundMoves } from '@dice/db';
 import { isLeft } from 'fp-ts/Either';
 import { psqlNum } from '../validation.js';
-import type { RoundExecutorData } from '@dice/utils';
+import type { RoundExecutorBackendData } from '@dice/utils';
 import { getBlockHeight } from 'paima-sdk/paima-db';
 
-type Response = RoundExecutorData | Error;
+type Response = RoundExecutorBackendData | Error;
 
 interface Error {
   error: 'lobby not found' | 'bad round number' | 'round not found';

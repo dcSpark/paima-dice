@@ -6,6 +6,30 @@ import type {
   IGetPaginatedUserLobbiesResult,
 } from '@dice/db';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
+import type { Color } from 'chess.js';
+
+export interface TickEvent {
+  user: string;
+  isPoint: boolean;
+  dice: [number, number];
+}
+
+export interface MatchEnvironment {
+  user1: PlayerInfo;
+  user2: PlayerInfo;
+}
+
+export interface PlayerInfo {
+  wallet: string;
+  color: Color;
+}
+
+export interface MatchState {
+  player1Points: number;
+  player2Points: number;
+}
+
+export type MatchMove = boolean;
 
 export type LobbyStatus = 'open' | 'active' | 'finished' | 'closed';
 export type ConciseResult = 'w' | 't' | 'l';
@@ -17,10 +41,14 @@ export interface MatchWinnerResponse {
   winner_address?: string;
 }
 
-export interface RoundExecutorData {
+export interface RoundExecutorBackendData {
   lobby: IGetLobbyByIdResult;
   moves: IGetMovesByLobbyResult[];
   seed: string;
+}
+
+export interface RoundExecutorData extends RoundExecutorBackendData {
+  matchState: MatchState;
 }
 
 interface ExecutorDataSeed {

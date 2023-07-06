@@ -1,6 +1,11 @@
-import { MatchState, TickEvent } from "@dice/game-logic";
+import {
+  MatchState,
+  TickEvent,
+  LobbyState,
+  LobbyStateQuery,
+  UserLobby,
+} from "@dice/utils";
 import * as Paima from "@dice/middleware";
-import { LobbyState, LobbyStateQuery, UserLobby } from "@dice/utils";
 import { MatchExecutor } from "paima-sdk/paima-executors";
 
 // The MainController is a React component that will be used to control the state of the application

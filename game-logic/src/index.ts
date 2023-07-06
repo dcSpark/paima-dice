@@ -1,12 +1,11 @@
 import type { RoundExecutor } from 'paima-sdk/paima-executors';
 import { roundExecutor } from 'paima-sdk/paima-executors';
 import type Prando from 'paima-sdk/paima-prando';
-import type { MatchState, MatchEnvironment, TickEvent } from './types';
+import type { MatchState, MatchEnvironment, TickEvent } from '@dice/utils';
 import { processTick } from './tick';
 import type { IGetLobbyByIdResult, IGetCachedMovesResult } from '@dice/db';
 import { WHITE, BLACK } from 'chess.js';
 
-export * from './types';
 export * from './tick';
 export * from './chess-logic';
 export * from './dice-logic';

@@ -1,5 +1,5 @@
 import type Prando from 'paima-sdk/paima-prando';
-import type { MatchState, MatchEnvironment, TickEvent } from './types';
+import type { MatchState, MatchEnvironment, TickEvent } from '@dice/utils';
 import type { IGetCachedMovesResult } from '@dice/db';
 import { genDiceRolls } from '.';
 

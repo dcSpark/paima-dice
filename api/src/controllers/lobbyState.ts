@@ -29,7 +29,10 @@ export class LobbyStatecontroller extends Controller {
       const [last_block_height] =
         last_round_data == null
           ? [undefined]
-          : await getBlockHeight.run({ block_height: last_round_data.starting_block_height }, pool);
+          : await getBlockHeight.run(
+              { block_height: last_round_data.execution_block_height },
+              pool
+            );
       const round_seed = last_block_height?.seed ?? lobby.initial_random_seed;
 
       return {

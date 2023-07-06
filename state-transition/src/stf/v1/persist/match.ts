@@ -14,9 +14,14 @@ import {
   newFinalState,
   executedRound,
 } from '@dice/db';
-import type { MatchEnvironment, MatchState } from '@dice/game-logic';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
-import type { ConciseResult, ExpandedResult, MatchResult } from '@dice/utils';
+import type {
+  ConciseResult,
+  ExpandedResult,
+  MatchResult,
+  MatchEnvironment,
+  MatchState,
+} from '@dice/utils';
 import { scheduleZombieRound, deleteZombieRound } from './zombie.js';
 import type { INewFinalStateParams } from '@dice/db/src/insert.queries.js';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
