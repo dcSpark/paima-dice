@@ -1,16 +1,16 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { Ref, useEffect, useMemo, useRef, useState } from "react";
 import "./DiceGame.scss";
-import { Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import type { MatchState, TickEvent, LobbyState } from "@dice/utils";
 import { genDiceRolls, isPoint } from "@dice/game-logic";
 import * as Paima from "@dice/middleware";
 import Navbar from "@src/components/Navbar";
 import Wrapper from "@src/components/Wrapper";
-import Button from "@src/components/Button";
 import { DiceLogic, DiceService } from "./GameLogic";
-import ReactDice, { ReactDiceRef } from "react-dice-complete";
+import { ReactDiceRef } from "react-dice-complete";
 import Prando from "paima-sdk/paima-prando";
 import { RoundExecutor } from "paima-sdk/paima-executors";
+import Player from "./Player";
 
 interface DiceGameProps {
   lobby: LobbyState;
@@ -18,45 +18,16 @@ interface DiceGameProps {
 }
 
 const DiceGame: React.FC<DiceGameProps> = ({ lobby: initLobby, address }) => {
-  const diceRef = useRef<ReactDiceRef>(null);
+  const diceRef = useRef<{
+    1: undefined | ReactDiceRef;
+    2: undefined | ReactDiceRef;
+  }>({ 1: undefined, 2: undefined });
   const diceLogic = useMemo(() => {
     return new DiceLogic(address);
   }, [address]);
 
   const [waitingConfirmation, setWaitingConfirmation] = useState(false);
   const [lobbyState, setLobbyState] = useState<LobbyState>(initLobby);
-  useEffect(() => {
-    const fetchLobbyData = async () => {
-      if (waitingConfirmation) return;
-      const lobbyState = await DiceService.getLobbyState(initLobby.lobby_id);
-      if (lobbyState == null) return;
-      setLobbyState(lobbyState);
-    };
-
-    // Fetch data every 5 seconds
-    const intervalIdLobby = setInterval(fetchLobbyData, 5 * 1000);
-
-    // Clean up the interval when component unmounts
-    return () => {
-      clearInterval(intervalIdLobby);
-    };
-  }, [lobbyState]);
-  async function handleMove(): Promise<void> {
-    setWaitingConfirmation(true);
-    const dice = genDiceRolls(new Prando(lobbyState.round_seed));
-    diceRef.current?.rollAll(dice);
-    const moveResult = await DiceService.submitMove(
-      lobbyState.lobby_id,
-      lobbyState.current_round,
-      isPoint(dice)
-    );
-    console.log("Move result: ", moveResult);
-
-    const response = await DiceService.getLobbyState(initLobby.lobby_id);
-    if (response == null) return;
-    setLobbyState(response);
-    setWaitingConfirmation(false);
-  }
 
   // round being currently shown
   // interactive if this player's round,
@@ -73,6 +44,47 @@ const DiceGame: React.FC<DiceGameProps> = ({ lobby: initLobby, address }) => {
     undefined | RoundExecutor<MatchState, TickEvent>
   >();
   const [isTickDisplaying, setIsTickDisplaying] = useState(false);
+
+  useEffect(() => {
+    const fetchLobbyData = async () => {
+      if (waitingConfirmation) return;
+      const lobbyState = await DiceService.getLobbyState(initLobby.lobby_id);
+      if (lobbyState == null) return;
+      setLobbyState(lobbyState);
+    };
+
+    // Fetch data every 5 seconds
+    const intervalIdLobby = setInterval(fetchLobbyData, 5 * 1000);
+
+    // Clean up the interval when component unmounts
+    return () => {
+      clearInterval(intervalIdLobby);
+    };
+  }, [lobbyState]);
+  const isThisPlayerPlayerOne = useMemo(() => {
+    return diceLogic.isThisPlayerWhite(lobbyState);
+  }, [diceLogic, lobbyState]);
+  const isPlayersTurn = useMemo(() => {
+    return diceLogic.isThisPlayersTurn(lobbyState, displayedRound);
+  }, [diceLogic, lobbyState, displayedRound]);
+  async function handleMove(): Promise<void> {
+    setWaitingConfirmation(true);
+    const dice = genDiceRolls(new Prando(lobbyState.round_seed));
+    const playerRolling = isThisPlayerPlayerOne ? 1 : 2;
+    diceRef.current[playerRolling]?.rollAll(dice);
+    const moveResult = await DiceService.submitMove(
+      lobbyState.lobby_id,
+      lobbyState.current_round,
+      isPoint(dice)
+    );
+    console.log("Move result: ", moveResult);
+
+    const response = await DiceService.getLobbyState(initLobby.lobby_id);
+    if (response == null) return;
+    setLobbyState(response);
+    setWaitingConfirmation(false);
+  }
+
   useEffect(() => {
     // initiate animation display
     if (isTickDisplaying || roundExecutor.current == null) return;
@@ -93,7 +105,8 @@ const DiceGame: React.FC<DiceGameProps> = ({ lobby: initLobby, address }) => {
 
     const [tickEvent] = tickEvents;
     setIsTickDisplaying(true);
-    diceRef.current?.rollAll(tickEvent.dice);
+    const playerRolling = tickEvent.user === lobbyState.lobby_creator ? 1 : 2;
+    diceRef.current[playerRolling]?.rollAll(tickEvent.dice);
   }, [isTickDisplaying, roundExecutor.current]);
   function rollDone() {
     setIsTickDisplaying(false);
@@ -140,37 +153,68 @@ const DiceGame: React.FC<DiceGameProps> = ({ lobby: initLobby, address }) => {
       });
   }, [isFetchingRound, displayedRound, lobbyState.current_round]);
 
-  const isPlayersTurn = useMemo(() => {
-    return diceLogic.isThisPlayersTurn(lobbyState, displayedRound);
-  }, [address, lobbyState]);
   const disableInteraction =
     displayedRound !== lobbyState.current_round || !isPlayersTurn;
+
+  const players: Array<{
+    isThisPlayerYou: boolean;
+    points: number;
+    isThisPlayersTurn: boolean;
+    diceRef: Ref<ReactDiceRef>;
+  }> = [
+    {
+      isThisPlayerYou: isThisPlayerPlayerOne,
+      points: displayedState.player1Points,
+      isThisPlayersTurn: isThisPlayerPlayerOne === isPlayersTurn,
+      diceRef: (el) => {
+        diceRef.current[1] = el;
+      },
+    },
+    {
+      isThisPlayerYou: !isThisPlayerPlayerOne,
+      points: displayedState.player2Points,
+      isThisPlayersTurn: isThisPlayerPlayerOne !== isPlayersTurn,
+      diceRef: (el) => {
+        diceRef.current[2] = el;
+      },
+    },
+  ];
+
+  if (lobbyState == null) return <></>;
 
   return (
     <>
       <Navbar />
       <Wrapper small blurred={false}>
-        <Typography variant="h1">Chess Board {lobbyState.lobby_id}</Typography>
-        {lobbyState && (
-          <div className="game">
-            <div className="game-score">
-              <p className="game-info">Round: {displayedRound}</p>
-              <p className="game-info">
-                {isPlayersTurn ? "your turn" : "opponent's turn"}
-              </p>
-            </div>
-            <div className="game-score">
-              <p className="game-info">You: {displayedState.player1Points}</p>
-              <p className="game-info">
-                Opponent: {displayedState.player2Points}
-              </p>
-            </div>
-          </div>
-        )}
-        <ReactDice numDice={2} ref={diceRef} rollDone={rollDone} />
-        <Button disabled={disableInteraction} onClick={handleMove}>
-          move
-        </Button>
+        <Typography variant="h1">Lobby {lobbyState.lobby_id}</Typography>
+        <Typography
+          variant="caption"
+          sx={{
+            fontSize: "1.5rem",
+            lineHeight: "2rem",
+          }}
+        >
+          Round: {displayedRound}
+        </Typography>
+        <Box
+          sx={{
+            width: "100%",
+            display: "flex",
+            gap: 5,
+          }}
+        >
+          {players.map((player, i) => (
+            <Player
+              key={i}
+              isThisPlayerYou={player.isThisPlayerYou}
+              points={player.points}
+              isThisPlayersTurn={player.isThisPlayersTurn}
+              diceRef={player.diceRef}
+              rollDone={rollDone}
+              handleMove={handleMove}
+            />
+          ))}
+        </Box>
       </Wrapper>
     </>
   );
