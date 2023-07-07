@@ -1,16 +1,16 @@
-import { Body, Controller, Get, Query, Route } from 'tsoa';
+import { Controller, Get, Query, Route } from 'tsoa';
 import type { IGetFinalStateResult } from '@dice/db';
 import { requirePool, getLobbyById, getFinalState } from '@dice/db';
 import type { MatchWinnerResponse } from '@dice/utils';
 
-const getWinner = (finalState: IGetFinalStateResult): string => {
+const getWinner = (finalState: IGetFinalStateResult): undefined | number => {
   switch (finalState.player_one_result) {
     case 'win':
-      return finalState.player_one_wallet;
+      return finalState.player_one_nft_id;
     case 'loss':
-      return finalState.player_two_wallet;
+      return finalState.player_two_nft_id;
     default:
-      return '';
+      return;
   }
 };
 
@@ -37,7 +37,7 @@ export class MatchWinnerController extends Controller {
 
     return {
       match_status: 'finished',
-      winner_address: getWinner(finalState),
+      winner_nft_id: getWinner(finalState),
     };
   }
 }

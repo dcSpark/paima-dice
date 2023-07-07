@@ -30,6 +30,7 @@ const getUserWallet = (errorFxn: EndpointErrorFxn): Result<string> => {
 };
 
 async function createLobby(
+  creatorNftId: number,
   numberOfRounds: number,
   roundLength: number,
   playTimePerPlayer: number,
@@ -46,6 +47,7 @@ async function createLobby(
   const conciseBuilder = builder.initialize();
   conciseBuilder.setPrefix('c');
   conciseBuilder.addValues([
+    { value: creatorNftId.toString(10) },
     { value: numberOfRounds.toString(10) },
     { value: roundLength.toString(10) },
     { value: playTimePerPlayer.toString(10) },
@@ -98,16 +100,15 @@ async function createLobby(
   }
 }
 
-async function joinLobby(lobbyID: string): Promise<OldResult> {
+async function joinLobby(nftId: number, lobbyID: string): Promise<OldResult> {
   const errorFxn = buildEndpointErrorFxn('joinLobby');
-
-  const query = getUserWallet(errorFxn);
-  if (!query.success) return query;
-  const userWalletAddress = query.result;
 
   const conciseBuilder = builder.initialize();
   conciseBuilder.setPrefix('j');
-  conciseBuilder.addValue({ value: lobbyID, isStateIdentifier: true });
+  conciseBuilder.addValues([
+    { value: nftId.toString(10) },
+    { value: lobbyID, isStateIdentifier: true },
+  ]);
 
   let currentBlockVar: number;
   try {
@@ -131,16 +132,16 @@ async function joinLobby(lobbyID: string): Promise<OldResult> {
   try {
     await awaitBlock(currentBlock);
     const lobbyState = await retryPromise(
-      () => getLobbyStateWithUser(lobbyID, userWalletAddress),
+      () => getLobbyStateWithUser(lobbyID, nftId),
       RETRY_PERIOD,
       RETRIES_COUNT
     );
-    if (userJoinedLobby(userWalletAddress, lobbyState)) {
+    if (userJoinedLobby(nftId, lobbyState)) {
       return {
         success: true,
         message: '',
       };
-    } else if (userCreatedLobby(userWalletAddress, lobbyState)) {
+    } else if (userCreatedLobby(nftId, lobbyState)) {
       return errorFxn(MiddlewareErrorCode.CANNOT_JOIN_OWN_LOBBY);
     } else {
       return errorFxn(MiddlewareErrorCode.FAILURE_VERIFYING_LOBBY_JOIN);
@@ -150,12 +151,8 @@ async function joinLobby(lobbyID: string): Promise<OldResult> {
   }
 }
 
-async function closeLobby(lobbyID: string): Promise<OldResult> {
+async function closeLobby(nftId: number, lobbyID: string): Promise<OldResult> {
   const errorFxn = buildEndpointErrorFxn('closeLobby');
-
-  const query = getUserWallet(errorFxn);
-  if (!query.success) return query;
-  const userWalletAddress = query.result;
 
   const conciseBuilder = builder.initialize();
   conciseBuilder.setPrefix('cs');
@@ -183,13 +180,13 @@ async function closeLobby(lobbyID: string): Promise<OldResult> {
   try {
     await awaitBlock(currentBlock);
     const lobbyState = await retryPromise(
-      () => getLobbyStateWithUser(lobbyID, userWalletAddress),
+      () => getLobbyStateWithUser(lobbyID, nftId),
       RETRY_PERIOD,
       RETRIES_COUNT
     );
     if (lobbyWasClosed(lobbyState)) {
       return { success: true, message: '' };
-    } else if (!userCreatedLobby(userWalletAddress, lobbyState)) {
+    } else if (!userCreatedLobby(nftId, lobbyState)) {
       return errorFxn(MiddlewareErrorCode.CANNOT_CLOSE_SOMEONES_LOBBY);
     } else {
       return errorFxn(MiddlewareErrorCode.FAILURE_VERIFYING_LOBBY_CLOSE);
@@ -200,18 +197,16 @@ async function closeLobby(lobbyID: string): Promise<OldResult> {
 }
 
 async function submitMoves(
+  nftId: number,
   lobbyID: string,
   roundNumber: number,
   move: MatchMove
 ): Promise<OldResult> {
   const errorFxn = buildEndpointErrorFxn('submitMoves');
 
-  const query = getUserWallet(errorFxn);
-  if (!query.success) return query;
-  const userWalletAddress = query.result;
-
   const conciseBuilder = builder.initialize();
   conciseBuilder.setPrefix('s');
+  conciseBuilder.addValue({ value: nftId.toString(10) });
   conciseBuilder.addValue({ value: lobbyID, isStateIdentifier: true });
   conciseBuilder.addValue({ value: roundNumber.toString(10) });
   conciseBuilder.addValue({ value: move ? 'T' : '' });

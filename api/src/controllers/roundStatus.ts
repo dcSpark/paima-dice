@@ -24,10 +24,10 @@ export class RoundStatusController extends Controller {
       if (!lobby || !roundData) return { error: 'lobby not found' };
       else {
         const moves = await getRoundMoves.run({ lobby_id: lobbyID, round: round }, pool);
-        const ids = moves.map(m => m.wallet);
+        const uniqueIds = Array.from(new Set(moves.map(m => m.nft_id)));
         return {
           executed: !!roundData.execution_block_height,
-          usersWhoSubmittedMoves: Array.from(new Set(ids)),
+          usersWhoSubmittedMoves: uniqueIds,
           roundStarted: roundData.starting_block_height,
           roundLength: lobby.round_length,
         };

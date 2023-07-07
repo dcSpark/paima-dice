@@ -73,6 +73,14 @@ class MainController {
     }
   }
 
+  async fetchNfts(): Promise<undefined | number[]> {
+    if (this.userAddress == null) return;
+    const response = await Paima.default.getNftsForWallet(this.userAddress);
+    console.log("fetch nfts response: ", response);
+    if (!response.success) return;
+    return response.result;
+  }
+
   async loadLobbyState(lobbyId: string): Promise<LobbyState> {
     await this.enforceWalletConnected();
     this.callback(null, true, null);
@@ -103,6 +111,7 @@ class MainController {
   }
 
   async createLobby(
+    creatorNftId: number,
     numOfRounds: number,
     roundLength: number,
     timePerPlayer: number,
@@ -122,6 +131,7 @@ class MainController {
       isWhite
     );
     const response = await Paima.default.createLobby(
+      creatorNftId,
       numOfRounds,
       roundLength,
       timePerPlayer,
@@ -138,10 +148,10 @@ class MainController {
     this.callback(Page.Game, false, lobbyState);
   }
 
-  async joinLobby(lobbyId: string): Promise<void> {
+  async joinLobby(nftId: number, lobbyId: string): Promise<void> {
     await this.enforceWalletConnected();
     this.callback(null, true, null);
-    const response = await Paima.default.joinLobby(lobbyId);
+    const response = await Paima.default.joinLobby(nftId, lobbyId);
     if (!response.success) {
       this.callback(null, false, null);
       throw new Error("Could not join lobby");
@@ -167,10 +177,10 @@ class MainController {
     this.callback(Page.Game, false, response.lobby);
   }
 
-  async closeLobby(lobbyId: string): Promise<void> {
+  async closeLobby(nftId: number, lobbyId: string): Promise<void> {
     await this.enforceWalletConnected();
     this.callback(null, true, null);
-    const response = await Paima.default.closeLobby(lobbyId);
+    const response = await Paima.default.closeLobby(nftId, lobbyId);
     console.log("close lobby response: ", response);
     if (!response.success) {
       this.callback(null, false, null);
@@ -179,14 +189,14 @@ class MainController {
     this.callback(Page.MainMenu, false, null);
   }
 
-  async getOpenLobbies(page = 0, limit = 100): Promise<LobbyStateQuery[]> {
+  async getOpenLobbies(
+    nftId: number,
+    page = 0,
+    limit = 100
+  ): Promise<LobbyStateQuery[]> {
     await this.enforceWalletConnected();
     this.callback(null, true, null);
-    const response = await Paima.default.getOpenLobbies(
-      this.userAddress,
-      page,
-      limit
-    );
+    const response = await Paima.default.getOpenLobbies(nftId, page, limit);
     console.log("get open lobbies response: ", response);
     this.callback(null, false, null);
     if (!response.success) {
@@ -195,11 +205,11 @@ class MainController {
     return response.lobbies.filter((lobby) => lobby.lobby_state === "open");
   }
 
-  async getMyGames(page = 0, limit = 100): Promise<UserLobby[]> {
+  async getMyGames(nftId: number, page = 0, limit = 100): Promise<UserLobby[]> {
     await this.enforceWalletConnected();
     this.callback(null, true, null);
     const response = await Paima.default.getUserLobbiesMatches(
-      this.userAddress,
+      nftId,
       page,
       limit
     );

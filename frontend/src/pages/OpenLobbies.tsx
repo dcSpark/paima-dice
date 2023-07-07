@@ -16,6 +16,7 @@ import { AppContext } from "@src/main";
 import Wrapper from "@src/components/Wrapper";
 import Button from "@src/components/Button";
 import { formatDate } from "@src/utils";
+import { useNftContext } from "@src/NftContext";
 
 type Column = {
   id: keyof LobbyStateQuery | "action";
@@ -45,13 +46,16 @@ const expandValue = (id: keyof LobbyState, value: unknown) => {
 
 const OpenLobbies: React.FC = () => {
   const mainController: MainController = useContext(AppContext);
+  const {
+    selectedNftState: [selectedNft],
+  } = useNftContext();
   const [lobbies, setLobbies] = useState<LobbyStateQuery[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
-    mainController.getOpenLobbies().then((lobbies) => {
+    mainController.getOpenLobbies(selectedNft).then((lobbies) => {
       setLobbies(lobbies);
     });
   }, []);
@@ -82,7 +86,7 @@ const OpenLobbies: React.FC = () => {
   };
 
   const handleLobbiesRefresh = async () => {
-    const lobbies = await mainController.getOpenLobbies();
+    const lobbies = await mainController.getOpenLobbies(selectedNft);
 
     setPage(0);
     setSearchText("");
@@ -137,7 +141,10 @@ const OpenLobbies: React.FC = () => {
                             {column.id === "action" ? (
                               <Button
                                 onClick={() =>
-                                  mainController.joinLobby(lobby.lobby_id)
+                                  mainController.joinLobby(
+                                    selectedNft,
+                                    lobby.lobby_id
+                                  )
                                 }
                               >
                                 Enter

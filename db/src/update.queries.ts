@@ -6,7 +6,7 @@ export type lobby_status = 'active' | 'closed' | 'finished' | 'open';
 /** 'StartMatch' parameters type */
 export interface IStartMatchParams {
   lobby_id: string;
-  player_two: string;
+  player_two: number;
 }
 
 /** 'StartMatch' return type */
@@ -16,14 +16,14 @@ export interface IStartMatchResult {
   current_round: number;
   hidden: boolean;
   initial_random_seed: string;
-  lobby_creator: string;
+  lobby_creator: number;
   lobby_id: string;
   lobby_state: lobby_status;
   num_of_rounds: number;
   play_time_per_player: number;
   player_one_iswhite: boolean;
   player_one_points: number;
-  player_two: string | null;
+  player_two: number | null;
   player_two_points: number;
   practice: boolean;
   round_length: number;
@@ -199,7 +199,7 @@ export const executedRound = new PreparedQuery<IExecutedRoundParams,IExecutedRou
 
 /** 'AddWin' parameters type */
 export interface IAddWinParams {
-  wallet: string | null | void;
+  nft_id: number | null | void;
 }
 
 /** 'AddWin' return type */
@@ -211,7 +211,7 @@ export interface IAddWinQuery {
   result: IAddWinResult;
 }
 
-const addWinIR: any = {"usedParamSet":{"wallet":true},"params":[{"name":"wallet","required":false,"transform":{"type":"scalar"},"locs":[{"a":60,"b":66}]}],"statement":"UPDATE global_user_state\nSET\nwins = wins + 1\nWHERE wallet = :wallet"};
+const addWinIR: any = {"usedParamSet":{"nft_id":true},"params":[{"name":"nft_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":60,"b":66}]}],"statement":"UPDATE global_user_state\nSET\nwins = wins + 1\nWHERE nft_id = :nft_id"};
 
 /**
  * Query generated from SQL:
@@ -219,7 +219,7 @@ const addWinIR: any = {"usedParamSet":{"wallet":true},"params":[{"name":"wallet"
  * UPDATE global_user_state
  * SET
  * wins = wins + 1
- * WHERE wallet = :wallet
+ * WHERE nft_id = :nft_id
  * ```
  */
 export const addWin = new PreparedQuery<IAddWinParams,IAddWinResult>(addWinIR);
@@ -227,7 +227,7 @@ export const addWin = new PreparedQuery<IAddWinParams,IAddWinResult>(addWinIR);
 
 /** 'AddLoss' parameters type */
 export interface IAddLossParams {
-  wallet: string | null | void;
+  nft_id: number | null | void;
 }
 
 /** 'AddLoss' return type */
@@ -239,7 +239,7 @@ export interface IAddLossQuery {
   result: IAddLossResult;
 }
 
-const addLossIR: any = {"usedParamSet":{"wallet":true},"params":[{"name":"wallet","required":false,"transform":{"type":"scalar"},"locs":[{"a":64,"b":70}]}],"statement":"UPDATE global_user_state\nSET\nlosses = losses + 1\nWHERE wallet = :wallet"};
+const addLossIR: any = {"usedParamSet":{"nft_id":true},"params":[{"name":"nft_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":64,"b":70}]}],"statement":"UPDATE global_user_state\nSET\nlosses = losses + 1\nWHERE nft_id = :nft_id"};
 
 /**
  * Query generated from SQL:
@@ -247,7 +247,7 @@ const addLossIR: any = {"usedParamSet":{"wallet":true},"params":[{"name":"wallet
  * UPDATE global_user_state
  * SET
  * losses = losses + 1
- * WHERE wallet = :wallet
+ * WHERE nft_id = :nft_id
  * ```
  */
 export const addLoss = new PreparedQuery<IAddLossParams,IAddLossResult>(addLossIR);
@@ -255,7 +255,7 @@ export const addLoss = new PreparedQuery<IAddLossParams,IAddLossResult>(addLossI
 
 /** 'AddTie' parameters type */
 export interface IAddTieParams {
-  wallet: string | null | void;
+  nft_id: number | null | void;
 }
 
 /** 'AddTie' return type */
@@ -267,7 +267,7 @@ export interface IAddTieQuery {
   result: IAddTieResult;
 }
 
-const addTieIR: any = {"usedParamSet":{"wallet":true},"params":[{"name":"wallet","required":false,"transform":{"type":"scalar"},"locs":[{"a":60,"b":66}]}],"statement":"UPDATE global_user_state\nSET\nties = ties + 1\nWHERE wallet = :wallet"};
+const addTieIR: any = {"usedParamSet":{"nft_id":true},"params":[{"name":"nft_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":60,"b":66}]}],"statement":"UPDATE global_user_state\nSET\nties = ties + 1\nWHERE nft_id = :nft_id"};
 
 /**
  * Query generated from SQL:
@@ -275,7 +275,7 @@ const addTieIR: any = {"usedParamSet":{"wallet":true},"params":[{"name":"wallet"
  * UPDATE global_user_state
  * SET
  * ties = ties + 1
- * WHERE wallet = :wallet
+ * WHERE nft_id = :nft_id
  * ```
  */
 export const addTie = new PreparedQuery<IAddTieParams,IAddTieResult>(addTieIR);

@@ -2,16 +2,15 @@ import type { CreatedLobbyInput, JoinedLobbyInput } from '../types.js';
 import type { IGetLobbyByIdResult, IStartMatchParams, ICloseLobbyParams } from '@dice/db';
 import { createLobby, startMatch, closeLobby, ICreateLobbyParams } from '@dice/db';
 import Prando from 'paima-sdk/paima-prando';
-import type { WalletAddress } from 'paima-sdk/paima-utils';
 import type { LobbyStatus } from '@dice/utils';
-import { PRACTICE_BOT_ADDRESS } from '@dice/utils';
+import { PRACTICE_BOT_NFT_ID } from '@dice/utils';
 import { blankStats } from './stats';
 import { persistNewRound } from './match.js';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
 
 // Persist creation of a lobby
 export function persistLobbyCreation(
-  player: WalletAddress,
+  nftId: number,
   blockHeight: number,
   inputData: CreatedLobbyInput,
   seed: string
@@ -28,7 +27,7 @@ export function persistLobbyCreation(
     creation_block_height: blockHeight,
     hidden: inputData.isHidden,
     practice: inputData.isPractice,
-    lobby_creator: player,
+    lobby_creator: nftId,
     player_one_iswhite: inputData.playerOneIsWhite,
     player_two: null,
     lobby_state: 'open' as LobbyStatus,
@@ -38,13 +37,12 @@ export function persistLobbyCreation(
   // create the lobby according to the input data.
   const createLobbyTuple: SQLUpdate = [createLobby, params];
   // create user metadata if non existent
-  const blankStatsTuple: SQLUpdate = blankStats(player);
+  const blankStatsTuple: SQLUpdate = blankStats(nftId);
   // In case of a practice lobby join with a predetermined opponent right away
   const practiceLobbyUpdates = inputData.isPractice
     ? persistLobbyJoin(
         blockHeight,
-        PRACTICE_BOT_ADDRESS,
-        { input: 'joinedLobby', lobbyID: lobby_id },
+        { input: 'joinedLobby', nftId: PRACTICE_BOT_NFT_ID, lobbyID: lobby_id },
         params
       )
     : [];
@@ -54,28 +52,30 @@ export function persistLobbyCreation(
 // Persist joining a lobby
 export function persistLobbyJoin(
   blockHeight: number,
-  joiningPlayer: WalletAddress,
-  _inputData: JoinedLobbyInput,
+  inputData: JoinedLobbyInput,
   lobby: ICreateLobbyParams
 ): SQLUpdate[] {
   // First we validate if the lobby is actually open for users to join, before applying.
   // If not, just output an empty list of updates (meaning no state transition is applied)
-  if (!lobby.player_two && lobby.lobby_state === 'open' && lobby.lobby_creator !== joiningPlayer) {
+  if (
+    !lobby.player_two &&
+    lobby.lobby_state === 'open' &&
+    lobby.lobby_creator !== inputData.nftId
+  ) {
     // Save user metadata, like in the lobby creation flow,
     // then convert lobby into active and create empty round and user states
-    const updateLobbyTuple = persistActivateLobby(joiningPlayer, lobby, blockHeight);
-    const blankStatsTuple: SQLUpdate = blankStats(joiningPlayer);
+    const updateLobbyTuple = persistActivateLobby(inputData.nftId, lobby, blockHeight);
+    const blankStatsTuple: SQLUpdate = blankStats(inputData.nftId);
     return [...updateLobbyTuple, blankStatsTuple];
   } else return [];
 }
 
 // Convert lobby state from `open` to `close`, meaning no one will be able to join the lobby.
-export function persistCloseLobby(
-  requestingPlayer: WalletAddress,
-  lobby: IGetLobbyByIdResult
-): SQLUpdate | null {
-  if (lobby.player_two || lobby.lobby_state !== 'open' || lobby.lobby_creator !== requestingPlayer)
+export function persistCloseLobby(lobby: IGetLobbyByIdResult): SQLUpdate | null {
+  if (lobby.player_two || lobby.lobby_state !== 'open') {
+    console.log('DISCARD: lobby is full or not open');
     return null;
+  }
 
   const params: ICloseLobbyParams = {
     lobby_id: lobby.lobby_id,
@@ -85,14 +85,14 @@ export function persistCloseLobby(
 
 // Convert lobby from `open` to `active`, meaning the match has now started.
 function persistActivateLobby(
-  joiningPlayer: WalletAddress,
+  joiningNftId: number,
   lobby: ICreateLobbyParams,
   blockHeight: number
 ): SQLUpdate[] {
   // First update lobby row, marking its state as now 'active', and saving the joining player's wallet address
   const smParams: IStartMatchParams = {
     lobby_id: lobby.lobby_id,
-    player_two: joiningPlayer,
+    player_two: joiningNftId,
   };
   const newMatchTuple: SQLUpdate = [startMatch, smParams];
   // We insert the round and first two empty user states in their tables at this stage, so the round executor has empty states to iterate from.

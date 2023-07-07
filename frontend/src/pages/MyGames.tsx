@@ -16,6 +16,7 @@ import { AppContext } from "@src/main";
 import Wrapper from "@src/components/Wrapper";
 import Button from "@src/components/Button";
 import { formatDate } from "@src/utils";
+import { useNftContext } from "@src/NftContext";
 
 type Column = {
   id: keyof UserLobby | "action";
@@ -45,6 +46,9 @@ const actionMap: Record<LobbyStatus, string> = {
 
 const MyGames: React.FC<MyGamesProps> = ({ myAddress }) => {
   const mainController: MainController = useContext(AppContext);
+  const {
+    selectedNftState: [selectedNft],
+  } = useNftContext();
 
   const [lobbies, setLobbies] = useState<UserLobby[]>([]);
   const [page, setPage] = useState(0);
@@ -52,7 +56,7 @@ const MyGames: React.FC<MyGamesProps> = ({ myAddress }) => {
   const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
-    mainController.getMyGames().then((lobbies) => {
+    mainController.getMyGames(selectedNft).then((lobbies) => {
       setLobbies(lobbies);
     });
   }, []);
@@ -65,7 +69,7 @@ const MyGames: React.FC<MyGamesProps> = ({ myAddress }) => {
   };
 
   const handleLobbiesRefresh = async () => {
-    const lobbies = await mainController.getMyGames();
+    const lobbies = await mainController.getMyGames(selectedNft);
 
     setPage(0);
     setSearchText("");
@@ -96,7 +100,7 @@ const MyGames: React.FC<MyGamesProps> = ({ myAddress }) => {
 
   const handleLobbyAction = (status: LobbyStatus, lobbyId: string) => {
     if (status === "open") {
-      mainController.closeLobby(lobbyId);
+      mainController.closeLobby(selectedNft, lobbyId);
     } else {
       mainController.moveToJoinedLobby(lobbyId);
     }

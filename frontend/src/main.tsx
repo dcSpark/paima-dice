@@ -5,6 +5,7 @@ import MainController from "./MainController";
 import { BrowserRouter } from "react-router-dom";
 import { createTheme, ThemeProvider } from "@mui/material";
 import { theme } from "./theme";
+import { NftProvider } from "./NftContext";
 
 console.log("[ERWT]: Renderer execution started");
 export const AppContext = createContext(null);
@@ -15,7 +16,9 @@ const app = (
   <ThemeProvider theme={theme}>
     <BrowserRouter>
       <AppContext.Provider value={mainController}>
-        <PageCoordinator />
+        <NftProvider>
+          <PageCoordinator />
+        </NftProvider>
       </AppContext.Provider>
     </BrowserRouter>
   </ThemeProvider>

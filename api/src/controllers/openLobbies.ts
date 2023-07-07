@@ -12,7 +12,7 @@ interface OpenLobbiesResponse {
 export class OpenLobbiesController extends Controller {
   @Get()
   public async get(
-    @Query() wallet: string,
+    @Query() nftId: number,
     @Query() count?: number,
     @Query() page?: number
   ): Promise<OpenLobbiesResponse> {
@@ -26,12 +26,11 @@ export class OpenLobbiesController extends Controller {
     } else if (isLeft(valCount)) {
       throw new ValidateError({ count: { message: 'invalid number' } }, '');
     } else {
-      wallet = wallet.toLowerCase();
       const p = valPage.right;
       const c = valCount.right;
       const offset = (p - 1) * c;
       const lobbies = await getPaginatedOpenLobbies.run(
-        { count: `${c}`, page: `${offset}`, wallet },
+        { count: `${c}`, page: `${offset}`, nft_id: nftId },
         pool
       );
 

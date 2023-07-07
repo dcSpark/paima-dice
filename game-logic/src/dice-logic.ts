@@ -33,16 +33,16 @@ export function matchResults(
   const user2won = matchState.player2Points > matchState.player1Points;
   // Assign the winner to a variable called winner. If no one won, winner is null
   const winner = user1won
-    ? matchEnvironment.user1.wallet
+    ? matchEnvironment.user1.nftId
     : user2won
-    ? matchEnvironment.user2.wallet
+    ? matchEnvironment.user2.nftId
     : null;
 
   console.log(`${winner} won match.`);
 
   const results: [ConciseResult, ConciseResult] = !winner
     ? ['t', 't']
-    : winner === matchEnvironment.user1.wallet
+    : winner === matchEnvironment.user1.nftId
     ? ['w', 'l']
     : ['l', 'w'];
 

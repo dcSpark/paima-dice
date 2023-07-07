@@ -4,25 +4,16 @@ import { Typography } from "@mui/material";
 import type { LobbyState } from "@dice/utils";
 import Navbar from "@src/components/Navbar";
 import Wrapper from "@src/components/Wrapper";
-import { DiceLogic, DiceService } from "./GameLogic";
-import { ReactDiceRef } from "react-dice-complete";
+import { DiceService } from "./GameLogic";
 import DiceGame from "./DiceGame";
 
 export function Lobby({
   initialLobbyState,
-  address,
+  selectedNft,
 }: {
   initialLobbyState: LobbyState;
-  address: string;
+  selectedNft: number;
 }): React.ReactElement {
-  const diceRef = useRef<{
-    1: undefined | ReactDiceRef;
-    2: undefined | ReactDiceRef;
-  }>({ 1: undefined, 2: undefined });
-  const diceLogic = useMemo(() => {
-    return new DiceLogic(address);
-  }, [address]);
-
   const [lobbyState, setLobbyState] = useState<LobbyState>(initialLobbyState);
 
   useEffect(() => {
@@ -53,7 +44,7 @@ export function Lobby({
         {lobbyState.lobby_state === "active" && (
           <DiceGame
             lobbyState={lobbyState}
-            address={address}
+            selectedNft={selectedNft}
             refetchLobbyState={async () => {
               const response = await DiceService.getLobbyState(
                 initialLobbyState.lobby_id

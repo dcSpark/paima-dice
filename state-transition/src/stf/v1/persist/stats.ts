@@ -2,14 +2,13 @@ import type { IGetUserStatsResult, INewStatsParams, IUpdateStatsParams } from '@
 import { newStats, updateStats } from '@dice/db';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
 import { createScheduledData } from 'paima-sdk/paima-db';
-import type { WalletAddress } from 'paima-sdk/paima-utils';
 import type { ConciseResult } from '@dice/utils';
 
 // Generate blank/empty user stats
-export function blankStats(wallet: string): SQLUpdate {
+export function blankStats(nftId: number): SQLUpdate {
   const params: INewStatsParams = {
     stats: {
-      wallet: wallet,
+      nft_id: nftId,
       wins: 0,
       ties: 0,
       losses: 0,
@@ -20,13 +19,13 @@ export function blankStats(wallet: string): SQLUpdate {
 
 // Persist updating user stats in DB
 export function persistStatsUpdate(
-  user: WalletAddress,
+  nftId: number,
   result: ConciseResult,
   stats: IGetUserStatsResult
 ): SQLUpdate {
   const userParams: IUpdateStatsParams = {
     stats: {
-      wallet: user,
+      nft_id: nftId,
       wins: result === 'w' ? stats.wins + 1 : stats.wins,
       losses: result === 'l' ? stats.losses + 1 : stats.losses,
       ties: result === 't' ? stats.ties + 1 : stats.ties,
@@ -37,14 +36,14 @@ export function persistStatsUpdate(
 
 // Schedule a stats update to be executed in the future
 export function scheduleStatsUpdate(
-  wallet: WalletAddress,
+  nftId: number,
   result: ConciseResult,
   block_height: number
 ): SQLUpdate {
-  return createScheduledData(createStatsUpdateInput(wallet, result), block_height);
+  return createScheduledData(createStatsUpdateInput(nftId, result), block_height);
 }
 
 // Create stats update input
-function createStatsUpdateInput(wallet: WalletAddress, result: ConciseResult): string {
-  return `u|*${wallet}|${result}`;
+function createStatsUpdateInput(nftId: number, result: ConciseResult): string {
+  return `u|*${nftId.toString(10)}|${result}`;
 }

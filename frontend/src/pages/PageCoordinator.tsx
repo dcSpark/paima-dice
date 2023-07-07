@@ -11,9 +11,13 @@ import { LobbyState } from "@dice/utils";
 import "./PageCoordinator.scss";
 import { AppContext } from "@src/main";
 import { Lobby } from "./DiceGame/Lobby";
+import { useNftContext } from "@src/NftContext";
 
 const PageCoordinator: React.FC = () => {
   const mainController: MainController = useContext(AppContext);
+  const {
+    selectedNftState: [selectedNft],
+  } = useNftContext();
   const navigate = useNavigate();
 
   const [lobby, setLobby] = useState<LobbyState>(null);
@@ -58,10 +62,7 @@ const PageCoordinator: React.FC = () => {
         <Route
           path={Page.Game}
           element={
-            <Lobby
-              initialLobbyState={lobby}
-              address={mainController.userAddress}
-            />
+            <Lobby initialLobbyState={lobby} selectedNft={selectedNft} />
           }
         />
         <Route path={Page.CreateLobby} element={<CreateLobby />} />

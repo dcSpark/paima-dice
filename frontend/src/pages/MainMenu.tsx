@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, MenuItem, Select, Typography } from "@mui/material";
 import MainController, { Page } from "@src/MainController";
 import { useNavigate } from "react-router-dom";
 import Button from "@src/components/Button";
@@ -8,24 +8,15 @@ import Logo from "@src/components/Logo";
 import { AppContext } from "@src/main";
 import { buyNft } from "@src/services/contract";
 import * as Paima from "@dice/middleware";
+import { useNftContext } from "@src/NftContext";
 
 const MainMenu = () => {
   const navigate = useNavigate();
   const mainController: MainController = useContext(AppContext);
-
-  const [nfts, setNfts] = useState<number[]>();
-  useEffect(() => {
-    if (mainController.userAddress == null) return;
-    const fetchNfts = async () => {
-      const newNfts = await Paima.default.getNftsForWallet(
-        mainController.userAddress
-      );
-      if (!newNfts.success) return;
-      setNfts(newNfts.result);
-    };
-    const interval = setInterval(fetchNfts, 5 * 1000);
-    return () => clearInterval(interval);
-  }, [mainController.userAddress]);
+  const {
+    nfts,
+    selectedNftState: [selectedNft, setSelectedNft],
+  } = useNftContext();
 
   return (
     <>
@@ -50,7 +41,20 @@ const MainMenu = () => {
               <Button onClick={() => buyNft(mainController.userAddress)}>
                 Buy NFT
               </Button>
-              <Typography>NFTS: [{nfts.join(",")}]</Typography>
+              <Select
+                value={selectedNft ?? ""}
+                onChange={(event) => {
+                  const newValue = event.target.value;
+                  if (typeof newValue !== "number") return;
+                  setSelectedNft(newValue);
+                }}
+              >
+                {nfts?.map((nft) => (
+                  <MenuItem key={nft} value={nft}>
+                    {nft}
+                  </MenuItem>
+                ))}
+              </Select>
             </>
           )}
         </Box>

@@ -36,7 +36,8 @@
 						"type": "string"
 					},
 					"lobby_creator": {
-						"type": "string"
+						"type": "number",
+						"format": "double"
 					},
 					"lobby_id": {
 						"type": "string"
@@ -60,7 +61,8 @@
 						"format": "double"
 					},
 					"player_two": {
-						"type": "string",
+						"type": "number",
+						"format": "double",
 						"nullable": true
 					},
 					"player_two_points": {
@@ -136,8 +138,9 @@
 					"match_status": {
 						"$ref": "#/components/schemas/LobbyStatus"
 					},
-					"winner_address": {
-						"type": "string"
+					"winner_nft_id": {
+						"type": "number",
+						"format": "double"
 					}
 				},
 				"type": "object",
@@ -165,7 +168,8 @@
 						"type": "string"
 					},
 					"lobby_creator": {
-						"type": "string"
+						"type": "number",
+						"format": "double"
 					},
 					"lobby_id": {
 						"type": "string"
@@ -253,7 +257,8 @@
 						"type": "string"
 					},
 					"lobby_creator": {
-						"type": "string"
+						"type": "number",
+						"format": "double"
 					},
 					"lobby_id": {
 						"type": "string"
@@ -277,7 +282,8 @@
 						"format": "double"
 					},
 					"player_two": {
-						"type": "string",
+						"type": "number",
+						"format": "double",
 						"nullable": true
 					},
 					"player_two_points": {
@@ -330,96 +336,6 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-			"IGetRandomLobbyResult": {
-				"description": "'GetRandomLobby' return type",
-				"properties": {
-					"created_at": {
-						"type": "string",
-						"format": "date-time"
-					},
-					"creation_block_height": {
-						"type": "number",
-						"format": "double"
-					},
-					"current_round": {
-						"type": "number",
-						"format": "double"
-					},
-					"hidden": {
-						"type": "boolean"
-					},
-					"initial_random_seed": {
-						"type": "string"
-					},
-					"lobby_creator": {
-						"type": "string"
-					},
-					"lobby_id": {
-						"type": "string"
-					},
-					"lobby_state": {
-						"$ref": "#/components/schemas/lobby_status"
-					},
-					"num_of_rounds": {
-						"type": "number",
-						"format": "double"
-					},
-					"play_time_per_player": {
-						"type": "number",
-						"format": "double"
-					},
-					"player_one_iswhite": {
-						"type": "boolean"
-					},
-					"player_one_points": {
-						"type": "number",
-						"format": "double"
-					},
-					"player_two_points": {
-						"type": "number",
-						"format": "double"
-					},
-					"round_length": {
-						"type": "number",
-						"format": "double"
-					}
-				},
-				"required": [
-					"created_at",
-					"creation_block_height",
-					"current_round",
-					"hidden",
-					"initial_random_seed",
-					"lobby_creator",
-					"lobby_id",
-					"lobby_state",
-					"num_of_rounds",
-					"play_time_per_player",
-					"player_one_iswhite",
-					"player_one_points",
-					"player_two_points",
-					"round_length"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"RandomLobbyResponse": {
-				"properties": {
-					"lobby": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/IGetRandomLobbyResult"
-							}
-						],
-						"nullable": true
-					}
-				},
-				"required": [
-					"lobby"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
 			"IGetOpenLobbyByIdResult": {
 				"description": "'GetOpenLobbyById' return type",
 				"properties": {
@@ -442,7 +358,8 @@
 						"type": "string"
 					},
 					"lobby_creator": {
-						"type": "string"
+						"type": "number",
+						"format": "double"
 					},
 					"lobby_id": {
 						"type": "string"
@@ -515,7 +432,8 @@
 						"type": "string"
 					},
 					"lobby_creator": {
-						"type": "string"
+						"type": "number",
+						"format": "double"
 					},
 					"lobby_id": {
 						"type": "string"
@@ -740,10 +658,11 @@
 				"parameters": [
 					{
 						"in": "query",
-						"name": "wallet",
+						"name": "nftId",
 						"required": true,
 						"schema": {
-							"type": "string"
+							"format": "double",
+							"type": "number"
 						}
 					},
 					{
@@ -777,25 +696,6 @@
 							"application/json": {
 								"schema": {
 									"$ref": "#/components/schemas/RandomActiveLobbyResponse"
-								}
-							}
-						}
-					}
-				},
-				"security": [],
-				"parameters": []
-			}
-		},
-		"/random_lobby": {
-			"get": {
-				"operationId": "Get",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/RandomLobbyResponse"
 								}
 							}
 						}
@@ -898,10 +798,11 @@
 				"parameters": [
 					{
 						"in": "query",
-						"name": "wallet",
+						"name": "nftId",
 						"required": true,
 						"schema": {
-							"type": "string"
+							"format": "double",
+							"type": "number"
 						}
 					},
 					{
@@ -952,10 +853,11 @@
 				"parameters": [
 					{
 						"in": "query",
-						"name": "wallet",
+						"name": "nftId",
 						"required": true,
 						"schema": {
-							"type": "string"
+							"format": "double",
+							"type": "number"
 						}
 					},
 					{
@@ -998,10 +900,11 @@
 				"parameters": [
 					{
 						"in": "query",
-						"name": "wallet",
+						"name": "nftId",
 						"required": true,
 						"schema": {
-							"type": "string"
+							"format": "double",
+							"type": "number"
 						}
 					},
 					{
@@ -1035,10 +938,11 @@
 				"parameters": [
 					{
 						"in": "query",
-						"name": "wallet",
+						"name": "nftId",
 						"required": true,
 						"schema": {
-							"type": "string"
+							"format": "double",
+							"type": "number"
 						}
 					}
 				]

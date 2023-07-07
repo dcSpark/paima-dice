@@ -70,12 +70,12 @@ export async function getNonemptyNewLobbies(
 
 export async function getLobbyStateWithUser(
   lobbyID: string,
-  address: string
+  nftId: number
 ): Promise<PackedLobbyState> {
   const lobbyState = await getRawLobbyState(lobbyID);
   if (!lobbyState.success) {
     throw new Error('Failed to get lobby state');
-  } else if (userJoinedLobby(address, lobbyState) || userCreatedLobby(address, lobbyState)) {
+  } else if (userJoinedLobby(nftId, lobbyState) || userCreatedLobby(nftId, lobbyState)) {
     return lobbyState;
   } else {
     throw new Error('User is not in the lobby');

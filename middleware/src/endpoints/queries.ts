@@ -7,7 +7,6 @@ import type {
   MatchExecutorData,
   RoundStatusData,
   UserStats,
-  LobbyState,
   LobbyStateQuery,
   UserLobby,
   RoundExecutorBackendData,
@@ -24,7 +23,6 @@ import {
   backendQueryMatchWinner,
   backendQueryNftsForWallet,
   backendQueryOpenLobbies,
-  backendQueryRandomLobby,
   backendQueryRoundExecutor,
   backendQueryRoundStatus,
   backendQuerySearchLobby,
@@ -182,7 +180,7 @@ async function getNewLobbies(
 }
 
 async function getUserLobbiesMatches(
-  walletAddress: string,
+  nftId: number,
   page: number,
   count?: number
 ): Promise<PackedUserLobbies | FailedResult> {
@@ -190,7 +188,7 @@ async function getUserLobbiesMatches(
 
   let res: Response;
   try {
-    const query = backendQueryUserLobbies(walletAddress, count, page);
+    const query = backendQueryUserLobbies(nftId, count, page);
     res = await fetch(query);
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.ERROR_QUERYING_BACKEND_ENDPOINT, err);
@@ -202,7 +200,7 @@ async function getUserLobbiesMatches(
       success: true,
       lobbies: j.lobbies.map(lobby => ({
         ...lobby,
-        myTurn: isPlayersTurn(walletAddress, lobby),
+        myTurn: isPlayersTurn(nftId, lobby),
       })),
     };
   } catch (err) {
@@ -211,7 +209,7 @@ async function getUserLobbiesMatches(
 }
 
 async function getOpenLobbies(
-  wallet: string,
+  nftId: number,
   page: number,
   count?: number
 ): Promise<LobbyStates | FailedResult> {
@@ -219,7 +217,7 @@ async function getOpenLobbies(
 
   let res: Response;
   try {
-    const query = backendQueryOpenLobbies(wallet, count, page);
+    const query = backendQueryOpenLobbies(nftId, count, page);
     res = await fetch(query);
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.ERROR_QUERYING_BACKEND_ENDPOINT, err);
@@ -230,31 +228,6 @@ async function getOpenLobbies(
     return {
       success: true,
       lobbies: j.lobbies,
-    };
-  } catch (err) {
-    return errorFxn(PaimaMiddlewareErrorCode.INVALID_RESPONSE_FROM_BACKEND, err);
-  }
-}
-
-async function getRandomOpenLobby(): Promise<PackedLobbyState | FailedResult> {
-  const errorFxn = buildEndpointErrorFxn('getRandomOpenLobby');
-
-  let res: Response;
-  try {
-    const query = backendQueryRandomLobby();
-    res = await fetch(query);
-  } catch (err) {
-    return errorFxn(PaimaMiddlewareErrorCode.ERROR_QUERYING_BACKEND_ENDPOINT, err);
-  }
-
-  try {
-    const j = (await res.json()) as { lobby: LobbyState };
-    if (j.lobby === null) {
-      return errorFxn(MiddlewareErrorCode.NO_OPEN_LOBBIES);
-    }
-    return {
-      success: true,
-      lobby: j.lobby,
     };
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.INVALID_RESPONSE_FROM_BACKEND, err);
@@ -381,7 +354,6 @@ export const queryEndpoints = {
   getLobbyState,
   getLobbySearch,
   getRoundExecutionState,
-  getRandomOpenLobby,
   getOpenLobbies,
   getUserLobbiesMatches,
   getNewLobbies,

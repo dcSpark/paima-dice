@@ -12,13 +12,13 @@ export interface ICreateLobbyParams {
   current_round: number | null | void;
   hidden: boolean;
   initial_random_seed: string;
-  lobby_creator: string;
+  lobby_creator: number;
   lobby_id: string;
   lobby_state: lobby_status;
   num_of_rounds: number;
   play_time_per_player: number;
   player_one_iswhite: boolean;
-  player_two: string | null | void;
+  player_two: number | null | void;
   practice: boolean;
   round_length: number;
 }
@@ -113,7 +113,7 @@ export const newRound = new PreparedQuery<INewRoundParams,INewRoundResult>(newRo
 export interface INewMatchMoveParams {
   new_move: {
     lobby_id: string,
-    wallet: string,
+    nft_id: number,
     round: number,
     is_point: boolean
   };
@@ -128,12 +128,12 @@ export interface INewMatchMoveQuery {
   result: INewMatchMoveResult;
 }
 
-const newMatchMoveIR: any = {"usedParamSet":{"new_move":true},"params":[{"name":"new_move","required":false,"transform":{"type":"pick_tuple","keys":[{"name":"lobby_id","required":true},{"name":"wallet","required":true},{"name":"round","required":true},{"name":"is_point","required":true}]},"locs":[{"a":66,"b":74}]}],"statement":"INSERT INTO match_moves(lobby_id, wallet, round, is_point)\nVALUES :new_move"};
+const newMatchMoveIR: any = {"usedParamSet":{"new_move":true},"params":[{"name":"new_move","required":false,"transform":{"type":"pick_tuple","keys":[{"name":"lobby_id","required":true},{"name":"nft_id","required":true},{"name":"round","required":true},{"name":"is_point","required":true}]},"locs":[{"a":66,"b":74}]}],"statement":"INSERT INTO match_moves(lobby_id, nft_id, round, is_point)\nVALUES :new_move"};
 
 /**
  * Query generated from SQL:
  * ```
- * INSERT INTO match_moves(lobby_id, wallet, round, is_point)
+ * INSERT INTO match_moves(lobby_id, nft_id, round, is_point)
  * VALUES :new_move
  * ```
  */
@@ -145,10 +145,10 @@ export interface INewFinalStateParams {
   final_state: {
     lobby_id: string,
     player_one_iswhite: boolean,
-    player_one_wallet: string,
+    player_one_nft_id: number,
     player_one_result: match_result,
     player_one_elapsed_time: number,
-    player_two_wallet: string,
+    player_two_nft_id: number,
     player_two_result: match_result,
     player_two_elapsed_time: number,
     positions: string
@@ -164,12 +164,22 @@ export interface INewFinalStateQuery {
   result: INewFinalStateResult;
 }
 
-const newFinalStateIR: any = {"usedParamSet":{"final_state":true},"params":[{"name":"final_state","required":false,"transform":{"type":"pick_tuple","keys":[{"name":"lobby_id","required":true},{"name":"player_one_iswhite","required":true},{"name":"player_one_wallet","required":true},{"name":"player_one_result","required":true},{"name":"player_one_elapsed_time","required":true},{"name":"player_two_wallet","required":true},{"name":"player_two_result","required":true},{"name":"player_two_elapsed_time","required":true},{"name":"positions","required":true}]},"locs":[{"a":204,"b":215}]}],"statement":"INSERT INTO final_match_state(lobby_id, player_one_iswhite, player_one_wallet, player_one_result, player_one_elapsed_time, player_two_wallet, player_two_result, player_two_elapsed_time, positions)\nVALUES :final_state"};
+const newFinalStateIR: any = {"usedParamSet":{"final_state":true},"params":[{"name":"final_state","required":false,"transform":{"type":"pick_tuple","keys":[{"name":"lobby_id","required":true},{"name":"player_one_iswhite","required":true},{"name":"player_one_nft_id","required":true},{"name":"player_one_result","required":true},{"name":"player_one_elapsed_time","required":true},{"name":"player_two_nft_id","required":true},{"name":"player_two_result","required":true},{"name":"player_two_elapsed_time","required":true},{"name":"positions","required":true}]},"locs":[{"a":224,"b":235}]}],"statement":"INSERT INTO final_match_state(\n  lobby_id,\n  player_one_iswhite,\n  player_one_nft_id,\n  player_one_result,\n  player_one_elapsed_time,\n  player_two_nft_id,\n  player_two_result,\n  player_two_elapsed_time,\n  positions\n)\nVALUES :final_state"};
 
 /**
  * Query generated from SQL:
  * ```
- * INSERT INTO final_match_state(lobby_id, player_one_iswhite, player_one_wallet, player_one_result, player_one_elapsed_time, player_two_wallet, player_two_result, player_two_elapsed_time, positions)
+ * INSERT INTO final_match_state(
+ *   lobby_id,
+ *   player_one_iswhite,
+ *   player_one_nft_id,
+ *   player_one_result,
+ *   player_one_elapsed_time,
+ *   player_two_nft_id,
+ *   player_two_result,
+ *   player_two_elapsed_time,
+ *   positions
+ * )
  * VALUES :final_state
  * ```
  */
@@ -179,7 +189,7 @@ export const newFinalState = new PreparedQuery<INewFinalStateParams,INewFinalSta
 /** 'NewStats' parameters type */
 export interface INewStatsParams {
   stats: {
-    wallet: string,
+    nft_id: number,
     wins: number,
     losses: number,
     ties: number
@@ -195,14 +205,14 @@ export interface INewStatsQuery {
   result: INewStatsResult;
 }
 
-const newStatsIR: any = {"usedParamSet":{"stats":true},"params":[{"name":"stats","required":false,"transform":{"type":"pick_tuple","keys":[{"name":"wallet","required":true},{"name":"wins","required":true},{"name":"losses","required":true},{"name":"ties","required":true}]},"locs":[{"a":37,"b":42}]}],"statement":"INSERT INTO global_user_state\nVALUES :stats\nON CONFLICT (wallet)\nDO NOTHING"};
+const newStatsIR: any = {"usedParamSet":{"stats":true},"params":[{"name":"stats","required":false,"transform":{"type":"pick_tuple","keys":[{"name":"nft_id","required":true},{"name":"wins","required":true},{"name":"losses","required":true},{"name":"ties","required":true}]},"locs":[{"a":37,"b":42}]}],"statement":"INSERT INTO global_user_state\nVALUES :stats\nON CONFLICT (nft_id)\nDO NOTHING"};
 
 /**
  * Query generated from SQL:
  * ```
  * INSERT INTO global_user_state
  * VALUES :stats
- * ON CONFLICT (wallet)
+ * ON CONFLICT (nft_id)
  * DO NOTHING
  * ```
  */
@@ -212,7 +222,7 @@ export const newStats = new PreparedQuery<INewStatsParams,INewStatsResult>(newSt
 /** 'UpdateStats' parameters type */
 export interface IUpdateStatsParams {
   stats: {
-    wallet: string,
+    nft_id: number,
     wins: number,
     losses: number,
     ties: number
@@ -228,14 +238,14 @@ export interface IUpdateStatsQuery {
   result: IUpdateStatsResult;
 }
 
-const updateStatsIR: any = {"usedParamSet":{"stats":true},"params":[{"name":"stats","required":false,"transform":{"type":"pick_tuple","keys":[{"name":"wallet","required":true},{"name":"wins","required":true},{"name":"losses","required":true},{"name":"ties","required":true}]},"locs":[{"a":37,"b":42}]}],"statement":"INSERT INTO global_user_state\nVALUES :stats\nON CONFLICT (wallet)\nDO UPDATE SET\nwins = EXCLUDED.wins,\nlosses = EXCLUDED.losses,\nties = EXCLUDED.ties"};
+const updateStatsIR: any = {"usedParamSet":{"stats":true},"params":[{"name":"stats","required":false,"transform":{"type":"pick_tuple","keys":[{"name":"nft_id","required":true},{"name":"wins","required":true},{"name":"losses","required":true},{"name":"ties","required":true}]},"locs":[{"a":37,"b":42}]}],"statement":"INSERT INTO global_user_state\nVALUES :stats\nON CONFLICT (nft_id)\nDO UPDATE SET\nwins = EXCLUDED.wins,\nlosses = EXCLUDED.losses,\nties = EXCLUDED.ties"};
 
 /**
  * Query generated from SQL:
  * ```
  * INSERT INTO global_user_state
  * VALUES :stats
- * ON CONFLICT (wallet)
+ * ON CONFLICT (nft_id)
  * DO UPDATE SET
  * wins = EXCLUDED.wins,
  * losses = EXCLUDED.losses,

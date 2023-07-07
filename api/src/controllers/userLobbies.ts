@@ -13,7 +13,7 @@ interface Response {
 export class UserLobbiesController extends Controller {
   @Get()
   public async get(
-    @Query() wallet: string,
+    @Query() nftId: number,
     @Query() count?: number,
     @Query() page?: number
   ): Promise<Response> {
@@ -29,13 +29,12 @@ export class UserLobbiesController extends Controller {
       throw new ValidateError({ count: { message: 'invalid number' } }, '');
     }
 
-    wallet = wallet.toLowerCase();
     // after typecheck, valid data output is given in .right
     const p = valPage.right;
     const c = valCount.right;
     const offset = (p - 1) * c;
     const userLobbies = await getAllPaginatedUserLobbies.run(
-      { wallet: wallet, count: `${c}`, page: `${offset}` },
+      { nft_id: nftId, count: `${c}`, page: `${offset}` },
       pool
     );
     return { lobbies: userLobbies };

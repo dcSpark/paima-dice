@@ -14,10 +14,10 @@ import type {
 
 const myGrammar = `
 nftMint             = nftmint|address|tokenId
-createdLobby        = c|numOfRounds|roundLength|playTimePerPlayer|isHidden?|isPractice?|playerOneIsWhite?
-joinedLobby         = j|*lobbyID
+createdLobby        = c|creatorNftId|numOfRounds|roundLength|playTimePerPlayer|isHidden?|isPractice?|playerOneIsWhite?
+joinedLobby         = j|nftId|*lobbyID
 closedLobby         = cs|*lobbyID
-submittedMoves      = s|*lobbyID|roundNumber|isPoint?
+submittedMoves      = s|nftId|*lobbyID|roundNumber|isPoint?
 practiceMoves       = p|*lobbyID|roundNumber
 zombieScheduledData = z|*lobbyID
 userScheduledData   = u|*user|result
@@ -28,6 +28,7 @@ const nftMint: ParserRecord<NftMintInput> = {
   tokenId: PaimaParser.NumberParser(),
 };
 const createdLobby: ParserRecord<CreatedLobbyInput> = {
+  creatorNftId: PaimaParser.NumberParser(),
   numOfRounds: PaimaParser.NumberParser(3, 1000),
   roundLength: PaimaParser.DefaultRoundLength(),
   playTimePerPlayer: PaimaParser.NumberParser(1, 10000),
@@ -36,12 +37,14 @@ const createdLobby: ParserRecord<CreatedLobbyInput> = {
   playerOneIsWhite: PaimaParser.TrueFalseParser(true),
 };
 const joinedLobby: ParserRecord<JoinedLobbyInput> = {
+  nftId: PaimaParser.NumberParser(),
   lobbyID: PaimaParser.NCharsParser(12, 12),
 };
 const closedLobby: ParserRecord<ClosedLobbyInput> = {
   lobbyID: PaimaParser.NCharsParser(12, 12),
 };
 const submittedMoves: ParserRecord<SubmittedMovesInput> = {
+  nftId: PaimaParser.NumberParser(),
   lobbyID: PaimaParser.NCharsParser(12, 12),
   roundNumber: PaimaParser.NumberParser(1, 10000),
   isPoint: PaimaParser.TrueFalseParser(false),
@@ -58,7 +61,7 @@ const zombieScheduledData: ParserRecord<ZombieRound> = {
 const userScheduledData: ParserRecord<UserStats> = {
   renameCommand: 'scheduledData',
   effect: 'stats',
-  user: PaimaParser.WalletAddress(),
+  nftId: PaimaParser.NumberParser(),
   result: PaimaParser.RegexParser(/^[w|t|l]$/),
 };
 

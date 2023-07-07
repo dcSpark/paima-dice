@@ -1,6 +1,5 @@
 import type { UserLobby } from '@dice/utils';
 import { Chess } from 'chess.js';
-import type { WalletAddress } from 'paima-sdk/paima-utils';
 
 export function detectWin(chess: Chess): boolean {
   return chess.isCheckmate();
@@ -31,10 +30,10 @@ export function didPlayerWin(playerColor: string, fen: string): boolean {
   }
 }
 
-export function isPlayersTurn(player: WalletAddress, lobby: UserLobby) {
+export function isPlayersTurn(nftId: number, lobby: UserLobby) {
   // Note: match starts at round 1, because we use persistNewRound to start it
   const isWhiteTurn = lobby.current_round % 2 === 1;
-  const isCreator = lobby.lobby_creator === player;
+  const isCreator = lobby.lobby_creator === nftId;
   const isWhite = isCreator === lobby.player_one_iswhite;
   return isWhite === isWhiteTurn;
 }

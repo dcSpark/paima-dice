@@ -54,11 +54,7 @@ export function backendQueryUserStats(wallet: WalletAddress): string {
   return buildBackendQuery(endpoint, options);
 }
 
-export function backendQueryUserLobbies(
-  wallet: WalletAddress,
-  count?: number,
-  page?: number
-): string {
+export function backendQueryUserLobbies(nftId: number, count?: number, page?: number): string {
   const endpoint = 'user_lobbies';
   const optsStart: QueryOptions = {};
   if (typeof count !== 'undefined') {
@@ -68,19 +64,15 @@ export function backendQueryUserLobbies(
     optsStart.page = page;
   }
   const options = {
-    wallet,
+    nftId,
     ...optsStart,
   };
   return buildBackendQuery(endpoint, options);
 }
 
-export function backendQueryOpenLobbies(
-  wallet: WalletAddress,
-  count?: number,
-  page?: number
-): string {
+export function backendQueryOpenLobbies(nftId: number, count?: number, page?: number): string {
   const endpoint = 'open_lobbies';
-  const options: QueryOptions = { wallet };
+  const options: QueryOptions = { nftId };
   if (typeof count !== 'undefined') {
     options.count = count;
   }
@@ -104,12 +96,6 @@ export function backendQueryMatchExecutor(lobbyID: string): string {
   const options = {
     lobbyID,
   };
-  return buildBackendQuery(endpoint, options);
-}
-
-export function backendQueryRandomLobby(): string {
-  const endpoint = 'random_lobby';
-  const options = {};
   return buildBackendQuery(endpoint, options);
 }
 
