@@ -30,14 +30,14 @@ export async function getRawLobbyState(lobbyID: string): Promise<PackedLobbyStat
 }
 
 export async function getRawNewLobbies(
-  wallet: string,
+  nftId: number,
   blockHeight: number
 ): Promise<NewLobbies | FailedResult> {
   const errorFxn = buildEndpointErrorFxn('getRawNewLobbies');
 
   let res: Response;
   try {
-    const query = backendQueryUserLobbiesBlockheight(wallet, blockHeight);
+    const query = backendQueryUserLobbiesBlockheight(nftId, blockHeight);
     res = await fetch(query);
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.ERROR_QUERYING_BACKEND_ENDPOINT, err);
@@ -55,10 +55,10 @@ export async function getRawNewLobbies(
 }
 
 export async function getNonemptyNewLobbies(
-  address: string,
+  nftId: number,
   blockHeight: number
 ): Promise<NewLobbies> {
-  const newLobbies = await getRawNewLobbies(address, blockHeight);
+  const newLobbies = await getRawNewLobbies(nftId, blockHeight);
   if (!newLobbies.success) {
     throw new Error('Failed to get new lobbies');
   } else if (newLobbies.lobbies.length === 0) {

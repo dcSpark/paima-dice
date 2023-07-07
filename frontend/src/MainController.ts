@@ -93,15 +93,14 @@ class MainController {
     return response.lobby;
   }
 
-  async searchLobby(query: string, page: number): Promise<LobbyStateQuery[]> {
+  async searchLobby(
+    nftId: number,
+    query: string,
+    page: number
+  ): Promise<LobbyStateQuery[]> {
     await this.enforceWalletConnected();
     this.callback(null, true, null);
-    const response = await Paima.default.getLobbySearch(
-      this.userAddress,
-      query,
-      page,
-      1
-    );
+    const response = await Paima.default.getLobbySearch(nftId, query, page, 1);
     console.log("search lobby response: ", response);
     this.callback(null, false, null);
     if (!response.success) {

@@ -1,6 +1,6 @@
 import type { Pool } from 'pg';
 import Prando from 'paima-sdk/paima-prando';
-import type { WalletAddress } from 'paima-sdk/paima-utils';
+import { SCHEDULED_DATA_ADDRESS, type WalletAddress } from 'paima-sdk/paima-utils';
 import type { IGetLobbyByIdResult, IGetRoundDataResult, IGetRoundMovesResult } from '@dice/db';
 import { getCachedMoves, getLobbyById, getRoundData, getUserStats, endMatch } from '@dice/db';
 import type { ConciseResult, MatchState } from '@dice/utils';
@@ -103,7 +103,7 @@ export const submittedMoves = async (
   const [lobby] = await getLobbyById.run({ lobby_id: input.lobbyID }, dbConn);
   if (!lobby) return [];
 
-  if (!(await checkUserOwns(player, input.nftId, dbConn))) {
+  if (player !== SCHEDULED_DATA_ADDRESS && !(await checkUserOwns(player, input.nftId, dbConn))) {
     console.log('DISCARD: user does not own specified nft');
     return [];
   }

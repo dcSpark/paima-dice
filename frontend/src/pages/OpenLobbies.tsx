@@ -16,7 +16,7 @@ import { AppContext } from "@src/main";
 import Wrapper from "@src/components/Wrapper";
 import Button from "@src/components/Button";
 import { formatDate } from "@src/utils";
-import { useNftContext } from "@src/NftContext";
+import { useGlobalStateContext } from "@src/GlobalStateContext";
 
 type Column = {
   id: keyof LobbyStateQuery | "action";
@@ -48,7 +48,7 @@ const OpenLobbies: React.FC = () => {
   const mainController: MainController = useContext(AppContext);
   const {
     selectedNftState: [selectedNft],
-  } = useNftContext();
+  } = useGlobalStateContext();
   const [lobbies, setLobbies] = useState<LobbyStateQuery[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -70,7 +70,7 @@ const OpenLobbies: React.FC = () => {
   };
 
   const searchForHiddenLobby = async (query: string) => {
-    const results = await mainController.searchLobby(query, 0);
+    const results = await mainController.searchLobby(selectedNft, query, 0);
     if (results == null || results.length === 0) return;
     const newLobbies = results.filter(
       (result) => !lobbies.some((lobby) => lobby.lobby_id === result.lobby_id)

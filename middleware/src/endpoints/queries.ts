@@ -84,7 +84,7 @@ async function getLobbyState(lobbyID: string): Promise<PackedLobbyState | Failed
 }
 
 async function getLobbySearch(
-  wallet: string,
+  nftId: number,
   searchQuery: string,
   page: number,
   count?: number
@@ -93,7 +93,7 @@ async function getLobbySearch(
 
   let response: Response;
   try {
-    const query = backendQuerySearchLobby(wallet, searchQuery, page, count);
+    const query = backendQuerySearchLobby(nftId, searchQuery, page, count);
     response = await fetch(query);
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.ERROR_QUERYING_BACKEND_ENDPOINT, err);
@@ -145,12 +145,12 @@ async function getRoundExecutionState(
   }
 }
 
-async function getUserStats(walletAddress: string): Promise<PackedUserStats | FailedResult> {
+async function getUserStats(nftId: number): Promise<PackedUserStats | FailedResult> {
   const errorFxn = buildEndpointErrorFxn('getUserStats');
 
   let res: Response;
   try {
-    const query = backendQueryUserStats(walletAddress);
+    const query = backendQueryUserStats(nftId);
     res = await fetch(query);
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.ERROR_QUERYING_BACKEND_ENDPOINT, err);
@@ -168,12 +168,12 @@ async function getUserStats(walletAddress: string): Promise<PackedUserStats | Fa
 }
 
 async function getNewLobbies(
-  wallet: string,
+  nftId: number,
   blockHeight: number
 ): Promise<NewLobbies | FailedResult> {
   const errorFxn = buildEndpointErrorFxn('getNewLobbies');
   try {
-    return getRawNewLobbies(wallet, blockHeight);
+    return getRawNewLobbies(nftId, blockHeight);
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.UNKNOWN, err);
   }

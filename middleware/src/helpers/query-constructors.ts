@@ -11,13 +11,13 @@ export function backendQueryLobbyState(lobbyID: string): string {
 }
 
 export function backendQuerySearchLobby(
-  wallet: WalletAddress,
+  nftId: number,
   searchQuery: string,
   page: number,
   count?: number
 ): string {
   const endpoint = 'search_open_lobbies';
-  const options: QueryOptions = { wallet, searchQuery, page };
+  const options: QueryOptions = { nftId, searchQuery, page };
   if (count !== undefined) {
     options.count = count;
   }
@@ -25,13 +25,10 @@ export function backendQuerySearchLobby(
   return buildBackendQuery(endpoint, options);
 }
 
-export function backendQueryUserLobbiesBlockheight(
-  wallet: WalletAddress,
-  blockHeight: number
-): string {
+export function backendQueryUserLobbiesBlockheight(nftId: number, blockHeight: number): string {
   const endpoint = 'user_lobbies_blockheight';
   const options = {
-    wallet,
+    nftId,
     blockHeight,
   };
   return buildBackendQuery(endpoint, options);
@@ -46,10 +43,10 @@ export function backendQueryRoundStatus(lobbyID: string, round: number): string 
   return buildBackendQuery(endpoint, options);
 }
 
-export function backendQueryUserStats(wallet: WalletAddress): string {
+export function backendQueryUserStats(nftId: number): string {
   const endpoint = 'user_stats';
   const options = {
-    wallet,
+    nftId,
   };
   return buildBackendQuery(endpoint, options);
 }

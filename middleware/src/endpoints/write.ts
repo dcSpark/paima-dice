@@ -40,10 +40,6 @@ async function createLobby(
 ): Promise<CreateLobbySuccessfulResponse | FailedResult> {
   const errorFxn = buildEndpointErrorFxn('createLobby');
 
-  const query = getUserWallet(errorFxn);
-  if (!query.success) return query;
-  const userWalletAddress = query.result;
-
   const conciseBuilder = builder.initialize();
   conciseBuilder.setPrefix('c');
   conciseBuilder.addValues([
@@ -78,7 +74,7 @@ async function createLobby(
   try {
     await awaitBlock(currentBlock);
     const newLobbies = await retryPromise(
-      () => getNonemptyNewLobbies(userWalletAddress, currentBlock),
+      () => getNonemptyNewLobbies(creatorNftId, currentBlock),
       RETRY_PERIOD,
       RETRIES_COUNT
     );

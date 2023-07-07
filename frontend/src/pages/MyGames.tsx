@@ -16,7 +16,7 @@ import { AppContext } from "@src/main";
 import Wrapper from "@src/components/Wrapper";
 import Button from "@src/components/Button";
 import { formatDate } from "@src/utils";
-import { useNftContext } from "@src/NftContext";
+import { useGlobalStateContext } from "@src/GlobalStateContext";
 
 type Column = {
   id: keyof UserLobby | "action";
@@ -33,10 +33,6 @@ const columns: Column[] = [
   { id: "action", label: "", minWidth: 50 },
 ];
 
-interface MyGamesProps {
-  myAddress: string;
-}
-
 const actionMap: Record<LobbyStatus, string> = {
   active: "Enter",
   finished: "Enter",
@@ -44,11 +40,11 @@ const actionMap: Record<LobbyStatus, string> = {
   closed: "",
 };
 
-const MyGames: React.FC<MyGamesProps> = ({ myAddress }) => {
+const MyGames: React.FC = () => {
   const mainController: MainController = useContext(AppContext);
   const {
     selectedNftState: [selectedNft],
-  } = useNftContext();
+  } = useGlobalStateContext();
 
   const [lobbies, setLobbies] = useState<UserLobby[]>([]);
   const [page, setPage] = useState(0);
@@ -83,8 +79,8 @@ const MyGames: React.FC<MyGamesProps> = ({ myAddress }) => {
   });
 
   const expandValue = (id: keyof UserLobby, value: unknown) => {
-    if (id === "lobby_creator" && typeof value === "string") {
-      return value.toLowerCase() === myAddress.toLowerCase() ? "Yes" : "No";
+    if (id === "lobby_creator" && typeof value === "number") {
+      return value === selectedNft ? "Yes" : "No";
     }
     if (id === "created_at" && typeof value === "string") {
       return formatDate(value);

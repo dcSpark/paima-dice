@@ -7,13 +7,13 @@ import { AppContext } from "@src/main";
 import Wrapper from "@src/components/Wrapper";
 import Button from "@src/components/Button";
 import NumericField from "@src/components/NumericField";
-import { useNftContext } from "@src/NftContext";
+import { useGlobalStateContext } from "@src/GlobalStateContext";
 
 const CreateLobby: React.FC = () => {
   const mainController: MainController = useContext(AppContext);
   const {
     selectedNftState: [selectedNft],
-  } = useNftContext();
+  } = useGlobalStateContext();
 
   const [numberOfRounds, setNumberOfRounds] = useState("10");
   const [roundLength, setRoundLength] = useState("100");
