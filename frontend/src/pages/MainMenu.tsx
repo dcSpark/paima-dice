@@ -42,9 +42,9 @@ const MainMenu = () => {
             gap: "24px",
           }}
         >
-          <Button onClick={() => navigate(Page.CreateLobby)}>Create</Button>
-          <Button onClick={() => navigate(Page.OpenLobbies)}>Lobbies</Button>
-          <Button onClick={() => navigate(Page.MyGames)}>My Games</Button>
+          <Button sx={theme => ({ backgroundColor: theme.palette.menuButton.main })} onClick={() => navigate(Page.CreateLobby)}>Create</Button>
+          <Button sx={theme => ({ backgroundColor: theme.palette.menuButton.main })} onClick={() => navigate(Page.OpenLobbies)}>Lobbies</Button>
+          <Button sx={theme => ({ backgroundColor: theme.palette.menuButton.main })} onClick={() => navigate(Page.MyGames)}>My Games</Button>
           {mainController.userAddress && (
             <>
               <Button onClick={() => buyNft(mainController.userAddress)}>
