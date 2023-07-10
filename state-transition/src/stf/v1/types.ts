@@ -23,6 +23,7 @@ export interface NftMintInput {
 
 export interface CreatedLobbyInput {
   input: 'createdLobby';
+  creatorNftId: number;
   numOfRounds: number;
   roundLength: number;
   playTimePerPlayer: number;
@@ -33,6 +34,7 @@ export interface CreatedLobbyInput {
 
 export interface JoinedLobbyInput {
   input: 'joinedLobby';
+  nftId: number;
   lobbyID: string;
 }
 
@@ -43,6 +45,7 @@ export interface ClosedLobbyInput {
 
 export interface SubmittedMovesInput {
   input: 'submittedMoves';
+  nftId: number;
   lobbyID: string;
   roundNumber: number;
   isPoint: boolean;
@@ -65,7 +68,7 @@ export interface ZombieRound extends ScheduledDataInput {
 
 export interface UserStats extends ScheduledDataInput {
   effect: 'stats';
-  user: WalletAddress;
+  nftId: number;
   result: ConciseResult;
 }
 

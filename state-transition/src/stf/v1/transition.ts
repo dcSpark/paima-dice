@@ -1,6 +1,6 @@
 import type { Pool } from 'pg';
 import Prando from 'paima-sdk/paima-prando';
-import type { WalletAddress } from 'paima-sdk/paima-utils';
+import { SCHEDULED_DATA_ADDRESS, type WalletAddress } from 'paima-sdk/paima-utils';
 import type { IGetLobbyByIdResult, IGetRoundDataResult, IGetRoundMovesResult } from '@dice/db';
 import { getCachedMoves, getLobbyById, getRoundData, getUserStats, endMatch } from '@dice/db';
 import type { ConciseResult, MatchState } from '@dice/utils';
@@ -28,9 +28,10 @@ import type {
   SubmittedMovesInput,
 } from './types.js';
 import { isUserStats, isZombieRound } from './types.js';
-import { PRACTICE_BOT_ADDRESS } from '@dice/utils';
+import { NFT_NAME, PRACTICE_BOT_NFT_ID } from '@dice/utils';
 import { getBlockHeight, type SQLUpdate } from 'paima-sdk/paima-db';
 import { PracticeAI } from './persist/practice-ai';
+import { getOwnedNfts } from 'paima-sdk/paima-utils-backend';
 
 // State transition when a create lobby input is processed
 export const createdLobby = async (
@@ -40,7 +41,11 @@ export const createdLobby = async (
   dbConn: Pool
 ): Promise<SQLUpdate[]> => {
   const [block] = await getBlockHeight.run({ block_height: blockHeight }, dbConn);
-  return persistLobbyCreation(player, blockHeight, input, block.seed);
+  if (!(await checkUserOwns(player, input.creatorNftId, dbConn))) {
+    console.log('DISCARD: user does not own specified nft');
+    return [];
+  }
+  return persistLobbyCreation(input.creatorNftId, blockHeight, input, block.seed);
 };
 
 // State transition when a join lobby input is processed
@@ -51,8 +56,17 @@ export const joinedLobby = async (
   dbConn: Pool
 ): Promise<SQLUpdate[]> => {
   const [lobby] = await getLobbyById.run({ lobby_id: input.lobbyID }, dbConn);
-  if (lobby) return persistLobbyJoin(blockHeight, player, input, lobby);
-  else return [];
+  if (lobby == null) {
+    console.log('DISCARD: lobby does not exist');
+    return [];
+  }
+
+  if (!(await checkUserOwns(player, input.nftId, dbConn))) {
+    console.log('DISCARD: user does not own specified nft');
+    return [];
+  }
+
+  return persistLobbyJoin(blockHeight, input, lobby);
 };
 
 // State transition when a close lobby input is processed
@@ -62,11 +76,19 @@ export const closedLobby = async (
   dbConn: Pool
 ): Promise<SQLUpdate[]> => {
   const [lobby] = await getLobbyById.run({ lobby_id: input.lobbyID }, dbConn);
-  if (!lobby) return [];
-  const query = persistCloseLobby(player, lobby);
-  // persisting failed the validation, bail
-  if (!query) return [];
-  console.log(query, 'closing lobby');
+  if (lobby == null) {
+    console.log('DISCARD: lobby does not exist');
+    return [];
+  }
+
+  if (!(await checkUserOwns(player, lobby.lobby_creator, dbConn))) {
+    console.log('DISCARD: user does not own creator nft');
+    return [];
+  }
+
+  const query = persistCloseLobby(lobby);
+  if (query == null) return [];
+
   return [query];
 };
 
@@ -80,6 +102,12 @@ export const submittedMoves = async (
   // Perform DB read queries to get needed data
   const [lobby] = await getLobbyById.run({ lobby_id: input.lobbyID }, dbConn);
   if (!lobby) return [];
+
+  if (player !== SCHEDULED_DATA_ADDRESS && !(await checkUserOwns(player, input.nftId, dbConn))) {
+    console.log('DISCARD: user does not own specified nft');
+    return [];
+  }
+
   const [round] = await getRoundData.run(
     { lobby_id: lobby.lobby_id, round_number: input.roundNumber },
     dbConn
@@ -88,9 +116,9 @@ export const submittedMoves = async (
   if (prandoSeed == null) return [];
 
   // If the submitted moves are usable/all validation passes, continue
-  if (!validateSubmittedMoves(lobby, round, input, player, new Prando(prandoSeed))) return [];
+  if (!validateSubmittedMoves(lobby, round, input, new Prando(prandoSeed))) return [];
   // Generate update to persist the moves
-  const persistMoveTuple = persistMoveSubmission(player, input, lobby);
+  const persistMoveTuple = persistMoveSubmission(input, lobby);
   // We generated an SQL update for persisting the moves.
   // Now we capture the params (the moves typed as we need) and pass it to the round executor.
   const newMove: IGetRoundMovesResult = persistMoveTuple[1].new_move;
@@ -104,7 +132,9 @@ export const submittedMoves = async (
   );
 
   // In practice mode we will submit a move for the AI
-  if (lobby.practice && player !== PRACTICE_BOT_ADDRESS) {
+  // If this is a bot move, do nothing
+  // TODO: instead of this check if "next player is bot"
+  if (lobby.practice && input.nftId !== PRACTICE_BOT_NFT_ID) {
     const practiceMoveSchedule = schedulePracticeMove(
       lobby.lobby_id,
       lobby.current_round + 1,
@@ -135,6 +165,7 @@ export const practiceMoves = async (
   const regularInput: SubmittedMovesInput = {
     ...input,
     input: 'submittedMoves',
+    nftId: PRACTICE_BOT_NFT_ID,
     isPoint: practiceMove,
   };
 
@@ -146,7 +177,6 @@ function validateSubmittedMoves(
   lobby: IGetLobbyByIdResult,
   round: IGetRoundDataResult,
   input: SubmittedMovesInput,
-  player: WalletAddress,
   randomnessGenerator: Prando
 ): boolean {
   // If lobby not active or existing
@@ -154,7 +184,7 @@ function validateSubmittedMoves(
 
   // If user does not belong to lobby
   const lobby_players = [lobby.lobby_creator, lobby.player_two];
-  if (!lobby_players.includes(player)) return false;
+  if (!lobby_players.includes(input.nftId)) return false;
 
   // TODO: it is this player's turn
 
@@ -183,7 +213,7 @@ export const scheduledData = async (
   }
   // Update the users stats
   if (isUserStats(input)) {
-    return updateStats(input.user, input.result, dbConn);
+    return updateStats(input.nftId, input.result, dbConn);
   }
   return [];
 };
@@ -213,15 +243,15 @@ export const zombieRound = async (
 
 // State transition when an update stats input is processed
 export const updateStats = async (
-  player: WalletAddress,
+  nftId: number,
   result: ConciseResult,
   dbConn: Pool
 ): Promise<SQLUpdate[]> => {
-  const [stats] = await getUserStats.run({ wallet: player }, dbConn);
+  const [stats] = await getUserStats.run({ nft_id: nftId }, dbConn);
   // Verify coherency that the user has existing stats which can be updated
   if (stats) {
-    const query = persistStatsUpdate(player, result, stats);
-    console.log(query[1], `Updating stats of ${player}`);
+    const query = persistStatsUpdate(nftId, result, stats);
+    console.log(query[1], `Updating stats of ${nftId}`);
     return [query];
   }
   return [];
@@ -298,12 +328,12 @@ function finalizeMatch(
   // Create the new scheduled data for updating user stats.
   // Stats are updated with scheduled data to support parallelism safely.
   const statsUpdate1 = scheduleStatsUpdate(
-    matchEnvironment.user1.wallet,
+    matchEnvironment.user1.nftId,
     results[0],
     blockHeight + 1
   );
   const statsUpdate2 = scheduleStatsUpdate(
-    matchEnvironment.user2.wallet,
+    matchEnvironment.user2.nftId,
     results[1],
     blockHeight + 1
   );
@@ -342,4 +372,9 @@ async function fetchPrandoSeed(
   );
   if (lastRoundBlock == null) return;
   return lastRoundBlock.seed;
+}
+
+async function checkUserOwns(user: WalletAddress, nftId: number, dbConn: Pool): Promise<boolean> {
+  const walletNfts = await getOwnedNfts(dbConn, NFT_NAME, user);
+  return walletNfts.some(ownedNftId => Number(ownedNftId) === nftId);
 }

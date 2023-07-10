@@ -22,7 +22,7 @@ export function processTick(
   // If a move does exist, we continue processing the tick by generating the event.
   // Required for frontend visualization and applying match state updates.
   const event: TickEvent = {
-    user: move.wallet,
+    nftId: move.nft_id,
     dice: genDiceRolls(randomnessGenerator),
     isPoint: move.is_point,
   };
@@ -42,10 +42,10 @@ function applyEvents(
   event: TickEvent
 ): void {
   if (event.isPoint) {
-    if (event.user === matchEnvironment.user1.wallet) {
+    if (event.nftId === matchEnvironment.user1.nftId) {
       matchState.player1Points = matchState.player1Points + 1;
     }
-    if (event.user === matchEnvironment.user2.wallet) {
+    if (event.nftId === matchEnvironment.user2.nftId) {
       matchState.player2Points = matchState.player2Points + 1;
     }
   }

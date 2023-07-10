@@ -42,32 +42,53 @@ RETURNING *;
 
 /* 
   @name newMatchMove
-  @param new_move -> (lobby_id!, wallet!, round!, is_point!)
+  @param new_move -> (lobby_id!, nft_id!, round!, is_point!)
 */
-INSERT INTO match_moves(lobby_id, wallet, round, is_point)
+INSERT INTO match_moves(lobby_id, nft_id, round, is_point)
 VALUES :new_move;
 
-/* @name newFinalState
-  @param final_state -> (lobby_id!, player_one_iswhite!, player_one_wallet!, player_one_result!, player_one_elapsed_time!, player_two_wallet!, player_two_result!, player_two_elapsed_time!, positions!)
+/* 
+  @name newFinalState
+  @param final_state -> (
+    lobby_id!,
+    player_one_iswhite!,
+    player_one_nft_id!,
+    player_one_result!,
+    player_one_elapsed_time!,
+    player_two_nft_id!,
+    player_two_result!,
+    player_two_elapsed_time!,
+    positions!
+  )
 */
-INSERT INTO final_match_state(lobby_id, player_one_iswhite, player_one_wallet, player_one_result, player_one_elapsed_time, player_two_wallet, player_two_result, player_two_elapsed_time, positions)
+INSERT INTO final_match_state(
+  lobby_id,
+  player_one_iswhite,
+  player_one_nft_id,
+  player_one_result,
+  player_one_elapsed_time,
+  player_two_nft_id,
+  player_two_result,
+  player_two_elapsed_time,
+  positions
+)
 VALUES :final_state;
 
 /* @name newStats
-  @param stats -> (wallet!, wins!, losses!, ties!)
+  @param stats -> (nft_id!, wins!, losses!, ties!)
 */
 INSERT INTO global_user_state
 VALUES :stats
-ON CONFLICT (wallet)
+ON CONFLICT (nft_id)
 DO NOTHING;
 
 /* 
   @name updateStats
-  @param stats -> (wallet!, wins!, losses!, ties!)
+  @param stats -> (nft_id!, wins!, losses!, ties!)
 */
 INSERT INTO global_user_state
 VALUES :stats
-ON CONFLICT (wallet)
+ON CONFLICT (nft_id)
 DO UPDATE SET
 wins = EXCLUDED.wins,
 losses = EXCLUDED.losses,

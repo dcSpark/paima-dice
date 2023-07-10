@@ -15,7 +15,7 @@ lobbies.lobby_creator,
 lobbies.player_one_iswhite,
 lobbies.lobby_state
 FROM lobbies
-WHERE lobbies.lobby_state = 'open' AND lobbies.hidden IS FALSE AND lobbies.lobby_creator != :wallet
+WHERE lobbies.lobby_state = 'open' AND lobbies.hidden IS FALSE AND lobbies.lobby_creator != :nft_id
 ORDER BY created_at DESC
 LIMIT :count
 OFFSET :page;
@@ -37,7 +37,7 @@ lobbies.lobby_creator,
 lobbies.player_one_iswhite,
 lobbies.lobby_state
 FROM lobbies
-WHERE lobbies.lobby_state = 'open' AND lobbies.hidden IS FALSE AND lobbies.lobby_creator != :wallet AND lobbies.lobby_id LIKE :searchQuery
+WHERE lobbies.lobby_state = 'open' AND lobbies.hidden IS FALSE AND lobbies.lobby_creator != :nft_id AND lobbies.lobby_id LIKE :searchQuery
 ORDER BY created_at DESC
 LIMIT :count
 OFFSET :page;
@@ -59,7 +59,7 @@ lobbies.lobby_creator,
 lobbies.player_one_iswhite,
 lobbies.lobby_state
 FROM lobbies
-WHERE lobbies.lobby_state = 'open' AND lobbies.lobby_id = :searchQuery AND lobbies.lobby_creator != :wallet;
+WHERE lobbies.lobby_state = 'open' AND lobbies.lobby_id = :searchQuery AND lobbies.lobby_creator != :nft_id;
 
 /* @name getRandomLobby */
 SELECT
@@ -92,24 +92,24 @@ LIMIT 1;
 SELECT * FROM lobbies
 WHERE lobbies.lobby_state != 'finished'
 AND lobbies.lobby_state != 'closed'
-AND (lobbies.lobby_creator = :wallet
-OR lobbies.player_two = :wallet)
+AND (lobbies.lobby_creator = :nft_id
+OR lobbies.player_two = :nft_id)
 ORDER BY created_at DESC;
 
 /* @name getPaginatedUserLobbies */
 SELECT * FROM lobbies
 WHERE lobbies.lobby_state != 'finished'
 AND lobbies.lobby_state != 'closed'
-AND (lobbies.lobby_creator = :wallet
-OR lobbies.player_two = :wallet)
+AND (lobbies.lobby_creator = :nft_id
+OR lobbies.player_two = :nft_id)
 ORDER BY created_at DESC
 LIMIT :count
 OFFSET :page;
 
 /* @name getAllPaginatedUserLobbies */
 SELECT * FROM lobbies
-WHERE (lobbies.lobby_creator = :wallet
-OR lobbies.player_two = :wallet)
+WHERE (lobbies.lobby_creator = :nft_id
+OR lobbies.player_two = :nft_id)
 ORDER BY lobby_state = 'active' DESC,
          lobby_state = 'open' DESC,
          lobby_state = 'finished' DESC,
@@ -127,21 +127,21 @@ WHERE lobby_id = :lobby_id;
 
 /* @name getUserStats */
 SELECT * FROM global_user_state
-WHERE wallet = :wallet;
+WHERE nft_id = :nft_id;
 
 /* @name getBothUserStats */
-SELECT global_user_state.wallet, wins, losses, ties
+SELECT global_user_state.nft_id, wins, losses, ties
 FROM global_user_state
-WHERE global_user_state.wallet = :wallet
-OR global_user_state.wallet = :wallet2;
+WHERE global_user_state.nft_id = :nft_id_1
+OR global_user_state.nft_id = :nft_id_2;
 
 
 /* @name getMatchUserStats */
 SELECT * FROM global_user_state
 INNER JOIN lobbies
-ON lobbies.lobby_creator = global_user_state.wallet
-OR lobbies.player_two = global_user_state.wallet
-WHERE global_user_state.wallet = :wallet1;
+ON lobbies.lobby_creator = global_user_state.nft_id
+OR lobbies.player_two = global_user_state.nft_id
+WHERE global_user_state.nft_id = :nft_id;
 
 /* @name getRoundMoves */
 SELECT * FROM match_moves
@@ -152,7 +152,7 @@ AND   round = :round!;
 SELECT
 match_moves.id,
 match_moves.lobby_id,
-match_moves.wallet,
+match_moves.nft_id,
 match_moves.is_point,
 match_moves.round
 FROM match_moves
@@ -170,7 +170,7 @@ WHERE match_moves.lobby_id = :lobby_id;
 
 /* @name getNewLobbiesByUserAndBlockHeight */
 SELECT lobby_id FROM lobbies
-WHERE lobby_creator = :wallet
+WHERE lobby_creator = :nft_id
 AND creation_block_height = :block_height;
 
 /* @name getRoundData */

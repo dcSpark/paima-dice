@@ -11,13 +11,13 @@ export function backendQueryLobbyState(lobbyID: string): string {
 }
 
 export function backendQuerySearchLobby(
-  wallet: WalletAddress,
+  nftId: number,
   searchQuery: string,
   page: number,
   count?: number
 ): string {
   const endpoint = 'search_open_lobbies';
-  const options: QueryOptions = { wallet, searchQuery, page };
+  const options: QueryOptions = { nftId, searchQuery, page };
   if (count !== undefined) {
     options.count = count;
   }
@@ -25,13 +25,10 @@ export function backendQuerySearchLobby(
   return buildBackendQuery(endpoint, options);
 }
 
-export function backendQueryUserLobbiesBlockheight(
-  wallet: WalletAddress,
-  blockHeight: number
-): string {
+export function backendQueryUserLobbiesBlockheight(nftId: number, blockHeight: number): string {
   const endpoint = 'user_lobbies_blockheight';
   const options = {
-    wallet,
+    nftId,
     blockHeight,
   };
   return buildBackendQuery(endpoint, options);
@@ -46,19 +43,15 @@ export function backendQueryRoundStatus(lobbyID: string, round: number): string 
   return buildBackendQuery(endpoint, options);
 }
 
-export function backendQueryUserStats(wallet: WalletAddress): string {
+export function backendQueryUserStats(nftId: number): string {
   const endpoint = 'user_stats';
   const options = {
-    wallet,
+    nftId,
   };
   return buildBackendQuery(endpoint, options);
 }
 
-export function backendQueryUserLobbies(
-  wallet: WalletAddress,
-  count?: number,
-  page?: number
-): string {
+export function backendQueryUserLobbies(nftId: number, count?: number, page?: number): string {
   const endpoint = 'user_lobbies';
   const optsStart: QueryOptions = {};
   if (typeof count !== 'undefined') {
@@ -68,19 +61,15 @@ export function backendQueryUserLobbies(
     optsStart.page = page;
   }
   const options = {
-    wallet,
+    nftId,
     ...optsStart,
   };
   return buildBackendQuery(endpoint, options);
 }
 
-export function backendQueryOpenLobbies(
-  wallet: WalletAddress,
-  count?: number,
-  page?: number
-): string {
+export function backendQueryOpenLobbies(nftId: number, count?: number, page?: number): string {
   const endpoint = 'open_lobbies';
-  const options: QueryOptions = { wallet };
+  const options: QueryOptions = { nftId };
   if (typeof count !== 'undefined') {
     options.count = count;
   }
@@ -104,12 +93,6 @@ export function backendQueryMatchExecutor(lobbyID: string): string {
   const options = {
     lobbyID,
   };
-  return buildBackendQuery(endpoint, options);
-}
-
-export function backendQueryRandomLobby(): string {
-  const endpoint = 'random_lobby';
-  const options = {};
   return buildBackendQuery(endpoint, options);
 }
 

@@ -3,7 +3,7 @@ import { buildEndpointErrorFxn, MiddlewareErrorCode } from '../errors';
 import type { PackedLobbyState, RoundEnd } from '../types';
 import { PaimaMiddlewareErrorCode } from 'paima-sdk/paima-mw-core';
 
-export function userJoinedLobby(address: String, lobby: PackedLobbyState): boolean {
+export function userJoinedLobby(nftId: number, lobby: PackedLobbyState): boolean {
   if (!lobby.hasOwnProperty('lobby')) {
     return false;
   }
@@ -12,13 +12,13 @@ export function userJoinedLobby(address: String, lobby: PackedLobbyState): boole
   if (!lobbyState.hasOwnProperty('player_two')) {
     return false;
   }
-  if (!lobbyState.player_two || !address) {
+  if (lobbyState.player_two == null) {
     return false;
   }
-  return lobbyState.player_two.toLowerCase() === address.toLowerCase();
+  return lobbyState.player_two === nftId;
 }
 
-export function userCreatedLobby(address: String, lobby: PackedLobbyState): boolean {
+export function userCreatedLobby(nftId: number, lobby: PackedLobbyState): boolean {
   if (!lobby.hasOwnProperty('lobby')) {
     return false;
   }
@@ -27,10 +27,10 @@ export function userCreatedLobby(address: String, lobby: PackedLobbyState): bool
   if (!lobbyState.hasOwnProperty('lobby_creator')) {
     return false;
   }
-  if (!lobbyState.lobby_creator || !address) {
+  if (lobbyState.lobby_creator == null) {
     return false;
   }
-  return lobbyState.lobby_creator.toLowerCase() === address.toLowerCase();
+  return lobbyState.lobby_creator === nftId;
 }
 
 export function lobbyWasClosed(lobby: PackedLobbyState): boolean {

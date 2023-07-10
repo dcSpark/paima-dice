@@ -14,7 +14,6 @@ import {
   newFinalState,
   executedRound,
 } from '@dice/db';
-import type { WalletAddress } from 'paima-sdk/paima-utils';
 import type {
   ConciseResult,
   ExpandedResult,
@@ -52,14 +51,13 @@ export function persistNewRound(
 
 // Persist moves sent by player to an active match
 export function persistMoveSubmission(
-  player: WalletAddress,
   inputData: SubmittedMovesInput,
   lobby: IGetLobbyByIdResult
 ): SQLUpdate {
   const mmParams: INewMatchMoveParams = {
     new_move: {
       lobby_id: inputData.lobbyID,
-      wallet: player,
+      nft_id: inputData.nftId,
       round: lobby.current_round,
       is_point: inputData.isPoint,
     },
@@ -106,10 +104,10 @@ export function persistMatchResults(
     final_state: {
       lobby_id: lobbyId,
       player_one_iswhite: matchEnvironment.user1.color === 'w',
-      player_one_wallet: matchEnvironment.user1.wallet,
+      player_one_nft_id: matchEnvironment.user1.nftId,
       player_one_result: expandResult(results[0]),
       player_one_elapsed_time: 0, // Example TODO: for the developer to implement themselves
-      player_two_wallet: matchEnvironment.user2.wallet,
+      player_two_nft_id: matchEnvironment.user2.nftId,
       player_two_result: expandResult(results[1]),
       player_two_elapsed_time: 0, // Example TODO
       positions: '',

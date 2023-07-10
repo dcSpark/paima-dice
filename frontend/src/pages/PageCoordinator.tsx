@@ -11,9 +11,13 @@ import { LobbyState } from "@dice/utils";
 import "./PageCoordinator.scss";
 import { AppContext } from "@src/main";
 import { Lobby } from "./DiceGame/Lobby";
+import { useGlobalStateContext } from "@src/GlobalStateContext";
 
 const PageCoordinator: React.FC = () => {
   const mainController: MainController = useContext(AppContext);
+  const {
+    selectedNftState: [selectedNft],
+  } = useGlobalStateContext();
   const navigate = useNavigate();
 
   const [lobby, setLobby] = useState<LobbyState>(null);
@@ -51,17 +55,11 @@ const PageCoordinator: React.FC = () => {
       <Routes>
         <Route path={Page.MainMenu} element={<MainMenu />} />
         <Route path={Page.OpenLobbies} element={<OpenLobbies />} />
-        <Route
-          path={Page.MyGames}
-          element={<MyGames myAddress={mainController.userAddress} />}
-        />
+        <Route path={Page.MyGames} element={<MyGames />} />
         <Route
           path={Page.Game}
           element={
-            <Lobby
-              initialLobbyState={lobby}
-              address={mainController.userAddress}
-            />
+            <Lobby initialLobbyState={lobby} selectedNft={selectedNft} />
           }
         />
         <Route path={Page.CreateLobby} element={<CreateLobby />} />

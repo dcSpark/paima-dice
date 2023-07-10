@@ -18,21 +18,27 @@ export class DiceService {
 
   // Submit Moves
   static async submitMove(
+    nftId: number,
     lobbyId: string,
     roundNumber: number,
     move: boolean
   ): Promise<OldResult> {
-    const result = await Paima.default.submitMoves(lobbyId, roundNumber, move);
+    const result = await Paima.default.submitMoves(
+      nftId,
+      lobbyId,
+      roundNumber,
+      move
+    );
     console.log("Submit move result: ", result);
     return result;
   }
 }
 
 export class DiceLogic {
-  userAddress: string;
+  nftId: number;
 
-  constructor(userAddress: string) {
-    this.userAddress = userAddress;
+  constructor(nftId: number) {
+    this.nftId = nftId;
   }
 
   async handleMove(lobbyState: LobbyState, move: boolean): Promise<void> {
@@ -46,6 +52,7 @@ export class DiceLogic {
     }
 
     const moveResult = await DiceService.submitMove(
+      this.nftId,
       lobbyState.lobby_id,
       lobbyState.current_round,
       move
@@ -65,8 +72,7 @@ export class DiceLogic {
   }
 
   isThisPlayerWhite(lobbyState: LobbyState): boolean {
-    const isCreator =
-      lobbyState.lobby_creator === this.userAddress ? true : false;
+    const isCreator = lobbyState.lobby_creator === this.nftId ? true : false;
     const isCreatorWhite = lobbyState.player_one_iswhite;
     return isCreator === isCreatorWhite;
   }

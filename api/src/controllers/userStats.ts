@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Path, Post, Query, Route, SuccessResponse } from 'tsoa';
+import { Controller, Get, Query, Route } from 'tsoa';
 import { requirePool, getUserStats } from '@dice/db';
 import type { UserStats } from '@dice/utils';
 
@@ -9,10 +9,9 @@ interface Response {
 @Route('user_stats')
 export class UserStatsController extends Controller {
   @Get()
-  public async get(@Query() wallet: string): Promise<Response> {
+  public async get(@Query() nftId: number): Promise<Response> {
     const pool = requirePool();
-    wallet = wallet.toLowerCase();
-    const [stats] = await getUserStats.run({ wallet }, pool);
+    const [stats] = await getUserStats.run({ nft_id: nftId }, pool);
     return { stats };
   }
 }

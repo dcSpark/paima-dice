@@ -42,14 +42,14 @@ AND rounds.round_within_match = :round!;
 UPDATE global_user_state
 SET
 wins = wins + 1
-WHERE wallet = :wallet;
+WHERE nft_id = :nft_id;
 /* @name addLoss */
 UPDATE global_user_state
 SET
 losses = losses + 1
-WHERE wallet = :wallet;
+WHERE nft_id = :nft_id;
 /* @name addTie */
 UPDATE global_user_state
 SET
 ties = ties + 1
-WHERE wallet = :wallet;
+WHERE nft_id = :nft_id;

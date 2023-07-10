@@ -11,16 +11,15 @@ interface Response {
 @Route('user_lobbies_blockheight')
 export class UserLobbiesBlockheightController extends Controller {
   @Get()
-  public async get(@Query() wallet: string, @Query() blockHeight: number): Promise<Response> {
+  public async get(@Query() nftId: number, @Query() blockHeight: number): Promise<Response> {
     const pool = requirePool();
     const valBH = psqlNum.decode(blockHeight);
     if (isLeft(valBH)) {
       throw new ValidateError({ blockHeight: { message: 'invalid number' } }, '');
     }
 
-    wallet = wallet.toLowerCase();
     const lobbies = await getNewLobbiesByUserAndBlockHeight.run(
-      { wallet, block_height: blockHeight },
+      { nft_id: nftId, block_height: blockHeight },
       pool
     );
     return { lobbies };

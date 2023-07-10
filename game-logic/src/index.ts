@@ -34,11 +34,11 @@ export function initRoundExecutor(
 export function extractMatchEnvironment(lobby: IGetLobbyByIdResult): MatchEnvironment {
   return {
     user1: {
-      wallet: lobby.lobby_creator,
+      nftId: lobby.lobby_creator,
       color: lobby.player_one_iswhite ? WHITE : BLACK,
     },
     user2: {
-      wallet: lobby.player_two!,
+      nftId: lobby.player_two!,
       color: lobby.player_one_iswhite !== true ? WHITE : BLACK,
     },
   };

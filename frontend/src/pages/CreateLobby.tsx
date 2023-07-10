@@ -7,9 +7,13 @@ import { AppContext } from "@src/main";
 import Wrapper from "@src/components/Wrapper";
 import Button from "@src/components/Button";
 import NumericField from "@src/components/NumericField";
+import { useGlobalStateContext } from "@src/GlobalStateContext";
 
 const CreateLobby: React.FC = () => {
   const mainController: MainController = useContext(AppContext);
+  const {
+    selectedNftState: [selectedNft],
+  } = useGlobalStateContext();
 
   const [numberOfRounds, setNumberOfRounds] = useState("10");
   const [roundLength, setRoundLength] = useState("100");
@@ -23,6 +27,7 @@ const CreateLobby: React.FC = () => {
     const playersTimeNum = parseInt(playersTime);
 
     await mainController.createLobby(
+      selectedNft,
       numberOfRoundsNum,
       roundLengthNum,
       playersTimeNum,

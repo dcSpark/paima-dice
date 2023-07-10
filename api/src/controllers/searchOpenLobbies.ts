@@ -15,7 +15,7 @@ const LOBBY_ID_LENGTH = 12;
 export class SearchOpenLobbiesController extends Controller {
   @Get()
   public async get(
-    @Query() wallet: string,
+    @Query() nftId: number,
     @Query() searchQuery: string,
     @Query() page?: number,
     @Query() count?: number
@@ -25,10 +25,8 @@ export class SearchOpenLobbiesController extends Controller {
     if (searchQuery.length < MIN_SEARCH_LENGTH || searchQuery.length > LOBBY_ID_LENGTH)
       return emptyResponse;
 
-    wallet = wallet.toLowerCase();
-
     if (searchQuery.length == LOBBY_ID_LENGTH) {
-      const lobbies = await getOpenLobbyById.run({ searchQuery, wallet }, pool);
+      const lobbies = await getOpenLobbyById.run({ searchQuery, nft_id: nftId }, pool);
       return { lobbies };
     }
 
@@ -47,7 +45,7 @@ export class SearchOpenLobbiesController extends Controller {
     const c = valCount.right;
     const offset = (valPage.right - 1) * c;
     const lobbies = await searchPaginatedOpenLobbies.run(
-      { count: `${c}`, page: `${offset}`, searchQuery: `%${searchQuery}%`, wallet },
+      { count: `${c}`, page: `${offset}`, searchQuery: `%${searchQuery}%`, nft_id: nftId },
       pool
     );
     return { lobbies };

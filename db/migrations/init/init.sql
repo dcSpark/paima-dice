@@ -20,9 +20,9 @@ CREATE TABLE lobbies (
   creation_block_height INTEGER NOT NULL,
   hidden BOOLEAN NOT NULL DEFAULT false,
   practice BOOLEAN NOT NULL DEFAULT false,
-  lobby_creator TEXT NOT NULL,
+  lobby_creator INTEGER NOT NULL,
   player_one_iswhite BOOLEAN NOT NULL,
-  player_two TEXT,
+  player_two INTEGER,
   lobby_state lobby_status NOT NULL
 );
 
@@ -38,10 +38,10 @@ CREATE TYPE match_result AS ENUM ('win', 'tie', 'loss');
 CREATE TABLE final_match_state (
    lobby_id TEXT NOT NULL references lobbies(lobby_id),
    player_one_iswhite BOOLEAN NOT NULL,
-   player_one_wallet TEXT NOT NULL,
+   player_one_nft_id INTEGER NOT NULL,
    player_one_result match_result NOT NULL,
    player_one_elapsed_time INTEGER NOT NULL,
-   player_two_wallet TEXT NOT NULL,
+   player_two_nft_id INTEGER NOT NULL,
    player_two_result match_result NOT NULL,
    player_two_elapsed_time INTEGER NOT NULL,
    positions TEXT NOT NULL,
@@ -50,13 +50,13 @@ CREATE TABLE final_match_state (
 CREATE TABLE match_moves (
    id SERIAL PRIMARY KEY,
    lobby_id TEXT NOT NULL references lobbies(lobby_id),
-   wallet TEXT NOT NULL,
+   nft_id INTEGER NOT NULL,
    round INTEGER NOT NULL,
    is_point BOOLEAN NOT NULL
 );
 
 CREATE TABLE global_user_state (
-  wallet TEXT NOT NULL PRIMARY KEY,
+  nft_id INTEGER NOT NULL PRIMARY KEY,
   wins INTEGER NOT NULL DEFAULT 0,
   losses INTEGER NOT NULL DEFAULT 0,
   ties INTEGER NOT NULL DEFAULT 0

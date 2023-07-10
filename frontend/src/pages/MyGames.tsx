@@ -16,6 +16,7 @@ import { AppContext } from "@src/main";
 import Wrapper from "@src/components/Wrapper";
 import Button from "@src/components/Button";
 import { formatDate } from "@src/utils";
+import { useGlobalStateContext } from "@src/GlobalStateContext";
 
 type Column = {
   id: keyof UserLobby | "action";
@@ -32,10 +33,6 @@ const columns: Column[] = [
   { id: "action", label: "", minWidth: 50 },
 ];
 
-interface MyGamesProps {
-  myAddress: string;
-}
-
 const actionMap: Record<LobbyStatus, string> = {
   active: "Enter",
   finished: "Enter",
@@ -43,8 +40,11 @@ const actionMap: Record<LobbyStatus, string> = {
   closed: "",
 };
 
-const MyGames: React.FC<MyGamesProps> = ({ myAddress }) => {
+const MyGames: React.FC = () => {
   const mainController: MainController = useContext(AppContext);
+  const {
+    selectedNftState: [selectedNft],
+  } = useGlobalStateContext();
 
   const [lobbies, setLobbies] = useState<UserLobby[]>([]);
   const [page, setPage] = useState(0);
@@ -52,7 +52,7 @@ const MyGames: React.FC<MyGamesProps> = ({ myAddress }) => {
   const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
-    mainController.getMyGames().then((lobbies) => {
+    mainController.getMyGames(selectedNft).then((lobbies) => {
       setLobbies(lobbies);
     });
   }, []);
@@ -65,7 +65,7 @@ const MyGames: React.FC<MyGamesProps> = ({ myAddress }) => {
   };
 
   const handleLobbiesRefresh = async () => {
-    const lobbies = await mainController.getMyGames();
+    const lobbies = await mainController.getMyGames(selectedNft);
 
     setPage(0);
     setSearchText("");
@@ -79,8 +79,8 @@ const MyGames: React.FC<MyGamesProps> = ({ myAddress }) => {
   });
 
   const expandValue = (id: keyof UserLobby, value: unknown) => {
-    if (id === "lobby_creator" && typeof value === "string") {
-      return value.toLowerCase() === myAddress.toLowerCase() ? "Yes" : "No";
+    if (id === "lobby_creator" && typeof value === "number") {
+      return value === selectedNft ? "Yes" : "No";
     }
     if (id === "created_at" && typeof value === "string") {
       return formatDate(value);
@@ -96,7 +96,7 @@ const MyGames: React.FC<MyGamesProps> = ({ myAddress }) => {
 
   const handleLobbyAction = (status: LobbyStatus, lobbyId: string) => {
     if (status === "open") {
-      mainController.closeLobby(lobbyId);
+      mainController.closeLobby(selectedNft, lobbyId);
     } else {
       mainController.moveToJoinedLobby(lobbyId);
     }

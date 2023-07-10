@@ -5,11 +5,10 @@ import type {
   IGetNewLobbiesByUserAndBlockHeightResult,
   IGetPaginatedUserLobbiesResult,
 } from '@dice/db';
-import type { WalletAddress } from 'paima-sdk/paima-utils';
 import type { Color } from 'chess.js';
 
 export interface TickEvent {
-  user: string;
+  nftId: number;
   isPoint: boolean;
   dice: [number, number];
 }
@@ -20,7 +19,7 @@ export interface MatchEnvironment {
 }
 
 export interface PlayerInfo {
-  wallet: string;
+  nftId: number;
   color: Color;
 }
 
@@ -38,7 +37,7 @@ export type MatchResult = [ConciseResult, ConciseResult];
 
 export interface MatchWinnerResponse {
   match_status?: LobbyStatus;
-  winner_address?: string;
+  winner_nft_id?: undefined | number;
 }
 
 export interface RoundExecutorBackendData {
@@ -65,7 +64,7 @@ export interface MatchExecutorData {
 
 export interface BaseRoundStatus {
   executed: boolean;
-  usersWhoSubmittedMoves: WalletAddress[];
+  usersWhoSubmittedMoves: number[];
 }
 
 export interface RoundStatusData extends BaseRoundStatus {

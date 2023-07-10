@@ -13,21 +13,21 @@ import Player from "./Player";
 interface DiceGameProps {
   lobbyState: LobbyState;
   refetchLobbyState: () => Promise<void>;
-  address: string;
+  selectedNft: number;
 }
 
 const DiceGame: React.FC<DiceGameProps> = ({
   lobbyState,
   refetchLobbyState,
-  address,
+  selectedNft,
 }) => {
   const diceRef = useRef<{
     1: undefined | ReactDiceRef;
     2: undefined | ReactDiceRef;
   }>({ 1: undefined, 2: undefined });
   const diceLogic = useMemo(() => {
-    return new DiceLogic(address);
-  }, [address]);
+    return new DiceLogic(selectedNft);
+  }, [selectedNft]);
 
   // round being currently shown
   // interactive if this player's round,
@@ -56,6 +56,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
     const playerRolling = isThisPlayerPlayerOne ? 1 : 2;
     diceRef.current[playerRolling]?.rollAll(dice);
     const moveResult = await DiceService.submitMove(
+      selectedNft,
       lobbyState.lobby_id,
       lobbyState.current_round,
       isPoint(dice)
@@ -85,7 +86,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
 
     const [tickEvent] = tickEvents;
     setIsTickDisplaying(true);
-    const playerRolling = tickEvent.user === lobbyState.lobby_creator ? 1 : 2;
+    const playerRolling = tickEvent.nftId === lobbyState.lobby_creator ? 1 : 2;
     diceRef.current[playerRolling]?.rollAll(tickEvent.dice);
   }, [isTickDisplaying, roundExecutor.current]);
   function rollDone() {

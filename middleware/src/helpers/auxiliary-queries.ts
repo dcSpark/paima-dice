@@ -30,14 +30,14 @@ export async function getRawLobbyState(lobbyID: string): Promise<PackedLobbyStat
 }
 
 export async function getRawNewLobbies(
-  wallet: string,
+  nftId: number,
   blockHeight: number
 ): Promise<NewLobbies | FailedResult> {
   const errorFxn = buildEndpointErrorFxn('getRawNewLobbies');
 
   let res: Response;
   try {
-    const query = backendQueryUserLobbiesBlockheight(wallet, blockHeight);
+    const query = backendQueryUserLobbiesBlockheight(nftId, blockHeight);
     res = await fetch(query);
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.ERROR_QUERYING_BACKEND_ENDPOINT, err);
@@ -55,10 +55,10 @@ export async function getRawNewLobbies(
 }
 
 export async function getNonemptyNewLobbies(
-  address: string,
+  nftId: number,
   blockHeight: number
 ): Promise<NewLobbies> {
-  const newLobbies = await getRawNewLobbies(address, blockHeight);
+  const newLobbies = await getRawNewLobbies(nftId, blockHeight);
   if (!newLobbies.success) {
     throw new Error('Failed to get new lobbies');
   } else if (newLobbies.lobbies.length === 0) {
@@ -70,12 +70,12 @@ export async function getNonemptyNewLobbies(
 
 export async function getLobbyStateWithUser(
   lobbyID: string,
-  address: string
+  nftId: number
 ): Promise<PackedLobbyState> {
   const lobbyState = await getRawLobbyState(lobbyID);
   if (!lobbyState.success) {
     throw new Error('Failed to get lobby state');
-  } else if (userJoinedLobby(address, lobbyState) || userCreatedLobby(address, lobbyState)) {
+  } else if (userJoinedLobby(nftId, lobbyState) || userCreatedLobby(nftId, lobbyState)) {
     return lobbyState;
   } else {
     throw new Error('User is not in the lobby');
