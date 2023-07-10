@@ -28,6 +28,7 @@ export function persistLobbyCreation(
     hidden: inputData.isHidden,
     practice: inputData.isPractice,
     lobby_creator: nftId,
+    // TODO: support multiple players
     player_one_iswhite: inputData.playerOneIsWhite,
     player_two: null,
     lobby_state: 'open' as LobbyStatus,
@@ -58,6 +59,7 @@ export function persistLobbyJoin(
   // First we validate if the lobby is actually open for users to join, before applying.
   // If not, just output an empty list of updates (meaning no state transition is applied)
   if (
+    // TODO: support multiple players
     !lobby.player_two &&
     lobby.lobby_state === 'open' &&
     lobby.lobby_creator !== inputData.nftId
@@ -72,7 +74,8 @@ export function persistLobbyJoin(
 
 // Convert lobby state from `open` to `close`, meaning no one will be able to join the lobby.
 export function persistCloseLobby(lobby: IGetLobbyByIdResult): SQLUpdate | null {
-  if (lobby.player_two || lobby.lobby_state !== 'open') {
+  // TODO: support multiple players
+  if (lobby.player_two != null || lobby.lobby_state !== 'open') {
     console.log('DISCARD: lobby is full or not open');
     return null;
   }
@@ -92,6 +95,7 @@ function persistActivateLobby(
   // First update lobby row, marking its state as now 'active', and saving the joining player's wallet address
   const smParams: IStartMatchParams = {
     lobby_id: lobby.lobby_id,
+    // TODO: support multiple players
     player_two: joiningNftId,
   };
   const newMatchTuple: SQLUpdate = [startMatch, smParams];

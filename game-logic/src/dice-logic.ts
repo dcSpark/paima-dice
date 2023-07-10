@@ -16,7 +16,7 @@ export function genDiceRolls(randomnessGenerator: Prando): [number, number] {
 }
 
 export function isPoint(dice: [number, number]): boolean {
-  return dice[0] + dice[1] >= 7; // TODO
+  return dice[0] + dice[1] >= 7; // TODO: update to blackjack dice logic
 }
 
 export function isValidMove(randomnessGenerator: Prando, point: boolean): boolean {
@@ -28,6 +28,8 @@ export function matchResults(
   matchState: MatchState,
   matchEnvironment: MatchEnvironment
 ): MatchResult {
+  // TODO: allow for more than 2 players
+
   // We compute the winner
   const user1won = matchState.player1Points > matchState.player2Points;
   const user2won = matchState.player2Points > matchState.player1Points;

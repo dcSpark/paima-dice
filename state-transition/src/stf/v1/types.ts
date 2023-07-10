@@ -48,6 +48,7 @@ export interface SubmittedMovesInput {
   nftId: number;
   lobbyID: string;
   roundNumber: number;
+  // TODO: remove isPoint everywhere since this isn't necessary
   isPoint: boolean;
 }
 

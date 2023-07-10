@@ -53,6 +53,8 @@ export default function Player({
         disableIndividual
         numDice={2}
         ref={diceRef}
+        faceColor="#A51C3E"
+        dotColor="#FFEEEE"
         rollDone={rollDone}
       />
       {isThisPlayerYou && (

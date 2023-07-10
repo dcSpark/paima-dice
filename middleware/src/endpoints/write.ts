@@ -49,11 +49,13 @@ async function createLobby(
     { value: playTimePerPlayer.toString(10) },
     { value: isHidden ? 'T' : '' },
     { value: isPractice ? 'T' : '' },
+    // TODO: change to support multiple players
     { value: playerOneIsWhite ? 'T' : '' },
   ]);
 
   let currentBlockVar: number;
   try {
+    // TODO: do not use deprecated function
     const result = await postConciselyEncodedData(conciseBuilder.build());
     if (!result.success) {
       return errorFxn(PaimaMiddlewareErrorCode.ERROR_POSTING_TO_CHAIN, result.errorMessage);
