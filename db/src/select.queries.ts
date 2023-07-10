@@ -859,7 +859,6 @@ export interface IGetFinalStateResult {
   player_two_elapsed_time: number;
   player_two_nft_id: number;
   player_two_result: match_result;
-  positions: string;
 }
 
 /** 'GetFinalState' query type */

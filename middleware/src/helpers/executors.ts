@@ -19,6 +19,7 @@ export function buildMatchExecutor({
   console.log(seeds, 'seeds used for the match executor at the middleware');
 
   const initialState: MatchState = {
+    // TODO: support multiple players
     player1Points: 0,
     player2Points: 0,
   };

@@ -183,6 +183,7 @@ function validateSubmittedMoves(
   if (!lobby || lobby.lobby_state !== 'active') return false;
 
   // If user does not belong to lobby
+  // TODO: support multiple players
   const lobby_players = [lobby.lobby_creator, lobby.player_two];
   if (!lobby_players.includes(input.nftId)) return false;
 
@@ -194,7 +195,7 @@ function validateSubmittedMoves(
   // If moves submitted don't target the current round
   if (input.roundNumber !== lobby.current_round) return false;
 
-  // If a move is sent that doesn't fit in the lobby grid size or is strictly invalid
+  // If a move is sent that is invalid
   if (!isValidMove(randomnessGenerator, input.isPoint)) return false;
 
   return true;
@@ -236,7 +237,7 @@ export const zombieRound = async (
   console.log(`Executing zombie round (#${lobby.current_round}) for lobby ${lobby.lobby_id}`);
 
   // We call the execute round function passing the unexecuted moves from the database, if any.
-  // In practice for chess, there will be no cached moves as only one player goes per turn
+  // In practice for blackjack dice, there will be no cached moves as only one player goes per turn
   // and the round is instantly executed. As such this will simply proceed to the next round.
   return executeRound(blockHeight, lobby, cachedMoves, round, randomnessGenerator);
 };
@@ -269,6 +270,7 @@ export function executeRound(
   const executor = initRoundExecutor(
     lobby,
     {
+      // TODO: support multiple players
       player1Points: lobby.player_one_points,
       player2Points: lobby.player_two_points,
     },
@@ -327,6 +329,7 @@ function finalizeMatch(
 
   // Create the new scheduled data for updating user stats.
   // Stats are updated with scheduled data to support parallelism safely.
+  // TODO: support multiple players
   const statsUpdate1 = scheduleStatsUpdate(
     matchEnvironment.user1.nftId,
     results[0],

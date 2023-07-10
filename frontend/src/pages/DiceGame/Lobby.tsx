@@ -1,6 +1,6 @@
 import React, { Ref, useEffect, useMemo, useRef, useState } from "react";
-import "./DiceGame.scss";
-import { Typography } from "@mui/material";
+import "./Lobby.scss";
+import { Box, CircularProgress, Typography } from "@mui/material";
 import type { LobbyState } from "@dice/utils";
 import Navbar from "@src/components/Navbar";
 import Wrapper from "@src/components/Wrapper";
@@ -41,6 +41,13 @@ export function Lobby({
       <Navbar />
       <Wrapper small blurred={false}>
         <Typography variant="h1">Lobby {lobbyState.lobby_id}</Typography>
+        {lobbyState.lobby_state === "open" && (
+          <>
+            <div>
+              Waiting for another player<span className="loading-text">...</span>
+            </div>
+          </>
+        )}
         {lobbyState.lobby_state === "active" && (
           <DiceGame
             lobbyState={lobbyState}

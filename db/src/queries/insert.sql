@@ -57,8 +57,7 @@ VALUES :new_move;
     player_one_elapsed_time!,
     player_two_nft_id!,
     player_two_result!,
-    player_two_elapsed_time!,
-    positions!
+    player_two_elapsed_time!
   )
 */
 INSERT INTO final_match_state(
@@ -69,8 +68,7 @@ INSERT INTO final_match_state(
   player_one_elapsed_time,
   player_two_nft_id,
   player_two_result,
-  player_two_elapsed_time,
-  positions
+  player_two_elapsed_time
 )
 VALUES :final_state;
 

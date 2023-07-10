@@ -87,6 +87,7 @@ export function persistExecutedRound(
   return [executedRoundTuple];
 }
 
+// TODO: allow for more than 2 players
 const expandResult = (result: ConciseResult): ExpandedResult => {
   if (result === 'w') return 'win';
   if (result === 'l') return 'loss';
@@ -103,6 +104,7 @@ export function persistMatchResults(
   const params: INewFinalStateParams = {
     final_state: {
       lobby_id: lobbyId,
+      // TODO: support multiple players
       player_one_iswhite: matchEnvironment.user1.color === 'w',
       player_one_nft_id: matchEnvironment.user1.nftId,
       player_one_result: expandResult(results[0]),
@@ -110,16 +112,16 @@ export function persistMatchResults(
       player_two_nft_id: matchEnvironment.user2.nftId,
       player_two_result: expandResult(results[1]),
       player_two_elapsed_time: 0, // Example TODO
-      positions: '',
     },
   };
   return [newFinalState, params];
 }
 
-// Update Lobby state with the updated board
+// Update Lobby state with the updated state
 export function persistUpdateMatchState(lobbyId: string, newMatchState: MatchState): SQLUpdate {
   const params: IUpdateLatestMatchStateParams = {
     lobby_id: lobbyId,
+    // TODO: support multiple players
     player_one_points: newMatchState.player1Points,
     player_two_points: newMatchState.player2Points,
   };

@@ -9,6 +9,7 @@ export function userJoinedLobby(nftId: number, lobby: PackedLobbyState): boolean
   }
   const lobbyState = lobby.lobby;
 
+  // TODO: support multiple players
   if (!lobbyState.hasOwnProperty('player_two')) {
     return false;
   }

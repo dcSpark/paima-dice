@@ -150,8 +150,7 @@ export interface INewFinalStateParams {
     player_one_elapsed_time: number,
     player_two_nft_id: number,
     player_two_result: match_result,
-    player_two_elapsed_time: number,
-    positions: string
+    player_two_elapsed_time: number
   };
 }
 
@@ -164,7 +163,7 @@ export interface INewFinalStateQuery {
   result: INewFinalStateResult;
 }
 
-const newFinalStateIR: any = {"usedParamSet":{"final_state":true},"params":[{"name":"final_state","required":false,"transform":{"type":"pick_tuple","keys":[{"name":"lobby_id","required":true},{"name":"player_one_iswhite","required":true},{"name":"player_one_nft_id","required":true},{"name":"player_one_result","required":true},{"name":"player_one_elapsed_time","required":true},{"name":"player_two_nft_id","required":true},{"name":"player_two_result","required":true},{"name":"player_two_elapsed_time","required":true},{"name":"positions","required":true}]},"locs":[{"a":224,"b":235}]}],"statement":"INSERT INTO final_match_state(\n  lobby_id,\n  player_one_iswhite,\n  player_one_nft_id,\n  player_one_result,\n  player_one_elapsed_time,\n  player_two_nft_id,\n  player_two_result,\n  player_two_elapsed_time,\n  positions\n)\nVALUES :final_state"};
+const newFinalStateIR: any = {"usedParamSet":{"final_state":true},"params":[{"name":"final_state","required":false,"transform":{"type":"pick_tuple","keys":[{"name":"lobby_id","required":true},{"name":"player_one_iswhite","required":true},{"name":"player_one_nft_id","required":true},{"name":"player_one_result","required":true},{"name":"player_one_elapsed_time","required":true},{"name":"player_two_nft_id","required":true},{"name":"player_two_result","required":true},{"name":"player_two_elapsed_time","required":true}]},"locs":[{"a":211,"b":222}]}],"statement":"INSERT INTO final_match_state(\n  lobby_id,\n  player_one_iswhite,\n  player_one_nft_id,\n  player_one_result,\n  player_one_elapsed_time,\n  player_two_nft_id,\n  player_two_result,\n  player_two_elapsed_time\n)\nVALUES :final_state"};
 
 /**
  * Query generated from SQL:
@@ -177,8 +176,7 @@ const newFinalStateIR: any = {"usedParamSet":{"final_state":true},"params":[{"na
  *   player_one_elapsed_time,
  *   player_two_nft_id,
  *   player_two_result,
- *   player_two_elapsed_time,
- *   positions
+ *   player_two_elapsed_time
  * )
  * VALUES :final_state
  * ```

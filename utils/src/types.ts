@@ -14,6 +14,7 @@ export interface TickEvent {
 }
 
 export interface MatchEnvironment {
+  // TODO: allow for more than 2 players
   user1: PlayerInfo;
   user2: PlayerInfo;
 }
@@ -31,8 +32,11 @@ export interface MatchState {
 export type MatchMove = boolean;
 
 export type LobbyStatus = 'open' | 'active' | 'finished' | 'closed';
+
+// TODO: allow for more than 2 players
 export type ConciseResult = 'w' | 't' | 'l';
 export type ExpandedResult = 'win' | 'tie' | 'loss';
+
 export type MatchResult = [ConciseResult, ConciseResult];
 
 export interface MatchWinnerResponse {

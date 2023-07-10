@@ -31,8 +31,13 @@ export function GlobalStateProvider({
     // poll owned nfts
     const interval = setInterval(async () => {
       const newNfts = await mainController.fetchNfts();
-      if (newNfts == null) return;
       setNfts(newNfts);
+      if (newNfts.length > 0) {
+        // only set a single NFT for this game
+        setSelectedNft(newNfts[0]);
+      } else {
+        setSelectedNft(undefined);
+      }
     }, 5000);
     return () => clearInterval(interval);
   }, [mainController]);

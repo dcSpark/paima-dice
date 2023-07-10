@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import {
+  Box,
   Table,
   TableBody,
   TableCell,
@@ -33,12 +34,54 @@ const columns: Column[] = [
   { id: "action", label: "", minWidth: 50 },
 ];
 
-const actionMap: Record<LobbyStatus, string> = {
-  active: "Enter",
-  finished: "Enter",
-  open: "Close",
-  closed: "",
+const actionMap: Record<LobbyStatus, string[]> = {
+  active: ["Enter"],
+  finished: ["Enter"],
+  open: ["Enter", "Close"],
+  closed: [],
 };
+
+const ActionButton: React.FC<{ lobby: UserLobby }> = (props) => {
+  const mainController: MainController = useContext(AppContext);
+  const {
+    selectedNftState: [selectedNft],
+  } = useGlobalStateContext();
+
+  const handleLobbyAction = (action: string, status: LobbyStatus, lobbyId: string) => {
+    if (action === "Close") {
+      mainController.closeLobby(selectedNft, lobbyId);
+    } else if (action === "Enter") {
+      mainController.moveToJoinedLobby(lobbyId);
+    }
+  };
+
+  const actions = actionMap[props.lobby.lobby_state];
+  if (actions == null || actions.length === 0) {
+    return <></>;
+  }
+  return (
+    <Box sx={{ display: 'flex' }}>
+      {actions.map((action, i) => (
+        <>
+          {i > 0 && <Box sx={{ marginLeft: '8px' }} />}
+          <Button
+            key={action}
+            disabled={props.lobby.lobby_state === "closed"}
+            onClick={() =>
+              handleLobbyAction(
+                action,
+                props.lobby.lobby_state,
+                props.lobby.lobby_id
+              )
+            }
+          >
+            {action}
+          </Button>
+        </>
+      ))}
+    </Box>
+  );
+}
 
 const MyGames: React.FC = () => {
   const mainController: MainController = useContext(AppContext);
@@ -94,14 +137,6 @@ const MyGames: React.FC = () => {
     return null;
   };
 
-  const handleLobbyAction = (status: LobbyStatus, lobbyId: string) => {
-    if (status === "open") {
-      mainController.closeLobby(selectedNft, lobbyId);
-    } else {
-      mainController.moveToJoinedLobby(lobbyId);
-    }
-  };
-
   return (
     <>
       <Navbar>
@@ -142,17 +177,7 @@ const MyGames: React.FC = () => {
                         return (
                           <TableCell key={column.id} align="left">
                             {column.id === "action" ? (
-                              <Button
-                                disabled={lobby.lobby_state === "closed"}
-                                onClick={() =>
-                                  handleLobbyAction(
-                                    lobby.lobby_state,
-                                    lobby.lobby_id
-                                  )
-                                }
-                              >
-                                {actionMap[lobby.lobby_state]}
-                              </Button>
+                              <ActionButton lobby={lobby} />
                             ) : (
                               expandValue(column.id, lobby[column.id])
                             )}

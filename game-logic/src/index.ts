@@ -33,6 +33,7 @@ export function initRoundExecutor(
 // relevant to the round executor, but which can not be updated.
 export function extractMatchEnvironment(lobby: IGetLobbyByIdResult): MatchEnvironment {
   return {
+    // TODO: support multiple players
     user1: {
       nftId: lobby.lobby_creator,
       color: lobby.player_one_iswhite ? WHITE : BLACK,
@@ -50,6 +51,3 @@ export function extractMatchEnvironment(lobby: IGetLobbyByIdResult): MatchEnviro
 export const buildMatchState = (matchState: MatchState): MatchState => ({
   ...matchState,
 });
-
-// initial board state in fen notation
-export const initialState = () => 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';

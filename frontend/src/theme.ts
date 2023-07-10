@@ -4,11 +4,13 @@ declare module "@mui/material/styles" {
   interface Palette {
     menuButton: {
       main: string;
+      dark: string;
     };
   }
   interface PaletteOptions {
     menuButton: {
       main: string;
+      dark: string;
     };
   }
 }
@@ -16,6 +18,7 @@ export const theme = createTheme({
   palette: {
     menuButton: {
       main: "#9EF79E",
+      dark: "#507e50",
     },
     primary: {
       main: "#73B573",
