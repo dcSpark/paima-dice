@@ -99,9 +99,7 @@ const MainMenu = () => {
       <Logo height={160} mainMenu />
       <Box paddingTop="96px" />
       <Wrapper small>
-        <Typography variant="h1" marginTop="96px">
-          Powered by Paima Engine
-        </Typography>
+        <Box marginTop="48px" />
         <Box
           sx={{
             display: "flex",
