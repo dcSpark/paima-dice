@@ -23,10 +23,13 @@ export interface IStartMatchResult {
   play_time_per_player: number;
   player_one_iswhite: boolean;
   player_one_points: number;
+  player_one_score: number;
   player_two: number | null;
   player_two_points: number;
+  player_two_score: number;
   practice: boolean;
   round_length: number;
+  turn: number;
 }
 
 /** 'StartMatch' query type */
@@ -113,7 +116,10 @@ export const updateRound = new PreparedQuery<IUpdateRoundParams,IUpdateRoundResu
 export interface IUpdateLatestMatchStateParams {
   lobby_id: string;
   player_one_points: number;
+  player_one_score: number;
   player_two_points: number;
+  player_two_score: number;
+  turn: number;
 }
 
 /** 'UpdateLatestMatchState' return type */
@@ -125,7 +131,7 @@ export interface IUpdateLatestMatchStateQuery {
   result: IUpdateLatestMatchStateResult;
 }
 
-const updateLatestMatchStateIR: any = {"usedParamSet":{"player_one_points":true,"player_two_points":true,"lobby_id":true},"params":[{"name":"player_one_points","required":true,"transform":{"type":"scalar"},"locs":[{"a":41,"b":59}]},{"name":"player_two_points","required":true,"transform":{"type":"scalar"},"locs":[{"a":84,"b":102}]},{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":121,"b":130}]}],"statement":"UPDATE lobbies\nSET\n  player_one_points = :player_one_points!,\n  player_two_points = :player_two_points!\nWHERE lobby_id = :lobby_id!"};
+const updateLatestMatchStateIR: any = {"usedParamSet":{"player_one_points":true,"player_two_points":true,"player_one_score":true,"player_two_score":true,"turn":true,"lobby_id":true},"params":[{"name":"player_one_points","required":true,"transform":{"type":"scalar"},"locs":[{"a":41,"b":59}]},{"name":"player_two_points","required":true,"transform":{"type":"scalar"},"locs":[{"a":84,"b":102}]},{"name":"player_one_score","required":true,"transform":{"type":"scalar"},"locs":[{"a":126,"b":143}]},{"name":"player_two_score","required":true,"transform":{"type":"scalar"},"locs":[{"a":167,"b":184}]},{"name":"turn","required":true,"transform":{"type":"scalar"},"locs":[{"a":196,"b":201}]},{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":220,"b":229}]}],"statement":"UPDATE lobbies\nSET\n  player_one_points = :player_one_points!,\n  player_two_points = :player_two_points!,\n  player_one_score = :player_one_score!,\n  player_two_score = :player_two_score!,\n  turn = :turn!\nWHERE lobby_id = :lobby_id!"};
 
 /**
  * Query generated from SQL:
@@ -133,7 +139,10 @@ const updateLatestMatchStateIR: any = {"usedParamSet":{"player_one_points":true,
  * UPDATE lobbies
  * SET
  *   player_one_points = :player_one_points!,
- *   player_two_points = :player_two_points!
+ *   player_two_points = :player_two_points!,
+ *   player_one_score = :player_one_score!,
+ *   player_two_score = :player_two_score!,
+ *   turn = :turn!
  * WHERE lobby_id = :lobby_id!
  * ```
  */

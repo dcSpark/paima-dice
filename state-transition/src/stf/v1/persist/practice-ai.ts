@@ -1,4 +1,5 @@
-import { genDiceRolls, isPoint } from '@dice/game-logic';
+import { genDiceRolls } from '@dice/game-logic';
+import type { MatchState } from '@dice/utils';
 import type Prando from 'paima-sdk/paima-prando';
 
 //
@@ -6,9 +7,11 @@ import type Prando from 'paima-sdk/paima-prando';
 //
 export class PracticeAI {
   randomnessGenerator: Prando;
+  matchState: MatchState;
 
-  constructor(randomnessGenerator: Prando) {
+  constructor(matchState: MatchState, randomnessGenerator: Prando) {
     this.randomnessGenerator = randomnessGenerator;
+    this.matchState = matchState;
   }
 
   // AI to generate next move
@@ -16,8 +19,9 @@ export class PracticeAI {
   // Return next move
   // Return null to not send next move.
   public getNextMove(): boolean {
-    const dice = genDiceRolls(this.randomnessGenerator);
-    const point = isPoint(dice);
-    return point;
+    const score =
+      this.matchState.turn === 1 ? this.matchState.player1Score : this.matchState.player2Score;
+    const diceRolls = genDiceRolls(score, this.randomnessGenerator);
+    return diceRolls.finalScore < 19;
   }
 }

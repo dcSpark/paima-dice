@@ -198,7 +198,7 @@ async function submitMoves(
   nftId: number,
   lobbyID: string,
   roundNumber: number,
-  move: MatchMove
+  rollAgain: MatchMove
 ): Promise<OldResult> {
   const errorFxn = buildEndpointErrorFxn('submitMoves');
 
@@ -207,7 +207,7 @@ async function submitMoves(
   conciseBuilder.addValue({ value: nftId.toString(10) });
   conciseBuilder.addValue({ value: lobbyID, isStateIdentifier: true });
   conciseBuilder.addValue({ value: roundNumber.toString(10) });
-  conciseBuilder.addValue({ value: move ? 'T' : '' });
+  conciseBuilder.addValue({ value: rollAgain ? 'T' : 'F' });
 
   try {
     const result = await postConciselyEncodedData(conciseBuilder.build());

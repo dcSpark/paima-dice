@@ -17,7 +17,7 @@ nftMint             = nftmint|address|tokenId
 createdLobby        = c|creatorNftId|numOfRounds|roundLength|playTimePerPlayer|isHidden?|isPractice?|playerOneIsWhite?
 joinedLobby         = j|nftId|*lobbyID
 closedLobby         = cs|*lobbyID
-submittedMoves      = s|nftId|*lobbyID|roundNumber|isPoint?
+submittedMoves      = s|nftId|*lobbyID|roundNumber|rollAgain
 practiceMoves       = p|*lobbyID|roundNumber
 zombieScheduledData = z|*lobbyID
 userScheduledData   = u|*user|result
@@ -47,7 +47,7 @@ const submittedMoves: ParserRecord<SubmittedMovesInput> = {
   nftId: PaimaParser.NumberParser(),
   lobbyID: PaimaParser.NCharsParser(12, 12),
   roundNumber: PaimaParser.NumberParser(1, 10000),
-  isPoint: PaimaParser.TrueFalseParser(false),
+  rollAgain: PaimaParser.TrueFalseParser(),
 };
 const practiceMoves: ParserRecord<PracticeMovesInput> = {
   lobbyID: PaimaParser.NCharsParser(12, 12),

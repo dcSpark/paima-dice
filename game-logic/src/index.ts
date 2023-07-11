@@ -7,7 +7,6 @@ import type { IGetLobbyByIdResult, IGetCachedMovesResult } from '@dice/db';
 import { WHITE, BLACK } from 'chess.js';
 
 export * from './tick';
-export * from './chess-logic';
 export * from './dice-logic';
 
 // We initialize the round executor object using lobby data + submitted moves + randomness generator.

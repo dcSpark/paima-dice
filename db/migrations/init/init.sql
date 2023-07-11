@@ -17,6 +17,9 @@ CREATE TABLE lobbies (
   -- TODO: support multiple players
   player_one_points INTEGER NOT NULL DEFAULT 0,
   player_two_points INTEGER NOT NULL DEFAULT 0,
+  player_one_score INTEGER NOT NULL DEFAULT 0,
+  player_two_score INTEGER NOT NULL DEFAULT 0,
+  turn INTEGER NOT NULL DEFAULT 1,
   created_at TIMESTAMP NOT NULL,
   creation_block_height INTEGER NOT NULL,
   hidden BOOLEAN NOT NULL DEFAULT false,
@@ -54,7 +57,7 @@ CREATE TABLE match_moves (
    lobby_id TEXT NOT NULL references lobbies(lobby_id),
    nft_id INTEGER NOT NULL,
    round INTEGER NOT NULL,
-   is_point BOOLEAN NOT NULL
+   roll_again BOOLEAN NOT NULL
 );
 
 CREATE TABLE global_user_state (
