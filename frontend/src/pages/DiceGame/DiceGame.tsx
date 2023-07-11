@@ -286,15 +286,6 @@ const DiceGame: React.FC<DiceGameProps> = ({
 
   return (
     <>
-      <Typography
-        variant="caption"
-        sx={{
-          fontSize: "1.5rem",
-          lineHeight: "2rem",
-        }}
-      >
-        Round: {displayedRound}
-      </Typography>
       <Box
         sx={{
           width: "100%",
