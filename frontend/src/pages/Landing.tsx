@@ -28,7 +28,6 @@ const LandingPage: React.FC = () => {
     <Container>
       <div className="landing-page">
         <h1 className="title">Dice</h1>
-        <h2 className="subtitle">Powered by Paima Engine</h2>
         {/* <button onClick={logMiddleware}>i</button>
         <button onClick={statusMiddleware}>s</button>
         <button onClick={connectMiddleware}>c</button> */}

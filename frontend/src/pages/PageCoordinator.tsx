@@ -5,13 +5,14 @@ import MainMenu from "./MainMenu";
 import OpenLobbies from "./OpenLobbies";
 import MyGames from "./MyGames";
 import CreateLobby from "./CreateLobby";
-import { CircularProgress } from "@mui/material";
+import { Box, CircularProgress } from "@mui/material";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { LobbyState } from "@dice/utils";
 import "./PageCoordinator.scss";
 import { AppContext } from "@src/main";
 import { Lobby } from "./DiceGame/Lobby";
 import { useGlobalStateContext } from "@src/GlobalStateContext";
+import { PaimaNotice } from "@src/components/PaimaNotice";
 
 const PageCoordinator: React.FC = () => {
   const mainController: MainController = useContext(AppContext);
@@ -66,6 +67,8 @@ const PageCoordinator: React.FC = () => {
         <Route path={Page.Landing} element={<LandingPage />} />
         <Route element={<div>There was something wrong...</div>} />
       </Routes>
+      <Box sx={{ marginTop: 3 }} />
+      <PaimaNotice />
     </div>
   );
 };
