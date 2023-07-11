@@ -11,7 +11,6 @@ export enum RoundKind {
   initial,
   extra,
 }
-
 export type DiceRolls = {
   finalScore: number;
 } & (
@@ -21,14 +20,25 @@ export type DiceRolls = {
     }
   | {
       roundKind: RoundKind.extra;
-      die: number;
+      dice: [[number]];
     }
 );
 
-export interface TickEvent {
+export enum TickEventKind {
+  roll,
+  roundEnd,
+}
+
+export type RollTickEvent = {
+  kind: TickEventKind.roll;
   diceRolls: [number] | [number, number];
   rollAgain: boolean;
-}
+};
+export type RoundEndTickEvent = {
+  kind: TickEventKind.roundEnd;
+};
+
+export type TickEvent = RollTickEvent | RoundEndTickEvent;
 
 export interface MatchEnvironment {
   // TODO: allow for more than 2 players

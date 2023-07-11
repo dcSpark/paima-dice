@@ -50,7 +50,7 @@ export function genDiceRolls(startingScore: number, randomnessGenerator: Prando)
   const extraDie = genDieRoll(randomnessGenerator);
   return {
     roundKind: RoundKind.extra,
-    die: extraDie,
+    dice: [[extraDie]],
     finalScore: startingScore + extraDie,
   };
 }

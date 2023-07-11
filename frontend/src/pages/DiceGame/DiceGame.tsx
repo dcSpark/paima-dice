@@ -1,7 +1,12 @@
 import React, { Ref, useEffect, useMemo, useRef, useState } from "react";
 import "./DiceGame.scss";
 import { Box, Typography } from "@mui/material";
-import { type MatchState, type TickEvent, type LobbyState } from "@dice/utils";
+import {
+  type MatchState,
+  type TickEvent,
+  type LobbyState,
+  TickEventKind,
+} from "@dice/utils";
 import {
   applyEvent,
   buildCurrentMatchState,
@@ -91,6 +96,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
       setDisplayedState((oldDisplayedState) => {
         const newDisplayedState = { ...oldDisplayedState };
         applyEvent(newDisplayedState, {
+          kind: TickEventKind.roll,
           diceRolls: playedInitialRoll,
           // won't be used, just mock value
           rollAgain: true,
@@ -138,6 +144,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
       setDisplayedState((oldDisplayedState) => {
         const newDisplayedState = { ...oldDisplayedState };
         applyEvent(newDisplayedState, {
+          kind: TickEventKind.roll,
           diceRolls: [dieRoll],
           // won't be used, just mock value
           rollAgain: true,
@@ -164,8 +171,10 @@ const DiceGame: React.FC<DiceGameProps> = ({
       const endState = roundExecutor.endState;
 
       for (const tickEvent of tickEvents) {
-        const playerRolling = displayedState.turn === 1 ? 1 : 2;
-        await diceRefs.current[playerRolling].roll(tickEvent.diceRolls);
+        if (tickEvent.kind === TickEventKind.roll) {
+          const playerRolling = displayedState.turn === 1 ? 1 : 2;
+          await diceRefs.current[playerRolling].roll(tickEvent.diceRolls);
+        }
         setDisplayedState((oldDisplayedState) => {
           const newDisplayedState = { ...oldDisplayedState };
           applyEvent(newDisplayedState, tickEvent);
