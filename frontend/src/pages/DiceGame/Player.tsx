@@ -26,6 +26,7 @@ export default function Player({
   return (
     <Box
       sx={{
+        flex: 1,
         padding: 2,
         background: isThisPlayersTurn
           ? "rgba(219, 109, 104, 0.5)"
