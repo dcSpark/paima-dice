@@ -41,25 +41,30 @@ const CreateLobby: React.FC = () => {
       <Navbar />
       <Wrapper small>
         <Box>
-          <Box sx={{ display: "flex", flexFlow: "column", gap: "2rem" }}>
-            <NumericField
-              label="Number of Rounds"
-              value={numberOfRounds}
-              onChange={setNumberOfRounds}
-            />
-            <NumericField
-              label="Player's Time"
-              value={playersTime}
-              onChange={setPlayersTime}
-            />
-            <NumericField
-              label="Round Length"
-              value={roundLength}
-              onChange={setRoundLength}
-            />
-          </Box>
+          {
+            // TODO: disabled - need to be properly implemented, on the backend:
+            //  <Box sx={{ display: "flex", flexFlow: "column", gap: "2rem" }}>
+            // <NumericField
+            //   label="Number of Rounds"
+            //   value={numberOfRounds}
+            //   onChange={setNumberOfRounds}
+            // />
+            // <NumericField
+            //   label="Player's Time"
+            //   value={playersTime}
+            //   onChange={setPlayersTime}
+            // />
+            // <NumericField
+            //   label="Round Length"
+            //   value={roundLength}
+            //   onChange={setRoundLength}
+            // />
+            // </Box>
+          }
           <Box sx={{ display: "flex", paddingTop: "24px" }}>
-            <FormControlLabel
+            {
+              // TODO: disabled - needs to be checked and fixed
+              /* <FormControlLabel
               sx={{ flex: "1" }}
               control={
                 <Checkbox
@@ -68,7 +73,8 @@ const CreateLobby: React.FC = () => {
                 />
               }
               label="Is Hidden?"
-            />
+            /> */
+            }
             <FormControlLabel
               sx={{ flex: "1" }}
               control={

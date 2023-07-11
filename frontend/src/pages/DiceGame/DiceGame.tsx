@@ -1,7 +1,12 @@
 import React, { Ref, useEffect, useMemo, useRef, useState } from "react";
 import "./DiceGame.scss";
 import { Box, Typography } from "@mui/material";
-import { type MatchState, type TickEvent, type LobbyState } from "@dice/utils";
+import {
+  type MatchState,
+  type TickEvent,
+  type LobbyState,
+  TickEventKind,
+} from "@dice/utils";
 import {
   applyEvent,
   buildCurrentMatchState,
@@ -34,6 +39,8 @@ const DiceGame: React.FC<DiceGameProps> = ({
   const diceLogic = useMemo(() => {
     return new DiceLogic(selectedNft);
   }, [selectedNft]);
+
+  const [caption, setCaption] = useState<undefined | string>();
 
   // round being currently shown
   // interactive if this player's round,
@@ -91,6 +98,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
       setDisplayedState((oldDisplayedState) => {
         const newDisplayedState = { ...oldDisplayedState };
         applyEvent(newDisplayedState, {
+          kind: TickEventKind.roll,
           diceRolls: playedInitialRoll,
           // won't be used, just mock value
           rollAgain: true,
@@ -138,6 +146,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
       setDisplayedState((oldDisplayedState) => {
         const newDisplayedState = { ...oldDisplayedState };
         applyEvent(newDisplayedState, {
+          kind: TickEventKind.roll,
           diceRolls: [dieRoll],
           // won't be used, just mock value
           rollAgain: true,
@@ -164,14 +173,36 @@ const DiceGame: React.FC<DiceGameProps> = ({
       const endState = roundExecutor.endState;
 
       for (const tickEvent of tickEvents) {
-        const playerRolling = displayedState.turn === 1 ? 1 : 2;
-        await diceRefs.current[playerRolling].roll(tickEvent.diceRolls);
+        if (tickEvent.kind === TickEventKind.roll) {
+          const playerRolling = displayedState.turn === 1 ? 1 : 2;
+          await diceRefs.current[playerRolling].roll(tickEvent.diceRolls);
+        }
         setDisplayedState((oldDisplayedState) => {
           const newDisplayedState = { ...oldDisplayedState };
           applyEvent(newDisplayedState, tickEvent);
           return newDisplayedState;
         });
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        if (tickEvent.kind === TickEventKind.roll)
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        if (tickEvent.kind === TickEventKind.applyPoints) {
+          setCaption(
+            (() => {
+              const [thisPlayer, opponent] = isThisPlayerPlayerOne
+                ? [tickEvent.player1, tickEvent.player2]
+                : [tickEvent.player2, tickEvent.player1];
+
+              if (thisPlayer === 2) return "21! You get 2 points";
+              if (thisPlayer === 1) return "You win! You get a point";
+              if (opponent === 1) return "You lose! Opponent gets a point";
+              if (opponent === 2) return "You lose! Opponent gets 2 points";
+              return "It's a tie";
+            })()
+          );
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+          setCaption(undefined);
+        }
       }
 
       setDisplayedRound(displayedRound + 1);
@@ -288,12 +319,9 @@ const DiceGame: React.FC<DiceGameProps> = ({
     <>
       <Typography
         variant="caption"
-        sx={{
-          fontSize: "1.5rem",
-          lineHeight: "2rem",
-        }}
+        sx={{ fontSize: "1.25rem", lineHeight: "1.75rem" }}
       >
-        Round: {displayedRound}
+        {caption ?? (isPlayersTurn ? "Your turn" : "Opponent's turn")}
       </Typography>
       <Box
         sx={{

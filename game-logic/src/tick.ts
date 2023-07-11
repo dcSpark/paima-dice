@@ -1,5 +1,11 @@
 import type Prando from 'paima-sdk/paima-prando';
-import { type MatchState, type MatchEnvironment, type TickEvent, RoundKind } from '@dice/utils';
+import type {
+  ApplyPointsTickEvent,
+  RollTickEvent,
+  RoundEndTickEvent,
+  TurnEndTickEvent,
+} from '@dice/utils';
+import { type MatchState, type MatchEnvironment, type TickEvent, TickEventKind } from '@dice/utils';
 import type { IGetCachedMovesResult } from '@dice/db';
 import { genDiceRolls, getPlayerScore } from '.';
 
@@ -11,6 +17,7 @@ export function processTick(
   currentTick: number,
   randomnessGenerator: Prando
 ): TickEvent[] | null {
+  const events = [];
   // Every tick we intend to process a single move.
   const move = moves[currentTick - 1];
 
@@ -23,25 +30,69 @@ export function processTick(
   // Required for frontend visualization and applying match state updates.
   const score = getPlayerScore(matchState);
   const diceRolls = genDiceRolls(score, randomnessGenerator);
-  const events: TickEvent[] =
-    diceRolls.roundKind === RoundKind.initial
-      ? diceRolls.dice.map((dice, i) => {
-          const isLast = i === diceRolls.dice.length - 1;
-          return {
-            diceRolls: dice,
-            rollAgain: !isLast || move.roll_again,
-          };
-        })
-      : [
-          {
-            diceRolls: [diceRolls.die],
-            rollAgain: move.roll_again,
-          },
-        ];
+  const rollEvents: RollTickEvent[] = diceRolls.dice.map((dice, i) => {
+    const isLast = i === diceRolls.dice.length - 1;
+    return {
+      kind: TickEventKind.roll,
+      diceRolls: dice,
+      rollAgain: !isLast || move.roll_again,
+    };
+  });
 
   // We then call `applyEvents` to mutate the `matchState` based off of the event.
-  for (const event of events) {
+  for (const event of rollEvents) {
     applyEvent(matchState, event);
+    events.push(event);
+  }
+
+  const turnEnds = !rollEvents[rollEvents.length - 1].rollAgain;
+  const roundEnds = turnEnds && matchState.turn === 2; // TODO: last player in turn order
+
+  const applyPointsEvents: ApplyPointsTickEvent[] = (() => {
+    if (!roundEnds) return [];
+
+    let player1 = 0;
+    let player2 = 0;
+
+    // replace going over with -1 score, simplifies logic
+    const score1 = matchState.player1Score > 21 ? -1 : matchState.player1Score;
+    const score2 = matchState.player2Score > 21 ? -1 : matchState.player2Score;
+
+    const someoneScored21 = [score1, score2].some(score => score === 21);
+    // each player scoring 21 in the round gets 2 points.
+    if (someoneScored21) {
+      if (score1 === 21) player1 += 2;
+      if (score2 === 21) player2 += 2;
+    } else {
+      // if more than one player have the same score, then no point is given to any player.
+      // the player closest to 21 gets 1 point.
+      if (score1 > score2) player1 += 1;
+      if (score2 > score1) player2 += 1;
+    }
+
+    return [
+      {
+        kind: TickEventKind.applyPoints,
+        player1,
+        player2,
+      },
+    ];
+  })();
+  for (const event of applyPointsEvents) {
+    applyEvent(matchState, event);
+    events.push(event);
+  }
+
+  const turnEndEvents: TurnEndTickEvent[] = turnEnds ? [{ kind: TickEventKind.turnEnd }] : [];
+  for (const event of turnEndEvents) {
+    applyEvent(matchState, event);
+    events.push(event);
+  }
+
+  const roundEndEvents: RoundEndTickEvent[] = roundEnds ? [{ kind: TickEventKind.roundEnd }] : [];
+  for (const event of roundEndEvents) {
+    applyEvent(matchState, event);
+    events.push(event);
   }
 
   // We return the tick event which gets emitted by the round executor. This is explicitly
@@ -51,36 +102,25 @@ export function processTick(
 
 // Apply events to match state for the roundExecutor.
 export function applyEvent(matchState: MatchState, event: TickEvent): void {
-  // apply score
-  const addedScore = event.diceRolls.reduce((acc, next) => acc + next, 0);
-  matchState[matchState.turn === 1 ? 'player1Score' : 'player2Score'] += addedScore;
-
-  // end turn
-  if (event.rollAgain) return;
-  matchState.turn = matchState.turn === 1 ? 2 : 1;
-
-  // end round, assign points
-  if (matchState.turn !== 1) return;
-
-  // replace going over with -1 score, simplifies logic
-  if (matchState.player1Score > 21) matchState.player1Score = -1;
-  if (matchState.player2Score > 21) matchState.player2Score = -1;
-
-  // each player scoring 21 in the round gets 2 points.
-  const someoneScored21 = [matchState.player1Score, matchState.player2Score].some(
-    score => score === 21
-  );
-  if (someoneScored21) {
-    if (matchState.player1Score === 21) matchState.player1Points += 2;
-    if (matchState.player2Score === 21) matchState.player2Points += 2;
-  } else {
-    // if more than one player have the same score, then no point is given to any player.
-    // the player closest to 21 gets 1 point.
-    if (matchState.player1Score > matchState.player2Score) matchState.player1Points += 1;
-    if (matchState.player2Score > matchState.player1Score) matchState.player2Points += 1;
+  if (event.kind === TickEventKind.roll) {
+    const addedScore = event.diceRolls.reduce((acc, next) => acc + next, 0);
+    matchState[matchState.turn === 1 ? 'player1Score' : 'player2Score'] += addedScore;
+    return;
   }
 
-  // reset scores
-  matchState.player1Score = 0;
-  matchState.player2Score = 0;
+  if (event.kind === TickEventKind.applyPoints) {
+    matchState.player1Points += event.player1;
+    matchState.player2Points += event.player2;
+  }
+
+  if (event.kind === TickEventKind.turnEnd) {
+    matchState.turn = matchState.turn === 1 ? 2 : 1;
+    return;
+  }
+
+  if (event.kind === TickEventKind.roundEnd) {
+    // reset scores
+    matchState.player1Score = 0;
+    matchState.player2Score = 0;
+  }
 }

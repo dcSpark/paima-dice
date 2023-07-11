@@ -347,7 +347,8 @@ function finalizeMatch(
 
 // Check if lobby is in final round
 function isFinalRound(lobby: IGetLobbyByIdResult): boolean {
-  if (lobby.num_of_rounds && lobby.current_round >= lobby.num_of_rounds) return true;
+  // TODO: end of round disabled - needs to be properly implemented
+  // if (lobby.num_of_rounds && lobby.current_round >= lobby.num_of_rounds) return true;
   return false;
 }
 
