@@ -26,6 +26,8 @@ export type DiceRolls = {
 
 export enum TickEventKind {
   roll,
+  applyPoints,
+  turnEnd,
   roundEnd,
 }
 
@@ -34,11 +36,19 @@ export type RollTickEvent = {
   diceRolls: [number] | [number, number];
   rollAgain: boolean;
 };
+export type ApplyPointsTickEvent = {
+  kind: TickEventKind.applyPoints;
+  player1: number;
+  player2: number;
+};
+export type TurnEndTickEvent = {
+  kind: TickEventKind.turnEnd;
+};
 export type RoundEndTickEvent = {
   kind: TickEventKind.roundEnd;
 };
 
-export type TickEvent = RollTickEvent | RoundEndTickEvent;
+export type TickEvent = RollTickEvent | ApplyPointsTickEvent | TurnEndTickEvent | RoundEndTickEvent;
 
 export interface MatchEnvironment {
   // TODO: allow for more than 2 players

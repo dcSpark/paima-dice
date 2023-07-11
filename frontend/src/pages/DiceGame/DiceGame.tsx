@@ -40,6 +40,8 @@ const DiceGame: React.FC<DiceGameProps> = ({
     return new DiceLogic(selectedNft);
   }, [selectedNft]);
 
+  const [caption, setCaption] = useState<undefined | string>();
+
   // round being currently shown
   // interactive if this player's round,
   // passive replay if other player's round
@@ -180,7 +182,27 @@ const DiceGame: React.FC<DiceGameProps> = ({
           applyEvent(newDisplayedState, tickEvent);
           return newDisplayedState;
         });
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        if (tickEvent.kind === TickEventKind.roll)
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        if (tickEvent.kind === TickEventKind.applyPoints) {
+          setCaption(
+            (() => {
+              const [thisPlayer, opponent] = isThisPlayerPlayerOne
+                ? [tickEvent.player1, tickEvent.player2]
+                : [tickEvent.player2, tickEvent.player1];
+
+              if (thisPlayer === 2) return "21! You get 2 points";
+              if (thisPlayer === 1) return "You win! You get a point";
+              if (opponent === 1) return "You lose! Opponent gets a point";
+              if (opponent === 2) return "You lose! Opponent gets 2 points";
+              return "It's a tie";
+            })()
+          );
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+          setCaption(undefined);
+        }
       }
 
       setDisplayedRound(displayedRound + 1);
@@ -295,6 +317,12 @@ const DiceGame: React.FC<DiceGameProps> = ({
 
   return (
     <>
+      <Typography
+        variant="caption"
+        sx={{ fontSize: "1.25rem", lineHeight: "1.75rem" }}
+      >
+        {caption ?? (isPlayersTurn ? "Your turn" : "Opponent's turn")}
+      </Typography>
       <Box
         sx={{
           width: "100%",
