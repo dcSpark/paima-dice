@@ -153,7 +153,7 @@ SELECT
 match_moves.id,
 match_moves.lobby_id,
 match_moves.nft_id,
-match_moves.is_point,
+match_moves.roll_again,
 match_moves.round
 FROM match_moves
 INNER JOIN rounds

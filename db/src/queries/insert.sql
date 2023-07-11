@@ -42,9 +42,9 @@ RETURNING *;
 
 /* 
   @name newMatchMove
-  @param new_move -> (lobby_id!, nft_id!, round!, is_point!)
+  @param new_move -> (lobby_id!, nft_id!, round!, roll_again!)
 */
-INSERT INTO match_moves(lobby_id, nft_id, round, is_point)
+INSERT INTO match_moves(lobby_id, nft_id, round, roll_again)
 VALUES :new_move;
 
 /* 

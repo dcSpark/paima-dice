@@ -59,7 +59,7 @@ export function persistMoveSubmission(
       lobby_id: inputData.lobbyID,
       nft_id: inputData.nftId,
       round: lobby.current_round,
-      is_point: inputData.isPoint,
+      roll_again: inputData.rollAgain,
     },
   };
   return [newMatchMove, mmParams];
@@ -124,6 +124,9 @@ export function persistUpdateMatchState(lobbyId: string, newMatchState: MatchSta
     // TODO: support multiple players
     player_one_points: newMatchState.player1Points,
     player_two_points: newMatchState.player2Points,
+    player_one_score: newMatchState.player1Score,
+    player_two_score: newMatchState.player2Score,
+    turn: newMatchState.turn,
   };
   return [updateLatestMatchState, params];
 }

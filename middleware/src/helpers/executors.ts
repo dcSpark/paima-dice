@@ -22,6 +22,9 @@ export function buildMatchExecutor({
     // TODO: support multiple players
     player1Points: 0,
     player2Points: 0,
+    player1Score: 0,
+    player2Score: 0,
+    turn: 1,
   };
   return matchExecutor.initialize(
     extractMatchEnvironment(lobby),

@@ -7,10 +7,27 @@ import type {
 } from '@dice/db';
 import type { Color } from 'chess.js';
 
+export enum RoundKind {
+  initial,
+  extra,
+}
+
+export type DiceRolls = {
+  finalScore: number;
+} & (
+  | {
+      roundKind: RoundKind.initial;
+      dice: [number, number][];
+    }
+  | {
+      roundKind: RoundKind.extra;
+      die: number;
+    }
+);
+
 export interface TickEvent {
-  nftId: number;
-  isPoint: boolean;
-  dice: [number, number];
+  diceRolls: [number] | [number, number];
+  rollAgain: boolean;
 }
 
 export interface MatchEnvironment {
@@ -27,6 +44,9 @@ export interface PlayerInfo {
 export interface MatchState {
   player1Points: number;
   player2Points: number;
+  player1Score: number;
+  player2Score: number;
+  turn: number; // whose turn is it
 }
 
 export type MatchMove = boolean;

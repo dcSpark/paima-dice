@@ -258,10 +258,13 @@ export interface IGetRandomActiveLobbyResult {
   play_time_per_player: number;
   player_one_iswhite: boolean;
   player_one_points: number;
+  player_one_score: number;
   player_two: number | null;
   player_two_points: number;
+  player_two_score: number;
   practice: boolean;
   round_length: number;
+  turn: number;
 }
 
 /** 'GetRandomActiveLobby' query type */
@@ -303,10 +306,13 @@ export interface IGetUserLobbiesResult {
   play_time_per_player: number;
   player_one_iswhite: boolean;
   player_one_points: number;
+  player_one_score: number;
   player_two: number | null;
   player_two_points: number;
+  player_two_score: number;
   practice: boolean;
   round_length: number;
+  turn: number;
 }
 
 /** 'GetUserLobbies' query type */
@@ -352,10 +358,13 @@ export interface IGetPaginatedUserLobbiesResult {
   play_time_per_player: number;
   player_one_iswhite: boolean;
   player_one_points: number;
+  player_one_score: number;
   player_two: number | null;
   player_two_points: number;
+  player_two_score: number;
   practice: boolean;
   round_length: number;
+  turn: number;
 }
 
 /** 'GetPaginatedUserLobbies' query type */
@@ -403,10 +412,13 @@ export interface IGetAllPaginatedUserLobbiesResult {
   play_time_per_player: number;
   player_one_iswhite: boolean;
   player_one_points: number;
+  player_one_score: number;
   player_two: number | null;
   player_two_points: number;
+  player_two_score: number;
   practice: boolean;
   round_length: number;
+  turn: number;
 }
 
 /** 'GetAllPaginatedUserLobbies' query type */
@@ -451,10 +463,13 @@ export interface IGetActiveLobbiesResult {
   play_time_per_player: number;
   player_one_iswhite: boolean;
   player_one_points: number;
+  player_one_score: number;
   player_two: number | null;
   player_two_points: number;
+  player_two_score: number;
   practice: boolean;
   round_length: number;
+  turn: number;
 }
 
 /** 'GetActiveLobbies' query type */
@@ -494,10 +509,13 @@ export interface IGetLobbyByIdResult {
   play_time_per_player: number;
   player_one_iswhite: boolean;
   player_one_points: number;
+  player_one_score: number;
   player_two: number | null;
   player_two_points: number;
+  player_two_score: number;
   practice: boolean;
   round_length: number;
+  turn: number;
 }
 
 /** 'GetLobbyById' query type */
@@ -604,11 +622,14 @@ export interface IGetMatchUserStatsResult {
   play_time_per_player: number;
   player_one_iswhite: boolean;
   player_one_points: number;
+  player_one_score: number;
   player_two: number | null;
   player_two_points: number;
+  player_two_score: number;
   practice: boolean;
   round_length: number;
   ties: number;
+  turn: number;
   wins: number;
 }
 
@@ -642,9 +663,9 @@ export interface IGetRoundMovesParams {
 /** 'GetRoundMoves' return type */
 export interface IGetRoundMovesResult {
   id: number;
-  is_point: boolean;
   lobby_id: string;
   nft_id: number;
+  roll_again: boolean;
   round: number;
 }
 
@@ -675,9 +696,9 @@ export interface IGetCachedMovesParams {
 /** 'GetCachedMoves' return type */
 export interface IGetCachedMovesResult {
   id: number;
-  is_point: boolean;
   lobby_id: string;
   nft_id: number;
+  roll_again: boolean;
   round: number;
 }
 
@@ -687,7 +708,7 @@ export interface IGetCachedMovesQuery {
   result: IGetCachedMovesResult;
 }
 
-const getCachedMovesIR: any = {"usedParamSet":{"lobby_id":true},"params":[{"name":"lobby_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":303,"b":311}]}],"statement":"SELECT\nmatch_moves.id,\nmatch_moves.lobby_id,\nmatch_moves.nft_id,\nmatch_moves.is_point,\nmatch_moves.round\nFROM match_moves\nINNER JOIN rounds\nON match_moves.lobby_id = rounds.lobby_id\nAND match_moves.round = rounds.round_within_match\nWHERE rounds.execution_block_height IS NULL\nAND match_moves.lobby_id = :lobby_id"};
+const getCachedMovesIR: any = {"usedParamSet":{"lobby_id":true},"params":[{"name":"lobby_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":305,"b":313}]}],"statement":"SELECT\nmatch_moves.id,\nmatch_moves.lobby_id,\nmatch_moves.nft_id,\nmatch_moves.roll_again,\nmatch_moves.round\nFROM match_moves\nINNER JOIN rounds\nON match_moves.lobby_id = rounds.lobby_id\nAND match_moves.round = rounds.round_within_match\nWHERE rounds.execution_block_height IS NULL\nAND match_moves.lobby_id = :lobby_id"};
 
 /**
  * Query generated from SQL:
@@ -696,7 +717,7 @@ const getCachedMovesIR: any = {"usedParamSet":{"lobby_id":true},"params":[{"name
  * match_moves.id,
  * match_moves.lobby_id,
  * match_moves.nft_id,
- * match_moves.is_point,
+ * match_moves.roll_again,
  * match_moves.round
  * FROM match_moves
  * INNER JOIN rounds
@@ -717,9 +738,9 @@ export interface IGetMovesByLobbyParams {
 /** 'GetMovesByLobby' return type */
 export interface IGetMovesByLobbyResult {
   id: number;
-  is_point: boolean;
   lobby_id: string;
   nft_id: number;
+  roll_again: boolean;
   round: number;
 }
 

@@ -24,7 +24,10 @@ WHERE lobby_id = :lobby_id!;
 UPDATE lobbies
 SET
   player_one_points = :player_one_points!,
-  player_two_points = :player_two_points!
+  player_two_points = :player_two_points!,
+  player_one_score = :player_one_score!,
+  player_two_score = :player_two_score!,
+  turn = :turn!
 WHERE lobby_id = :lobby_id!;
 
 /* @name endMatch */

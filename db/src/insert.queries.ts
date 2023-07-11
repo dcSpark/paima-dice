@@ -115,7 +115,7 @@ export interface INewMatchMoveParams {
     lobby_id: string,
     nft_id: number,
     round: number,
-    is_point: boolean
+    roll_again: boolean
   };
 }
 
@@ -128,12 +128,12 @@ export interface INewMatchMoveQuery {
   result: INewMatchMoveResult;
 }
 
-const newMatchMoveIR: any = {"usedParamSet":{"new_move":true},"params":[{"name":"new_move","required":false,"transform":{"type":"pick_tuple","keys":[{"name":"lobby_id","required":true},{"name":"nft_id","required":true},{"name":"round","required":true},{"name":"is_point","required":true}]},"locs":[{"a":66,"b":74}]}],"statement":"INSERT INTO match_moves(lobby_id, nft_id, round, is_point)\nVALUES :new_move"};
+const newMatchMoveIR: any = {"usedParamSet":{"new_move":true},"params":[{"name":"new_move","required":false,"transform":{"type":"pick_tuple","keys":[{"name":"lobby_id","required":true},{"name":"nft_id","required":true},{"name":"round","required":true},{"name":"roll_again","required":true}]},"locs":[{"a":68,"b":76}]}],"statement":"INSERT INTO match_moves(lobby_id, nft_id, round, roll_again)\nVALUES :new_move"};
 
 /**
  * Query generated from SQL:
  * ```
- * INSERT INTO match_moves(lobby_id, nft_id, round, is_point)
+ * INSERT INTO match_moves(lobby_id, nft_id, round, roll_again)
  * VALUES :new_move
  * ```
  */
