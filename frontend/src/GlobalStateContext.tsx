@@ -4,6 +4,8 @@ import { AppContext } from "./main";
 import { UseStateResponse } from "./utils";
 import { WalletAddress } from "paima-sdk/paima-utils";
 import * as Paima from "@dice/middleware";
+import ConnectingModal from "./ConnectingModal";
+import { PaimaNotice } from "./components/PaimaNotice";
 
 type GlobalState = {
   connectedWallet?: WalletAddress;
@@ -30,7 +32,9 @@ export function GlobalStateProvider({
   useEffect(() => {
     // poll owned nfts
     const interval = setInterval(async () => {
-      const newNfts = await mainController.fetchNfts();
+      if (connectedWallet == null) return;
+
+      const newNfts = await mainController.fetchNfts(connectedWallet);
       setNfts(newNfts);
       if (newNfts?.length > 0) {
         // only set a single NFT for this game
@@ -40,30 +44,45 @@ export function GlobalStateProvider({
       }
     }, 5000);
     return () => clearInterval(interval);
-  }, [mainController]);
+  }, [mainController, connectedWallet]);
 
   useEffect(() => {
     // poll connection to wallet
-    if (connectedWallet != null) return;
     const interval = setInterval(async () => {
-      const newWallet = await Paima.default.userWalletLogin("metamask");
-      if (!newWallet.success) return;
-      setConnectedWallet(newWallet.result.walletAddress);
+      const connectResult = await Paima.default.userWalletLogin("metamask");
+      const newWallet = connectResult.success
+        ? connectResult.result.walletAddress
+        : undefined;
+      setConnectedWallet(newWallet);
     }, 2000);
     return () => clearInterval(interval);
   }, [connectedWallet, mainController]);
 
+  // if a user disconnects, we will suspend the pages the previously connected wallet
+  // instead of setting connected wallet back to undefined
+  const [lastConnectedWallet, setLastConnectedWallet] = useState<
+    undefined | WalletAddress
+  >();
+  useEffect(() => {
+    if (connectedWallet == null) return;
+
+    setLastConnectedWallet(connectedWallet);
+  }, [connectedWallet]);
+
   const value = React.useMemo<GlobalState>(
     () => ({
-      connectedWallet,
+      connectedWallet: lastConnectedWallet,
       nfts,
       selectedNftState: [selectedNft, setSelectedNft],
     }),
-    [connectedWallet, nfts, selectedNft, setSelectedNft]
+    [lastConnectedWallet, nfts, selectedNft, setSelectedNft]
   );
+
   return (
     <GlobalStateContext.Provider value={value}>
+      <ConnectingModal open={connectedWallet == null} />
       {children}
+      <PaimaNotice />
     </GlobalStateContext.Provider>
   );
 }
