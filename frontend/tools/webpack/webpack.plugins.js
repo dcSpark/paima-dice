@@ -12,7 +12,27 @@ module.exports = [
     process: "process/browser",
   }),
   new webpack.DefinePlugin({
-    "process.env": JSON.stringify(process.env),
+    "process.env": JSON.stringify(
+      Object.fromEntries(
+        [
+          "CHAIN_URI",
+          "CHAIN_EXPLORER_URI",
+          "CHAIN_NAME",
+          "CHAIN_ID",
+          "CHAIN_CURRENCY_NAME",
+          "CHAIN_CURRENCY_SYMBOL",
+          "CHAIN_CURRENCY_DECIMALS",
+          "BLOCK_TIME",
+          "CONTRACT_ADDRESS",
+          "START_BLOCKHEIGHT",
+          "BACKEND_URI",
+          "WEBSERVER_PORT",
+          "SERVER_ONLY_MODE",
+          "NATIVE_PROXY",
+          "NFT",
+        ].map((key) => [key, process.env[key]])
+      )
+    ),
   }),
   new ForkTsCheckerWebpackPlugin(),
   inDev() && new webpack.HotModuleReplacementPlugin(),
