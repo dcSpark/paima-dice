@@ -76,12 +76,18 @@ export default function Player({
             gap: 1,
           }}
         >
-          <Button disabled={onRoll == null} onClick={onRoll}>
-            roll
-          </Button>
-          <Button disabled={onPass == null} onClick={onPass}>
-            pass
-          </Button>
+          {onRoll == null && onPass != null ? (
+            <Button onClick={onPass}>end turn</Button>
+          ) : (
+            <>
+              <Button disabled={onRoll == null} onClick={onRoll}>
+                roll
+              </Button>
+              <Button disabled={onPass == null} onClick={onPass}>
+                pass
+              </Button>
+            </>
+          )}
         </Box>
       )}
     </Box>
