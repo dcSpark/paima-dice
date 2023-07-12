@@ -6,6 +6,7 @@ export const PaimaNotice: React.FC = () => {
     <Card
       gap={1}
       sx={{
+        marginTop: 3,
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",

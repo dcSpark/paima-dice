@@ -5,7 +5,6 @@ import MainMenu from "./MainMenu";
 import OpenLobbies from "./OpenLobbies";
 import MyGames from "./MyGames";
 import CreateLobby from "./CreateLobby";
-import { Box, CircularProgress } from "@mui/material";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import { LobbyState } from "@dice/utils";
 import "./PageCoordinator.scss";
@@ -23,11 +22,6 @@ const PageCoordinator: React.FC = () => {
 
   const [lobby, setLobby] = useState<LobbyState>(null);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const page = mainController.initialState();
-    navigate(page);
-  }, []);
 
   useEffect(() => {
     mainController.callback = (
@@ -48,11 +42,6 @@ const PageCoordinator: React.FC = () => {
 
   return (
     <div className="dice-app">
-      {loading && (
-        <div className="overlay">
-          <CircularProgress sx={{ ml: 2 }} />
-        </div>
-      )}
       <Routes>
         <Route path={Page.MainMenu} element={<MainMenu />} />
         <Route path={Page.OpenLobbies} element={<OpenLobbies />} />
@@ -67,8 +56,6 @@ const PageCoordinator: React.FC = () => {
         <Route path={Page.Landing} element={<LandingPage />} />
         <Route element={<div>There was something wrong...</div>} />
       </Routes>
-      <Box sx={{ marginTop: 3 }} />
-      <PaimaNotice />
     </div>
   );
 };

@@ -117,8 +117,11 @@ const HasNFTMenu = () => {
 
 const MainMenu = () => {
   const {
+    connectedWallet,
     selectedNftState: [selectedNft],
   } = useGlobalStateContext();
+
+  if (connectedWallet == null) return <></>;
 
   return (
     <>
