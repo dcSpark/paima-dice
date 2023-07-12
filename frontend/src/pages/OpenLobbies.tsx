@@ -27,8 +27,6 @@ type Column = {
 const columns: Column[] = [
   { id: "lobby_id", label: "Lobby ID", minWidth: 50 },
   { id: "created_at", label: "Created At", minWidth: 50 },
-  // TODO: change to support multiple players
-  { id: "player_one_iswhite", label: "Host", minWidth: 50 },
   { id: "action", label: "", minWidth: 50 },
 ];
 
