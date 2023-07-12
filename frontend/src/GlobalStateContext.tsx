@@ -6,6 +6,8 @@ import { WalletAddress } from "paima-sdk/paima-utils";
 import * as Paima from "@dice/middleware";
 import ConnectingModal from "./ConnectingModal";
 import { PaimaNotice } from "./components/PaimaNotice";
+import { OasysNotice } from "./components/PaimaNotice";
+import { Box } from "@mui/material";
 
 type GlobalState = {
   connectedWallet?: WalletAddress;
@@ -83,6 +85,8 @@ export function GlobalStateProvider({
       <ConnectingModal open={connectedWallet == null} />
       {children}
       <PaimaNotice />
+      <Box sx={{ marginRight: 1 }} />
+      <OasysNotice />
     </GlobalStateContext.Provider>
   );
 }

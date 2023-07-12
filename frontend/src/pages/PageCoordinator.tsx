@@ -11,7 +11,6 @@ import "./PageCoordinator.scss";
 import { AppContext } from "@src/main";
 import { Lobby } from "./DiceGame/Lobby";
 import { useGlobalStateContext } from "@src/GlobalStateContext";
-import { PaimaNotice } from "@src/components/PaimaNotice";
 
 const PageCoordinator: React.FC = () => {
   const mainController: MainController = useContext(AppContext);
