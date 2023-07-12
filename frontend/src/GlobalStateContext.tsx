@@ -32,7 +32,7 @@ export function GlobalStateProvider({
     const interval = setInterval(async () => {
       const newNfts = await mainController.fetchNfts();
       setNfts(newNfts);
-      if (newNfts.length > 0) {
+      if (newNfts?.length > 0) {
         // only set a single NFT for this game
         setSelectedNft(newNfts[0]);
       } else {
