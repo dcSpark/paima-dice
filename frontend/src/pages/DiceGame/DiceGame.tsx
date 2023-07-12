@@ -127,16 +127,21 @@ const DiceGame: React.FC<DiceGameProps> = ({
     submit(true);
   }
 
+  // User submitted "roll again", we are expecting an extra roll to be shown.
+  // This requires a different animation. Basically, we want to show the first roll tick event
+  // of the next round, before the next round is complete, and also apply its state changes.
+  const isExtraRoll = useMemo(
+    () =>
+      lobbyState.current_round === displayedRound + 1 &&
+      diceLogic.isThisPlayersTurn(lobbyState, displayedState.turn) &&
+      diceLogic.isThisPlayersTurn(lobbyState, lobbyState.turn),
+    [lobbyState, displayedRound]
+  );
+
   useEffect(() => {
     // after user submits an extra roll, we have to wait for the lobby to update
     // and then automatically display the roll
-    if (isTickDisplaying) return;
-
-    const nextTurnStillPlayers =
-      lobbyState.current_round === displayedRound + 1 &&
-      diceLogic.isThisPlayersTurn(lobbyState, displayedState.turn) &&
-      diceLogic.isThisPlayersTurn(lobbyState, lobbyState.turn);
-    if (!nextTurnStillPlayers) return;
+    if (isTickDisplaying || !isExtraRoll) return;
 
     void (async () => {
       setIsTickDisplaying(true);
@@ -154,6 +159,9 @@ const DiceGame: React.FC<DiceGameProps> = ({
         return newDisplayedState;
       });
       setDisplayedRound(displayedRound + 1);
+      // This is a special case, where we didn't use round executor to show replay,
+      // but it still got fetched. We have to unset it to allow fetching next round.
+      setRoundExecutor(undefined);
       setIsTickDisplaying(false);
     })();
   }, [isTickDisplaying, isPlayersTurn, displayedRound, lobbyState, diceRefs]);
@@ -163,8 +171,15 @@ const DiceGame: React.FC<DiceGameProps> = ({
   }
 
   useEffect(() => {
-    // opponent's turn animation
-    if (isTickDisplaying || roundExecutor == null) return;
+    // past turn animation (mostly opponents' turns)
+
+    if (
+      isTickDisplaying ||
+      roundExecutor == null ||
+      // see comment before definition of this
+      isExtraRoll
+    )
+      return;
 
     void (async () => {
       setIsTickDisplaying(true);
@@ -173,6 +188,9 @@ const DiceGame: React.FC<DiceGameProps> = ({
       const endState = roundExecutor.endState;
 
       for (const tickEvent of tickEvents) {
+        // skip replay of this player's actions that already happened interactively
+        if (isPlayersTurn && tickEvent.kind === TickEventKind.roll) continue;
+
         if (tickEvent.kind === TickEventKind.roll) {
           const playerRolling = displayedState.turn === 1 ? 1 : 2;
           await diceRefs.current[playerRolling].roll(tickEvent.diceRolls);
@@ -241,25 +259,8 @@ const DiceGame: React.FC<DiceGameProps> = ({
             tickEvents: newRoundExecutor.result.processAllTicks(),
             endState: newRoundExecutor.result.endState(),
           };
-          if (diceLogic.isThisPlayersTurn(lobbyState, fetchedEndState.turn)) {
-            // skip replay for this player's round (it already happened interactively)
 
-            // TODO: this is terrible, need to find a way to clean it up
-            // last end state it was this players turn and next it's not -> player passed
-            // "extra roll" is in another useEffect
-            if (
-              !diceLogic.isThisPlayersTurn(
-                lobbyState,
-                newRoundExecutorResults.endState.turn
-              )
-            ) {
-              setDisplayedState(newRoundExecutor.result.endState());
-              setDisplayedRound(displayedRound + 1);
-            }
-          } else {
-            setRoundExecutor(newRoundExecutorResults);
-          }
-
+          setRoundExecutor(newRoundExecutorResults);
           setFetchedRound(nextFetchedRound + 1);
           setFetchedEndState(newRoundExecutorResults.endState);
           setIsFetchingRound(false);

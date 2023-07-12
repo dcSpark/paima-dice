@@ -60,6 +60,10 @@
 						"type": "number",
 						"format": "double"
 					},
+					"player_one_score": {
+						"type": "number",
+						"format": "double"
+					},
 					"player_two": {
 						"type": "number",
 						"format": "double",
@@ -69,10 +73,18 @@
 						"type": "number",
 						"format": "double"
 					},
+					"player_two_score": {
+						"type": "number",
+						"format": "double"
+					},
 					"practice": {
 						"type": "boolean"
 					},
 					"round_length": {
+						"type": "number",
+						"format": "double"
+					},
+					"turn": {
 						"type": "number",
 						"format": "double"
 					},
@@ -97,10 +109,13 @@
 					"play_time_per_player",
 					"player_one_iswhite",
 					"player_one_points",
+					"player_one_score",
 					"player_two",
 					"player_two_points",
+					"player_two_score",
 					"practice",
 					"round_length",
+					"turn",
 					"round_start_height",
 					"round_seed"
 				],
@@ -281,6 +296,10 @@
 						"type": "number",
 						"format": "double"
 					},
+					"player_one_score": {
+						"type": "number",
+						"format": "double"
+					},
 					"player_two": {
 						"type": "number",
 						"format": "double",
@@ -290,10 +309,18 @@
 						"type": "number",
 						"format": "double"
 					},
+					"player_two_score": {
+						"type": "number",
+						"format": "double"
+					},
 					"practice": {
 						"type": "boolean"
 					},
 					"round_length": {
+						"type": "number",
+						"format": "double"
+					},
+					"turn": {
 						"type": "number",
 						"format": "double"
 					}
@@ -311,10 +338,13 @@
 					"play_time_per_player",
 					"player_one_iswhite",
 					"player_one_points",
+					"player_one_score",
 					"player_two",
 					"player_two_points",
+					"player_two_score",
 					"practice",
-					"round_length"
+					"round_length",
+					"turn"
 				],
 				"type": "object",
 				"additionalProperties": false
