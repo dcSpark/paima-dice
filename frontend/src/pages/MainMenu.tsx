@@ -21,6 +21,8 @@ import { AppContext } from "@src/main";
 const NoNFTMenu = () => {
   const { connectedWallet, nfts } = useGlobalStateContext();
   const [isBuying, setIsBuying] = React.useState<boolean>(false);
+  // if user successfully submitted a tx, keep loading until we fetch the nft
+  const [buyDone, setBuyDone] = React.useState<boolean>(false);
 
   if (!connectedWallet || nfts == null)
     return (
@@ -33,7 +35,7 @@ const NoNFTMenu = () => {
   return (
     <>
       <LoadingButton
-        loading={isBuying}
+        loading={isBuying || buyDone}
         sx={(theme) => ({
           "&.Mui-disabled": {
             backgroundColor: theme.palette.menuButton.dark,
@@ -44,6 +46,8 @@ const NoNFTMenu = () => {
           try {
             setIsBuying(true);
             await buyNft(connectedWallet);
+            setBuyDone(true);
+          } catch (_e) {
           } finally {
             setIsBuying(false);
           }
