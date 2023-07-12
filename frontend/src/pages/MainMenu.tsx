@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Box,
   CircularProgress,
@@ -6,7 +6,7 @@ import {
   Select,
   Typography,
 } from "@mui/material";
-import { Page } from "@src/MainController";
+import MainController, { Page } from "@src/MainController";
 import { useNavigate } from "react-router-dom";
 import Button from "@src/components/Button";
 import Wrapper from "@src/components/Wrapper";
@@ -16,6 +16,7 @@ import * as Paima from "@dice/middleware";
 import { useGlobalStateContext } from "@src/GlobalStateContext";
 import { LoadingButton } from "@mui/lab";
 import { Dice, DiceRef } from "./DiceGame/Dice";
+import { AppContext } from "@src/main";
 
 const NoNFTMenu = () => {
   const { connectedWallet, nfts } = useGlobalStateContext();
@@ -70,13 +71,31 @@ const NoNFTMenu = () => {
 };
 
 const HasNFTMenu = () => {
+  const mainController: MainController = useContext(AppContext);
+  const {
+    selectedNftState: [selectedNft],
+  } = useGlobalStateContext();
   const navigate = useNavigate();
 
   return (
     <>
       <Button
         sx={(theme) => ({ backgroundColor: theme.palette.menuButton.main })}
-        onClick={() => navigate(Page.CreateLobby)}
+        // onClick={() => navigate(Page.CreateLobby)}
+        onClick={async () => {
+          // Creating a lobby is temporarily here, because none of the options are implemented properly
+          // so it makes no sense to have a separate page to create a lobby.
+          // Note: the number values are not going to be used, hidden lobbies aren't implemented
+          // and AI doesn't work on oasis chain because it scheduled inputs don't work there.
+          await mainController.createLobby(
+            selectedNft,
+            10,
+            100,
+            100,
+            false,
+            false
+          );
+        }}
       >
         Create
       </Button>
