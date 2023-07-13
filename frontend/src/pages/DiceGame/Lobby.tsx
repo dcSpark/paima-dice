@@ -1,7 +1,7 @@
 import React, { Ref, useEffect, useMemo, useRef, useState } from "react";
 import "./Lobby.scss";
 import { Box, CircularProgress, Typography } from "@mui/material";
-import type { LobbyState } from "@dice/utils";
+import type { LobbyStateQuery } from "@dice/utils";
 import Navbar from "@src/components/Navbar";
 import Wrapper from "@src/components/Wrapper";
 import { DiceService } from "./GameLogic";
@@ -11,10 +11,11 @@ export function Lobby({
   initialLobbyState,
   selectedNft,
 }: {
-  initialLobbyState: LobbyState;
+  initialLobbyState: LobbyStateQuery;
   selectedNft: number;
 }): React.ReactElement {
-  const [lobbyState, setLobbyState] = useState<LobbyState>(initialLobbyState);
+  const [lobbyState, setLobbyState] =
+    useState<LobbyStateQuery>(initialLobbyState);
 
   useEffect(() => {
     const fetchLobbyData = async () => {
@@ -44,7 +45,8 @@ export function Lobby({
         {lobbyState.lobby_state === "open" && (
           <>
             <div>
-              Waiting for another player<span className="loading-text">...</span>
+              Waiting for another player
+              <span className="loading-text">...</span>
             </div>
           </>
         )}

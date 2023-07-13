@@ -1,10 +1,4 @@
-import {
-  MatchState,
-  TickEvent,
-  LobbyState,
-  LobbyStateQuery,
-  UserLobby,
-} from "@dice/utils";
+import { MatchState, TickEvent, LobbyStateQuery, UserLobby } from "@dice/utils";
 import * as Paima from "@dice/middleware";
 import { MatchExecutor } from "paima-sdk/paima-executors";
 
@@ -30,7 +24,7 @@ class MainController {
   callback: (
     page: Page | null,
     isLoading: boolean,
-    extraData: LobbyState
+    extraData: LobbyStateQuery
   ) => void;
 
   private checkCallback() {
@@ -80,7 +74,7 @@ class MainController {
     return response.result;
   }
 
-  async loadLobbyState(lobbyId: string): Promise<LobbyState> {
+  async loadLobbyState(lobbyId: string): Promise<LobbyStateQuery> {
     await this.enforceWalletConnected();
     this.callback(null, true, null);
     const response = await Paima.default.getLobbyState(lobbyId);

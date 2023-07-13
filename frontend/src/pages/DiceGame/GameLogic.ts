@@ -1,10 +1,10 @@
-import { LobbyState } from "@dice/utils";
+import { LobbyStateQuery } from "@dice/utils";
 import * as Paima from "@dice/middleware";
 import { OldResult } from "paima-sdk/paima-mw-core";
 
 export class DiceService {
   // Get Lobby State
-  static async getLobbyState(lobbyId: string): Promise<LobbyState | null> {
+  static async getLobbyState(lobbyId: string): Promise<LobbyStateQuery | null> {
     const result = await Paima.default.getLobbyState(lobbyId);
 
     if (result.success === false) {
@@ -41,7 +41,7 @@ export class DiceLogic {
     this.nftId = nftId;
   }
 
-  async handleMove(lobbyState: LobbyState, move: boolean): Promise<void> {
+  async handleMove(lobbyState: LobbyStateQuery, move: boolean): Promise<void> {
     if (lobbyState == null) {
       throw new Error("Lobby state is null");
     }
@@ -65,7 +65,7 @@ export class DiceLogic {
   }
 
   // TODO: support multiple players
-  isThisPlayersTurn(lobbyState: LobbyState, turn?: number): boolean {
+  isThisPlayersTurn(lobbyState: LobbyStateQuery, turn?: number): boolean {
     // Note: match starts at round 1, because we use persistNewRound to start it
     const isPlayerOnesTurn = (turn ?? lobbyState.turn) === 1;
     const isThisPlayerPlayerOne = this.isThisPlayerPlayerOne(lobbyState);
@@ -73,7 +73,7 @@ export class DiceLogic {
   }
 
   // TODO: support multiple players
-  isThisPlayerPlayerOne(lobbyState: LobbyState): boolean {
+  isThisPlayerPlayerOne(lobbyState: LobbyStateQuery): boolean {
     const isCreator = lobbyState.lobby_creator === this.nftId ? true : false;
     const isCreatorWhite = lobbyState.player_one_iswhite;
     return isCreator === isCreatorWhite;

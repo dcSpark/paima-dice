@@ -44,13 +44,9 @@ async function getLobbyState(lobbyID: string): Promise<PackedLobbyState | Failed
   const errorFxn = buildEndpointErrorFxn('getLobbyState');
 
   let packedLobbyState: PackedLobbyState | FailedResult;
-  let latestBlockHeight: number;
 
   try {
-    [packedLobbyState, latestBlockHeight] = await Promise.all([
-      getRawLobbyState(lobbyID),
-      getBlockNumber(),
-    ]);
+    packedLobbyState = await getRawLobbyState(lobbyID);
 
     if (!packedLobbyState.success) {
       return errorFxn(packedLobbyState.errorMessage);
@@ -61,22 +57,10 @@ async function getLobbyState(lobbyID: string): Promise<PackedLobbyState | Failed
 
   try {
     const { lobby } = packedLobbyState;
-    let [start, length] = [0, 0];
-
-    if (lobby.lobby_state === 'active') {
-      start = lobby.round_start_height;
-      length = lobby.round_length;
-    }
-
-    const end = calculateRoundEnd(start, length, latestBlockHeight);
 
     return {
       success: true,
-      lobby: {
-        ...lobby,
-        round_ends_in_blocks: end.blocks,
-        round_ends_in_secs: end.seconds,
-      },
+      lobby,
     };
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.INVALID_RESPONSE_FROM_BACKEND, err);

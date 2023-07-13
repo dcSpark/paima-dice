@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@mui/material";
 import MainController from "@src/MainController";
-import { LobbyState, LobbyStateQuery } from "@dice/utils";
+import { LobbyStateQuery } from "@dice/utils";
 import Navbar from "@src/components/Navbar";
 import SearchBar from "@src/components/SearchBar";
 import { AppContext } from "@src/main";
@@ -30,7 +30,7 @@ const columns: Column[] = [
   { id: "action", label: "", minWidth: 50 },
 ];
 
-const expandValue = (id: keyof LobbyState, value: unknown) => {
+const expandValue = (id: keyof LobbyStateQuery, value: unknown) => {
   // TODO: change to support multiple players
   if (id === "player_one_iswhite") {
     return value ? "White" : "Black";
