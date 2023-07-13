@@ -120,7 +120,7 @@ export type UserStats = IGetUserStatsResult;
 
 export type NewLobby = IGetNewLobbiesByUserAndBlockHeightResult;
 
-export interface LobbyStateQuery extends IGetLobbyByIdResult {
+export interface LobbyState extends IGetLobbyByIdResult {
   round_seed: string;
 }
 

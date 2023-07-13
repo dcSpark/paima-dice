@@ -2,7 +2,7 @@ import type { Hash } from 'paima-sdk/paima-utils';
 
 import type {
   BaseRoundStatus,
-  LobbyStateQuery,
+  LobbyState,
   LobbyStatus,
   NewLobby,
   UserLobby,
@@ -27,7 +27,7 @@ export interface NewLobbies {
 
 export interface PackedLobbyState {
   success: true;
-  lobby: LobbyStateQuery;
+  lobby: LobbyState;
 }
 
 export interface RoundExecutionState extends BaseRoundStatus {
@@ -42,7 +42,7 @@ export interface PackedRoundExecutionState {
 
 export interface LobbyStates {
   success: true;
-  lobbies: LobbyStateQuery[];
+  lobbies: LobbyState[];
 }
 
 export interface PackedUserLobbies {

@@ -15,7 +15,7 @@
 					"open"
 				]
 			},
-			"LobbyStateQuery": {
+			"LobbyState": {
 				"properties": {
 					"created_at": {
 						"type": "string",
@@ -88,10 +88,6 @@
 						"type": "number",
 						"format": "double"
 					},
-					"round_start_height": {
-						"type": "number",
-						"format": "double"
-					},
 					"round_seed": {
 						"type": "string"
 					}
@@ -116,7 +112,6 @@
 					"practice",
 					"round_length",
 					"turn",
-					"round_start_height",
 					"round_seed"
 				],
 				"type": "object",
@@ -127,7 +122,7 @@
 					"lobby": {
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/LobbyStateQuery"
+								"$ref": "#/components/schemas/LobbyState"
 							}
 						],
 						"nullable": true

@@ -5,7 +5,7 @@ import { buildEndpointErrorFxn } from '../errors';
 import type { NewLobbies, PackedLobbyState } from '../types';
 import { userCreatedLobby, userJoinedLobby } from './utility-functions';
 import { backendQueryLobbyState, backendQueryUserLobbiesBlockheight } from './query-constructors';
-import type { LobbyStateQuery, NewLobby } from '@dice/utils';
+import type { LobbyState, NewLobby } from '@dice/utils';
 
 export async function getRawLobbyState(lobbyID: string): Promise<PackedLobbyState | FailedResult> {
   const errorFxn = buildEndpointErrorFxn('getRawLobbyState');
@@ -19,7 +19,7 @@ export async function getRawLobbyState(lobbyID: string): Promise<PackedLobbyStat
   }
 
   try {
-    const j = (await res.json()) as { lobby: LobbyStateQuery };
+    const j = (await res.json()) as { lobby: LobbyState };
     return {
       success: true,
       lobby: j.lobby,

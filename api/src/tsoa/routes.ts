@@ -37,7 +37,7 @@ const models: TsoaRoute.Models = {
         "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["active"]},{"dataType":"enum","enums":["closed"]},{"dataType":"enum","enums":["finished"]},{"dataType":"enum","enums":["open"]}],"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "LobbyStateQuery": {
+    "LobbyState": {
         "dataType": "refObject",
         "properties": {
             "created_at": {"dataType":"datetime","required":true},
@@ -59,7 +59,6 @@ const models: TsoaRoute.Models = {
             "practice": {"dataType":"boolean","required":true},
             "round_length": {"dataType":"double","required":true},
             "turn": {"dataType":"double","required":true},
-            "round_start_height": {"dataType":"double","required":true},
             "round_seed": {"dataType":"string","required":true},
         },
         "additionalProperties": false,
@@ -68,7 +67,7 @@ const models: TsoaRoute.Models = {
     "Response": {
         "dataType": "refObject",
         "properties": {
-            "lobby": {"dataType":"union","subSchemas":[{"ref":"LobbyStateQuery"},{"dataType":"enum","enums":[null]}],"required":true},
+            "lobby": {"dataType":"union","subSchemas":[{"ref":"LobbyState"},{"dataType":"enum","enums":[null]}],"required":true},
         },
         "additionalProperties": false,
     },

@@ -1,10 +1,10 @@
 import { Controller, Get, Query, Route } from 'tsoa';
 import { getLobbyById, getRoundData, requirePool } from '@dice/db';
-import type { LobbyStateQuery } from '@dice/utils';
+import type { LobbyState } from '@dice/utils';
 import { getBlockHeight } from 'paima-sdk/paima-db';
 
 interface Response {
-  lobby: LobbyStateQuery | null;
+  lobby: LobbyState | null;
 }
 
 @Route('lobby_state')

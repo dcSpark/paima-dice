@@ -4,7 +4,7 @@ import { Box, Typography } from "@mui/material";
 import {
   type MatchState,
   type TickEvent,
-  type LobbyStateQuery,
+  type LobbyState,
   TickEventKind,
 } from "@dice/utils";
 import {
@@ -22,7 +22,7 @@ import Player from "./Player";
 import { DiceRef } from "./Dice";
 
 interface DiceGameProps {
-  lobbyState: LobbyStateQuery;
+  lobbyState: LobbyState;
   refetchLobbyState: () => Promise<void>;
   selectedNft: number;
 }

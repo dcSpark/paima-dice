@@ -7,7 +7,7 @@ import type {
   MatchExecutorData,
   RoundStatusData,
   UserStats,
-  LobbyStateQuery,
+  LobbyState,
   UserLobby,
   RoundExecutorBackendData,
   MatchState,
@@ -84,7 +84,7 @@ async function getLobbySearch(
   }
 
   try {
-    const j = (await response.json()) as { lobbies: LobbyStateQuery[] };
+    const j = (await response.json()) as { lobbies: LobbyState[] };
     return {
       success: true,
       lobbies: j.lobbies,
@@ -208,7 +208,7 @@ async function getOpenLobbies(
   }
 
   try {
-    const j = (await res.json()) as { lobbies: LobbyStateQuery[] };
+    const j = (await res.json()) as { lobbies: LobbyState[] };
     return {
       success: true,
       lobbies: j.lobbies,

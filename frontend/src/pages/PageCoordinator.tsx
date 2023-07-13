@@ -6,7 +6,7 @@ import OpenLobbies from "./OpenLobbies";
 import MyGames from "./MyGames";
 import CreateLobby from "./CreateLobby";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import { LobbyStateQuery } from "@dice/utils";
+import { LobbyState } from "@dice/utils";
 import "./PageCoordinator.scss";
 import { AppContext } from "@src/main";
 import { Lobby } from "./DiceGame/Lobby";
@@ -19,14 +19,14 @@ const PageCoordinator: React.FC = () => {
   } = useGlobalStateContext();
   const navigate = useNavigate();
 
-  const [lobby, setLobby] = useState<LobbyStateQuery>(null);
+  const [lobby, setLobby] = useState<LobbyState>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     mainController.callback = (
       newPage: Page | null,
       isLoading: boolean,
-      extraData: LobbyStateQuery | null
+      extraData: LobbyState | null
     ) => {
       // Update the local state and show a message to the user
       setLoading(isLoading);

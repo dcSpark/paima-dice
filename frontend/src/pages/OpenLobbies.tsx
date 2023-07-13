@@ -9,7 +9,7 @@ import {
   TableRow,
 } from "@mui/material";
 import MainController from "@src/MainController";
-import { LobbyStateQuery } from "@dice/utils";
+import { LobbyState } from "@dice/utils";
 import Navbar from "@src/components/Navbar";
 import SearchBar from "@src/components/SearchBar";
 import { AppContext } from "@src/main";
@@ -19,7 +19,7 @@ import { formatDate } from "@src/utils";
 import { useGlobalStateContext } from "@src/GlobalStateContext";
 
 type Column = {
-  id: keyof LobbyStateQuery | "action";
+  id: keyof LobbyState | "action";
   label: string;
   minWidth: number;
 };
@@ -30,7 +30,7 @@ const columns: Column[] = [
   { id: "action", label: "", minWidth: 50 },
 ];
 
-const expandValue = (id: keyof LobbyStateQuery, value: unknown) => {
+const expandValue = (id: keyof LobbyState, value: unknown) => {
   // TODO: change to support multiple players
   if (id === "player_one_iswhite") {
     return value ? "White" : "Black";
@@ -49,7 +49,7 @@ const OpenLobbies: React.FC = () => {
   const {
     selectedNftState: [selectedNft],
   } = useGlobalStateContext();
-  const [lobbies, setLobbies] = useState<LobbyStateQuery[]>([]);
+  const [lobbies, setLobbies] = useState<LobbyState[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchText, setSearchText] = useState("");

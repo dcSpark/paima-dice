@@ -1,4 +1,4 @@
-import { MatchState, TickEvent, LobbyStateQuery, UserLobby } from "@dice/utils";
+import { MatchState, TickEvent, LobbyState, UserLobby } from "@dice/utils";
 import * as Paima from "@dice/middleware";
 import { MatchExecutor } from "paima-sdk/paima-executors";
 
@@ -24,7 +24,7 @@ class MainController {
   callback: (
     page: Page | null,
     isLoading: boolean,
-    extraData: LobbyStateQuery
+    extraData: LobbyState
   ) => void;
 
   private checkCallback() {
@@ -74,7 +74,7 @@ class MainController {
     return response.result;
   }
 
-  async loadLobbyState(lobbyId: string): Promise<LobbyStateQuery> {
+  async loadLobbyState(lobbyId: string): Promise<LobbyState> {
     await this.enforceWalletConnected();
     this.callback(null, true, null);
     const response = await Paima.default.getLobbyState(lobbyId);
@@ -90,7 +90,7 @@ class MainController {
     nftId: number,
     query: string,
     page: number
-  ): Promise<LobbyStateQuery[]> {
+  ): Promise<LobbyState[]> {
     await this.enforceWalletConnected();
     this.callback(null, true, null);
     const response = await Paima.default.getLobbySearch(nftId, query, page, 1);
@@ -185,7 +185,7 @@ class MainController {
     nftId: number,
     page = 0,
     limit = 100
-  ): Promise<LobbyStateQuery[]> {
+  ): Promise<LobbyState[]> {
     await this.enforceWalletConnected();
     this.callback(null, true, null);
     const response = await Paima.default.getOpenLobbies(nftId, page, limit);

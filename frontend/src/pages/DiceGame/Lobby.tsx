@@ -1,7 +1,7 @@
 import React, { Ref, useEffect, useMemo, useRef, useState } from "react";
 import "./Lobby.scss";
 import { Box, CircularProgress, Typography } from "@mui/material";
-import type { LobbyStateQuery } from "@dice/utils";
+import type { LobbyState } from "@dice/utils";
 import Navbar from "@src/components/Navbar";
 import Wrapper from "@src/components/Wrapper";
 import { DiceService } from "./GameLogic";
@@ -11,11 +11,10 @@ export function Lobby({
   initialLobbyState,
   selectedNft,
 }: {
-  initialLobbyState: LobbyStateQuery;
+  initialLobbyState: LobbyState;
   selectedNft: number;
 }): React.ReactElement {
-  const [lobbyState, setLobbyState] =
-    useState<LobbyStateQuery>(initialLobbyState);
+  const [lobbyState, setLobbyState] = useState<LobbyState>(initialLobbyState);
 
   useEffect(() => {
     const fetchLobbyData = async () => {
