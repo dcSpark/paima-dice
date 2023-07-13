@@ -63,13 +63,17 @@ const DiceGame: React.FC<DiceGameProps> = ({
   >();
   const [isTickDisplaying, setIsTickDisplaying] = useState(false);
 
+  const thisPlayer = useMemo(() => {
+    const result = lobbyState.players.find(
+      (player) => player.nftId === selectedNft
+    );
+    if (result == null) throw new Error(`DiceGame: nft not in lobby`);
+    return result;
+  }, [lobbyState, selectedNft]);
+
   const isThisPlayerPlayerOne = useMemo(() => {
     return diceLogic.isThisPlayerPlayerOne(lobbyState);
   }, [diceLogic, lobbyState]);
-
-  const isPlayersTurn = useMemo(() => {
-    return diceLogic.isThisPlayersTurn(lobbyState, displayedState.turn);
-  }, [diceLogic, lobbyState, displayedRound]);
 
   // "forced moves", user has to roll until he gets score 16
   const [initialRollQueue, setInitialRollQueue] = React.useState<
@@ -133,9 +137,9 @@ const DiceGame: React.FC<DiceGameProps> = ({
   const isExtraRoll = useMemo(
     () =>
       lobbyState.current_round === displayedRound + 1 &&
-      diceLogic.isThisPlayersTurn(lobbyState, displayedState.turn) &&
-      diceLogic.isThisPlayersTurn(lobbyState, lobbyState.turn),
-    [lobbyState, displayedRound]
+      thisPlayer.turn === displayedState.turn &&
+      thisPlayer.turn === lobbyState.turn,
+    [lobbyState, displayedRound, thisPlayer]
   );
 
   useEffect(() => {
@@ -164,7 +168,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
       setRoundExecutor(undefined);
       setIsTickDisplaying(false);
     })();
-  }, [isTickDisplaying, isPlayersTurn, displayedRound, lobbyState, diceRefs]);
+  }, [isTickDisplaying, displayedRound, lobbyState, diceRefs]);
 
   async function handlePass(): Promise<void> {
     submit(false);
@@ -189,7 +193,11 @@ const DiceGame: React.FC<DiceGameProps> = ({
 
       for (const tickEvent of tickEvents) {
         // skip replay of this player's actions that already happened interactively
-        if (isPlayersTurn && tickEvent.kind === TickEventKind.roll) continue;
+        if (
+          thisPlayer.turn === displayedState.turn &&
+          tickEvent.kind === TickEventKind.roll
+        )
+          continue;
 
         if (tickEvent.kind === TickEventKind.roll) {
           const playerRolling = displayedState.turn === 1 ? 1 : 2;
@@ -281,7 +289,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
 
   const disableInteraction =
     displayedRound !== lobbyState.current_round ||
-    !isPlayersTurn ||
+    thisPlayer.turn !== displayedState.turn ||
     isTickDisplaying;
   const playerScore = getPlayerScore(displayedState);
   const canRoll = !disableInteraction && playerScore <= 21;
@@ -298,7 +306,8 @@ const DiceGame: React.FC<DiceGameProps> = ({
       isThisPlayerYou: isThisPlayerPlayerOne,
       score: displayedState.player1Score,
       points: displayedState.player1Points,
-      isThisPlayersTurn: isThisPlayerPlayerOne === isPlayersTurn,
+      isThisPlayersTurn:
+        isThisPlayerPlayerOne === (thisPlayer.turn === displayedState.turn),
       diceRef: (el) => {
         diceRefs.current[1] = el;
       },
@@ -307,7 +316,8 @@ const DiceGame: React.FC<DiceGameProps> = ({
       isThisPlayerYou: !isThisPlayerPlayerOne,
       score: displayedState.player2Score,
       points: displayedState.player2Points,
-      isThisPlayersTurn: isThisPlayerPlayerOne !== isPlayersTurn,
+      isThisPlayersTurn:
+        isThisPlayerPlayerOne !== (thisPlayer.turn === displayedState.turn),
       diceRef: (el) => {
         diceRefs.current[2] = el;
       },
@@ -322,7 +332,10 @@ const DiceGame: React.FC<DiceGameProps> = ({
         variant="caption"
         sx={{ fontSize: "1.25rem", lineHeight: "1.75rem" }}
       >
-        {caption ?? (isPlayersTurn ? "Your turn" : "Opponent's turn")}
+        {caption ??
+          (thisPlayer.turn === displayedState.turn
+            ? "Your turn"
+            : "Opponent's turn")}
       </Typography>
       <Box
         sx={{
