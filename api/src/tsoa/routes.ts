@@ -32,6 +32,11 @@ import * as express from 'express';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
 const models: TsoaRoute.Models = {
+    "LobbyPlayer": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"score":{"dataType":"double","required":true},"points":{"dataType":"double","required":true},"turn":{"dataType":"double","required":true},"nftId":{"dataType":"double","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "lobby_status": {
         "dataType": "refAlias",
         "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["active"]},{"dataType":"enum","enums":["closed"]},{"dataType":"enum","enums":["finished"]},{"dataType":"enum","enums":["open"]}],"validators":{}},
@@ -60,6 +65,7 @@ const models: TsoaRoute.Models = {
             "round_length": {"dataType":"double","required":true},
             "turn": {"dataType":"double","required":true},
             "round_seed": {"dataType":"string","required":true},
+            "players": {"dataType":"array","array":{"dataType":"refAlias","ref":"LobbyPlayer"},"required":true},
         },
         "additionalProperties": false,
     },

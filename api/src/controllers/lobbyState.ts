@@ -1,6 +1,6 @@
 import { Controller, Get, Query, Route } from 'tsoa';
 import { getLobbyById, getRoundData, requirePool } from '@dice/db';
-import type { LobbyState } from '@dice/utils';
+import type { LobbyPlayer, LobbyState } from '@dice/utils';
 import { getBlockHeight } from 'paima-sdk/paima-db';
 
 interface Response {
@@ -30,10 +30,27 @@ export class LobbyStatecontroller extends Controller {
             );
       const round_seed = last_block_height?.seed ?? lobby.initial_random_seed;
 
+      const players: LobbyPlayer[] = [
+        {
+          nftId: lobby.lobby_creator,
+          turn: lobby.player_one_iswhite ? 1 : 2,
+          points: lobby.player_one_points,
+          score: lobby.player_one_score,
+        },
+      ];
+      if (lobby.player_two != null)
+        players.push({
+          nftId: lobby.player_two,
+          turn: lobby.player_one_iswhite ? 2 : 1,
+          points: lobby.player_two_points,
+          score: lobby.player_two_score,
+        });
+
       return {
         lobby: {
           ...lobby,
           round_seed,
+          players,
         },
       };
     }

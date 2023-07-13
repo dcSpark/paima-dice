@@ -120,8 +120,16 @@ export type UserStats = IGetUserStatsResult;
 
 export type NewLobby = IGetNewLobbiesByUserAndBlockHeightResult;
 
+export type LobbyPlayer = {
+  nftId: number;
+  turn: number;
+  points: number;
+  score: number;
+};
+
 export interface LobbyState extends IGetLobbyByIdResult {
   round_seed: string;
+  players: LobbyPlayer[];
 }
 
 export interface UserLobby extends IGetPaginatedUserLobbiesResult {

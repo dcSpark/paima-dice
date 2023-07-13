@@ -6,6 +6,33 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
+			"LobbyPlayer": {
+				"properties": {
+					"score": {
+						"type": "number",
+						"format": "double"
+					},
+					"points": {
+						"type": "number",
+						"format": "double"
+					},
+					"turn": {
+						"type": "number",
+						"format": "double"
+					},
+					"nftId": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"score",
+					"points",
+					"turn",
+					"nftId"
+				],
+				"type": "object"
+			},
 			"lobby_status": {
 				"type": "string",
 				"enum": [
@@ -90,6 +117,12 @@
 					},
 					"round_seed": {
 						"type": "string"
+					},
+					"players": {
+						"items": {
+							"$ref": "#/components/schemas/LobbyPlayer"
+						},
+						"type": "array"
 					}
 				},
 				"required": [
@@ -112,7 +145,8 @@
 					"practice",
 					"round_length",
 					"turn",
-					"round_seed"
+					"round_seed",
+					"players"
 				],
 				"type": "object",
 				"additionalProperties": false
