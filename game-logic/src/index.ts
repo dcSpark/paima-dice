@@ -5,6 +5,7 @@ import type { MatchState, MatchEnvironment, TickEvent } from '@dice/utils';
 import { processTick } from './tick';
 import type { IGetLobbyByIdResult, IGetCachedMovesResult } from '@dice/db';
 import { WHITE, BLACK } from 'chess.js';
+import { cloneMatchState } from './dice-logic';
 
 export * from './tick';
 export * from './dice-logic';
@@ -47,6 +48,4 @@ export function extractMatchEnvironment(lobby: IGetLobbyByIdResult): MatchEnviro
 // From a given round, construct the match state which will be used by the round executor.
 // A match state is comprised of mutable data which the round executor will
 // update, and in the end return a final new match state upon completion.
-export const buildMatchState = (matchState: MatchState): MatchState => ({
-  ...matchState,
-});
+export const buildMatchState = (matchState: MatchState): MatchState => cloneMatchState(matchState);

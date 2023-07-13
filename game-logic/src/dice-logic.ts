@@ -1,5 +1,5 @@
 import { RoundKind } from '@dice/utils';
-import type { MatchEnvironment, MatchState, UserLobby, DiceRolls } from '@dice/utils';
+import type { MatchEnvironment, MatchState, UserLobby, DiceRolls, LobbyPlayer } from '@dice/utils';
 import type { ConciseResult, MatchResult } from '@dice/utils';
 import type { IGetBlockHeightResult } from 'paima-sdk/paima-db';
 import Prando from 'paima-sdk/paima-prando';
@@ -87,8 +87,8 @@ export function matchResults(
   // TODO: allow for more than 2 players
 
   // We compute the winner
-  const user1won = matchState.player1Points > matchState.player2Points;
-  const user2won = matchState.player2Points > matchState.player1Points;
+  const user1won = matchState.players[0] > matchState.players[1];
+  const user2won = matchState.players[1] > matchState.players[0];
   // Assign the winner to a variable called winner. If no one won, winner is null
   const winner = user1won
     ? matchEnvironment.user1.nftId
@@ -108,15 +108,44 @@ export function matchResults(
 }
 
 export function buildCurrentMatchState(lobby: UserLobby): MatchState {
+  const players: LobbyPlayer[] = [
+    {
+      nftId: lobby.lobby_creator,
+      turn: lobby.player_one_iswhite ? 1 : 2,
+      points: lobby.player_one_points,
+      score: lobby.player_one_score,
+    },
+  ];
+  if (lobby.player_two != null)
+    players.push({
+      nftId: lobby.player_two,
+      turn: lobby.player_one_iswhite ? 2 : 1,
+      points: lobby.player_two_points,
+      score: lobby.player_two_score,
+    });
+
   return {
-    player1Points: lobby.player_one_points,
-    player2Points: lobby.player_two_points,
-    player1Score: lobby.player_one_score,
-    player2Score: lobby.player_two_score,
+    players,
     turn: lobby.turn,
   };
 }
 
+export function cloneMatchState(template: MatchState): MatchState {
+  return {
+    ...template,
+    players: template.players.map(template => ({
+      ...template,
+    })),
+  };
+}
+
 export function getPlayerScore(matchState: MatchState): number {
-  return matchState.turn === 1 ? matchState.player1Score : matchState.player2Score;
+  const turnPlayer = getTurnPlayer(matchState);
+  return turnPlayer.score;
+}
+
+export function getTurnPlayer(matchState: MatchState): LobbyPlayer {
+  const turnPlayer = matchState.players.find(player => player.turn === matchState.turn);
+  if (turnPlayer == null) throw new Error(`getTurnPlayer: missing player for turn`);
+  return turnPlayer;
 }

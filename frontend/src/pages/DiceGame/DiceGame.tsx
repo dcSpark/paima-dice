@@ -6,6 +6,7 @@ import {
   type TickEvent,
   type LobbyState,
   TickEventKind,
+  LobbyPlayer,
 } from "@dice/utils";
 import {
   applyEvent,
@@ -13,11 +14,11 @@ import {
   genDieRoll,
   genInitialDiceRolls,
   getPlayerScore,
+  cloneMatchState,
 } from "@dice/game-logic";
 import * as Paima from "@dice/middleware";
 import { DiceLogic, DiceService } from "./GameLogic";
 import Prando from "paima-sdk/paima-prando";
-import { RoundExecutor } from "paima-sdk/paima-executors";
 import Player from "./Player";
 import { DiceRef } from "./Dice";
 
@@ -32,10 +33,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
   refetchLobbyState,
   selectedNft,
 }) => {
-  const diceRefs = useRef<{
-    1: undefined | DiceRef;
-    2: undefined | DiceRef;
-  }>({ 1: undefined, 2: undefined });
+  const diceRefs = useRef<Record<number, undefined | DiceRef>>({});
   const diceLogic = useMemo(() => {
     return new DiceLogic(selectedNft);
   }, [selectedNft]);
@@ -100,7 +98,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
       setInitialRollQueue(restInitialRolls);
       await diceRef?.roll(playedInitialRoll);
       setDisplayedState((oldDisplayedState) => {
-        const newDisplayedState = { ...oldDisplayedState };
+        const newDisplayedState = cloneMatchState(oldDisplayedState);
         applyEvent(newDisplayedState, {
           kind: TickEventKind.roll,
           diceRolls: playedInitialRoll,
@@ -153,7 +151,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
       const dieRoll = genDieRoll(new Prando(lobbyState.round_seed));
       await diceRef.roll([dieRoll]);
       setDisplayedState((oldDisplayedState) => {
-        const newDisplayedState = { ...oldDisplayedState };
+        const newDisplayedState = cloneMatchState(oldDisplayedState);
         applyEvent(newDisplayedState, {
           kind: TickEventKind.roll,
           diceRolls: [dieRoll],
@@ -204,7 +202,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
           await diceRefs.current[playerRolling].roll(tickEvent.diceRolls);
         }
         setDisplayedState((oldDisplayedState) => {
-          const newDisplayedState = { ...oldDisplayedState };
+          const newDisplayedState = cloneMatchState(oldDisplayedState);
           applyEvent(newDisplayedState, tickEvent);
           return newDisplayedState;
         });
@@ -215,14 +213,21 @@ const DiceGame: React.FC<DiceGameProps> = ({
         if (tickEvent.kind === TickEventKind.applyPoints) {
           setCaption(
             (() => {
-              const [thisPlayer, opponent] = isThisPlayerPlayerOne
-                ? [tickEvent.player1, tickEvent.player2]
-                : [tickEvent.player2, tickEvent.player1];
+              const thisPlayerIndex = displayedState.players.findIndex(
+                (player) => player.nftId === selectedNft
+              );
 
-              if (thisPlayer === 2) return "21! You get 2 points";
-              if (thisPlayer === 1) return "You win! You get a point";
-              if (opponent === 1) return "You lose! Opponent gets a point";
-              if (opponent === 2) return "You lose! Opponent gets 2 points";
+              const you = tickEvent.points[thisPlayerIndex];
+              const opponents = tickEvent.points.filter(
+                (_, i) => i !== thisPlayerIndex
+              );
+
+              if (you === 2) return "21! You get 2 points";
+              if (you === 1) return "You win! You get a point";
+              if (opponents.some((points) => points === 1))
+                return "You lose! Opponent gets a point";
+              if (opponents.some((points) => points === 2))
+                return "You lose! Opponent gets 2 points";
               return "It's a tie";
             })()
           );
@@ -295,35 +300,6 @@ const DiceGame: React.FC<DiceGameProps> = ({
   const canRoll = !disableInteraction && playerScore <= 21;
   const canPass = !disableInteraction && playerScore >= 16;
 
-  const players: Array<{
-    isThisPlayerYou: boolean;
-    score: number;
-    points: number;
-    isThisPlayersTurn: boolean;
-    diceRef: Ref<DiceRef>;
-  }> = [
-    {
-      isThisPlayerYou: isThisPlayerPlayerOne,
-      score: displayedState.player1Score,
-      points: displayedState.player1Points,
-      isThisPlayersTurn:
-        isThisPlayerPlayerOne === (thisPlayer.turn === displayedState.turn),
-      diceRef: (el) => {
-        diceRefs.current[1] = el;
-      },
-    },
-    {
-      isThisPlayerYou: !isThisPlayerPlayerOne,
-      score: displayedState.player2Score,
-      points: displayedState.player2Points,
-      isThisPlayersTurn:
-        isThisPlayerPlayerOne !== (thisPlayer.turn === displayedState.turn),
-      diceRef: (el) => {
-        diceRefs.current[2] = el;
-      },
-    },
-  ];
-
   if (lobbyState == null) return <></>;
 
   return (
@@ -344,14 +320,15 @@ const DiceGame: React.FC<DiceGameProps> = ({
           gap: 5,
         }}
       >
-        {players.map((player, i) => (
+        {displayedState.players.map((player) => (
           <Player
-            key={i}
-            isThisPlayerYou={player.isThisPlayerYou}
-            score={player.score}
-            points={player.points}
-            isThisPlayersTurn={player.isThisPlayersTurn}
-            diceRef={player.diceRef}
+            key={`player-${player.nftId}`}
+            lobbyPlayer={player}
+            thisClientPlayer={thisPlayer.nftId}
+            turn={displayedState.turn}
+            diceRef={(elem) => {
+              diceRefs.current[player.turn] = elem;
+            }}
             onRoll={canRoll ? handleRoll : undefined}
             onPass={canPass ? handlePass : undefined}
           />

@@ -137,18 +137,20 @@ export const submittedMoves = async (
   );
 
   // If a bot goes next, schedule a bot move
-  const newTurnNftId = newMatchState.turn === 1 ? lobby.lobby_creator : lobby.player_two;
-  if (newTurnNftId === PRACTICE_BOT_NFT_ID) {
+  const botMoves = (() => {
+    const newTurnNftId = newMatchState.turn === 1 ? lobby.lobby_creator : lobby.player_two;
+    if (newTurnNftId !== PRACTICE_BOT_NFT_ID) return [];
+
     const practiceMoveSchedule = schedulePracticeMove(
       lobby.lobby_id,
       lobby.current_round + 1,
       blockHeight + 1
     );
-    return [persistMoveTuple, ...roundExecutionTuples, practiceMoveSchedule];
-  }
+    return [practiceMoveSchedule];
+  })();
 
   console.log('New match state: ', newMatchState);
-  return [persistMoveTuple, ...roundExecutionTuples];
+  return [persistMoveTuple, ...roundExecutionTuples, ...botMoves];
 };
 
 // State transition when a practice moves input is processed

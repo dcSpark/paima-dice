@@ -1,34 +1,36 @@
-import React, { Ref, useEffect } from "react";
+import React, { Ref } from "react";
 import "./DiceGame.scss";
 import { Box, Typography } from "@mui/material";
 import Button from "@src/components/Button";
 import { Dice, DiceRef } from "./Dice";
+import { LobbyPlayer } from "@dice/utils";
 
 export type PlayerProps = {
+  lobbyPlayer: LobbyPlayer;
+  thisClientPlayer: number;
+  turn: number;
   diceRef: Ref<DiceRef>;
-  isThisPlayerYou: boolean;
-  score: number;
-  points: number;
-  isThisPlayersTurn: boolean;
   onRoll: undefined | (() => void);
   onPass: undefined | (() => void);
 };
 
 export default function Player({
+  lobbyPlayer,
+  thisClientPlayer,
+  turn,
   diceRef,
-  isThisPlayerYou,
-  score,
-  points,
-  isThisPlayersTurn,
   onRoll,
   onPass,
 }: PlayerProps): React.ReactElement {
+  const isMeThisClient = lobbyPlayer.nftId === thisClientPlayer;
+  const isMyTurn = lobbyPlayer.turn === turn;
+
   return (
     <Box
       sx={{
         flex: 1,
         padding: 2,
-        background: isThisPlayersTurn
+        background: isMyTurn
           ? "rgba(219, 109, 104, 0.5)"
           : "rgba(119, 109, 104, 0.5)",
         display: "flex",
@@ -43,7 +45,7 @@ export default function Player({
           lineHeight: "1.5rem",
         }}
       >
-        {isThisPlayerYou ? "You" : "Opponent"}
+        {isMeThisClient ? "You" : "Opponent"}
       </Typography>
       <Typography
         variant="caption"
@@ -52,7 +54,7 @@ export default function Player({
           lineHeight: "1.75rem",
         }}
       >
-        Points: {points}
+        Points: {lobbyPlayer.points}
       </Typography>
       <Typography
         variant="caption"
@@ -61,7 +63,7 @@ export default function Player({
           lineHeight: "1.75rem",
         }}
       >
-        Score: {score}
+        Score: {lobbyPlayer.score}
       </Typography>
       <Dice
         ref={diceRef}
@@ -69,7 +71,7 @@ export default function Player({
         faceColor="#A51C3E"
         dotColor="#FFEEEE"
       />
-      {isThisPlayerYou && (
+      {isMeThisClient && (
         <Box
           sx={{
             display: "flex",

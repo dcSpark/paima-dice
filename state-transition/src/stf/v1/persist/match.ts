@@ -99,7 +99,7 @@ export function persistMatchResults(
   lobbyId: string,
   results: MatchResult,
   matchEnvironment: MatchEnvironment,
-  newState: MatchState
+  _newState: MatchState
 ): SQLUpdate {
   const params: INewFinalStateParams = {
     final_state: {
@@ -119,13 +119,16 @@ export function persistMatchResults(
 
 // Update Lobby state with the updated state
 export function persistUpdateMatchState(lobbyId: string, newMatchState: MatchState): SQLUpdate {
+  if (newMatchState.players.length !== 2)
+    throw new Error(`persistUpdateMatchState: missing players`);
+
   const params: IUpdateLatestMatchStateParams = {
     lobby_id: lobbyId,
     // TODO: support multiple players
-    player_one_points: newMatchState.player1Points,
-    player_two_points: newMatchState.player2Points,
-    player_one_score: newMatchState.player1Score,
-    player_two_score: newMatchState.player2Score,
+    player_one_points: newMatchState.players[0].points,
+    player_two_points: newMatchState.players[1].points,
+    player_one_score: newMatchState.players[0].score,
+    player_two_score: newMatchState.players[1].score,
     turn: newMatchState.turn,
   };
   return [updateLatestMatchState, params];

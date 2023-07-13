@@ -38,8 +38,7 @@ export type RollTickEvent = {
 };
 export type ApplyPointsTickEvent = {
   kind: TickEventKind.applyPoints;
-  player1: number;
-  player2: number;
+  points: number[];
 };
 export type TurnEndTickEvent = {
   kind: TickEventKind.turnEnd;
@@ -62,10 +61,7 @@ export interface PlayerInfo {
 }
 
 export interface MatchState {
-  player1Points: number;
-  player2Points: number;
-  player1Score: number;
-  player2Score: number;
+  players: LobbyPlayer[];
   turn: number; // whose turn is it
 }
 
