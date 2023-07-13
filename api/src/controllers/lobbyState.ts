@@ -15,11 +15,6 @@ export class LobbyStatecontroller extends Controller {
     const [lobby] = await getLobbyById.run({ lobby_id: lobbyID }, pool);
     if (!lobby) return { lobby: null };
     else {
-      const [round_data] = await getRoundData.run(
-        { lobby_id: lobbyID, round_number: lobby.current_round },
-        pool
-      );
-
       // null if this is first round
       const [last_round_data] = await getRoundData.run(
         { lobby_id: lobbyID, round_number: lobby.current_round - 1 },
@@ -38,7 +33,6 @@ export class LobbyStatecontroller extends Controller {
       return {
         lobby: {
           ...lobby,
-          round_start_height: round_data?.starting_block_height || 0,
           round_seed,
         },
       };

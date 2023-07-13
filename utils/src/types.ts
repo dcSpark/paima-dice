@@ -121,7 +121,6 @@ export type UserStats = IGetUserStatsResult;
 export type NewLobby = IGetNewLobbiesByUserAndBlockHeightResult;
 
 export interface LobbyStateQuery extends IGetLobbyByIdResult {
-  round_start_height: number;
   round_seed: string;
 }
 
