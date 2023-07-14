@@ -10,7 +10,6 @@ import {
 } from "@dice/utils";
 import {
   applyEvent,
-  buildCurrentMatchState,
   genDieRoll,
   genInitialDiceRolls,
   getPlayerScore,
@@ -47,9 +46,10 @@ const DiceGame: React.FC<DiceGameProps> = ({
     lobbyState.current_round
   );
   // end state of last round (latest finished round)
-  const [displayedState, setDisplayedState] = useState<MatchState>(() =>
-    buildCurrentMatchState(lobbyState)
-  );
+  const [displayedState, setDisplayedState] = useState<MatchState>({
+    turn: lobbyState.turn,
+    players: lobbyState.players,
+  });
   // cache of state that was fetched, but still needs to be displayed
   // the actual round executor is stateful so we store all it's end results instead
   const [roundExecutor, setRoundExecutor] = useState<
@@ -245,9 +245,10 @@ const DiceGame: React.FC<DiceGameProps> = ({
   }, [isTickDisplaying, roundExecutor]);
 
   const [isFetchingRound, setIsFetchingRound] = useState(false);
-  const [fetchedEndState, setFetchedEndState] = useState<MatchState>(
-    buildCurrentMatchState(lobbyState)
-  );
+  const [fetchedEndState, setFetchedEndState] = useState<MatchState>({
+    turn: lobbyState.turn,
+    players: lobbyState.players,
+  });
   const [nextFetchedRound, setFetchedRound] = useState(
     lobbyState.current_round
   );

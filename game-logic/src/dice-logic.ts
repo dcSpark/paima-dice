@@ -1,3 +1,4 @@
+import type { IGetLobbyByIdResult } from '@dice/db';
 import { RoundKind } from '@dice/utils';
 import type { MatchEnvironment, MatchState, UserLobby, DiceRolls, LobbyPlayer } from '@dice/utils';
 import type { ConciseResult, MatchResult } from '@dice/utils';
@@ -107,7 +108,7 @@ export function matchResults(
   return results;
 }
 
-export function buildCurrentMatchState(lobby: UserLobby): MatchState {
+export function buildCurrentMatchState(lobby: IGetLobbyByIdResult): MatchState {
   const players: LobbyPlayer[] = [
     {
       nftId: lobby.lobby_creator,
