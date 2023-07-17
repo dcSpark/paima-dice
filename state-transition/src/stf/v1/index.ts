@@ -10,6 +10,7 @@ import {
   submittedMoves,
   scheduledData,
   practiceMoves,
+  mintNft,
 } from './transition';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
 
@@ -26,6 +27,8 @@ export default async function (
   console.log(`Input string parsed as: ${parsed.input}`);
 
   switch (parsed.input) {
+    case 'nftMint':
+      return mintNft(parsed);
     case 'createdLobby':
       return createdLobby(user, blockHeight, parsed, dbConn);
     case 'joinedLobby':

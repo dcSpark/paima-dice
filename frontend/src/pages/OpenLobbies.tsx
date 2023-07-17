@@ -31,10 +31,6 @@ const columns: Column[] = [
 ];
 
 const expandValue = (id: keyof LobbyState, value: unknown) => {
-  // TODO: change to support multiple players
-  if (id === "player_one_iswhite") {
-    return value ? "White" : "Black";
-  }
   if (id === "created_at" && typeof value === "string") {
     return formatDate(value);
   }

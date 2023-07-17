@@ -8,7 +8,6 @@ import type { MatchExecutorData, RoundExecutorData, MatchState, TickEvent } from
 export function buildRoundExecutor(data: RoundExecutorData): RoundExecutor<MatchState, TickEvent> {
   const seed = data.seed;
   const randomnessGenerator = new Prando(seed);
-  console.log('HELLO BUILD', JSON.stringify(data), data);
   return initRoundExecutor(data.lobby, data.matchState, data.moves, randomnessGenerator);
 }
 
@@ -19,23 +18,14 @@ export function buildMatchExecutor({
 }: MatchExecutorData): MatchExecutor<MatchState, TickEvent> {
   console.log(seeds, 'seeds used for the match executor at the middleware');
 
-  if (lobby.player_two == null) throw new Error(`buildMatchExecutor: missing player 2`);
   const initialState: MatchState = {
     // TODO: support multiple players
-    players: [
-      {
-        nftId: lobby.lobby_creator,
-        turn: lobby.player_one_iswhite ? 1 : 2,
-        points: 0,
-        score: 0,
-      },
-      {
-        nftId: lobby.player_two,
-        turn: lobby.player_one_iswhite ? 2 : 1,
-        points: 0,
-        score: 0,
-      },
-    ],
+    players: lobby.players.map(player => ({
+      nftId: player.nftId,
+      turn: player.turn,
+      points: 0,
+      score: 0,
+    })),
     turn: 1,
   };
   return matchExecutor.initialize(

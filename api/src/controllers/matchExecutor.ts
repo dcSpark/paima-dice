@@ -1,6 +1,12 @@
 import { Controller, Get, Query, Route } from 'tsoa';
-import { requirePool, getLobbyById, getMatchSeeds, getMovesByLobby } from '@dice/db';
-import type { MatchExecutorData } from '@dice/utils';
+import {
+  requirePool,
+  getLobbyById,
+  getMatchSeeds,
+  getMovesByLobby,
+  getLobbyPlayers,
+} from '@dice/db';
+import type { LobbyPlayer, MatchExecutorData } from '@dice/utils';
 
 type Response = MatchExecutorData | null;
 
@@ -10,9 +16,16 @@ export class MatchExecutorController extends Controller {
   public async get(@Query() lobbyID: string): Promise<Response> {
     const pool = requirePool();
     const [lobby] = await getLobbyById.run({ lobby_id: lobbyID }, pool);
+    const rawPlayers = await getLobbyPlayers.run({ lobby_id: lobbyID }, pool);
     if (!lobby) {
       return null;
     }
+    const players: LobbyPlayer[] = rawPlayers.map(raw => ({
+      nftId: raw.nft_id,
+      points: raw.points,
+      score: raw.score,
+      turn: raw.turn ?? undefined,
+    }));
 
     // sorted
     const rounds = await getMatchSeeds.run({ lobby_id: lobbyID }, pool);
@@ -22,6 +35,6 @@ export class MatchExecutorController extends Controller {
       round: round.round_within_match,
     }));
     const moves = await getMovesByLobby.run({ lobby_id: lobbyID }, pool);
-    return { lobby, seeds, moves };
+    return { lobby: { ...lobby, round_seed: lobby.initial_random_seed, players }, seeds, moves };
   }
 }

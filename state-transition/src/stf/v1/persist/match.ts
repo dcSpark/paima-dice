@@ -5,25 +5,13 @@ import type {
   INewRoundParams,
   INewMatchMoveParams,
   IExecutedRoundParams,
-  IUpdateLatestMatchStateParams,
+  IUpdateLobbyPlayerParams,
 } from '@dice/db';
-import {
-  newMatchMove,
-  newRound,
-  updateLatestMatchState,
-  newFinalState,
-  executedRound,
-} from '@dice/db';
-import type {
-  ConciseResult,
-  ExpandedResult,
-  MatchResult,
-  MatchEnvironment,
-  MatchState,
-} from '@dice/utils';
-import { scheduleZombieRound, deleteZombieRound } from './zombie.js';
-import type { INewFinalStateParams } from '@dice/db/src/insert.queries.js';
+import { newMatchMove, newRound, executedRound, updateLobbyPlayer } from '@dice/db';
+import type { ConciseResult, ExpandedResult, MatchState } from '@dice/utils';
+import { scheduleZombieRound } from './zombie.js';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
+import { updateLobby, type IUpdateLobbyParams } from '@dice/db/src/update.queries.js';
 
 // This function inserts a new empty round in the database.
 // We also schedule a future zombie round execution.
@@ -87,7 +75,6 @@ export function persistExecutedRound(
   return [executedRoundTuple];
 }
 
-// TODO: allow for more than 2 players
 const expandResult = (result: ConciseResult): ExpandedResult => {
   if (result === 'w') return 'win';
   if (result === 'l') return 'loss';
@@ -95,41 +82,30 @@ const expandResult = (result: ConciseResult): ExpandedResult => {
 };
 
 // Persist match results in the final states table
-export function persistMatchResults(
-  lobbyId: string,
-  results: MatchResult,
-  matchEnvironment: MatchEnvironment,
-  _newState: MatchState
-): SQLUpdate {
-  const params: INewFinalStateParams = {
-    final_state: {
-      lobby_id: lobbyId,
-      // TODO: support multiple players
-      player_one_iswhite: matchEnvironment.user1.color === 'w',
-      player_one_nft_id: matchEnvironment.user1.nftId,
-      player_one_result: expandResult(results[0]),
-      player_one_elapsed_time: 0, // Example TODO: for the developer to implement themselves
-      player_two_nft_id: matchEnvironment.user2.nftId,
-      player_two_result: expandResult(results[1]),
-      player_two_elapsed_time: 0, // Example TODO
-    },
-  };
-  return [newFinalState, params];
+export function persistMatchResults(): SQLUpdate[] {
+  // TODO
+  return [];
 }
 
 // Update Lobby state with the updated state
-export function persistUpdateMatchState(lobbyId: string, newMatchState: MatchState): SQLUpdate {
+export function persistUpdateMatchState(lobbyId: string, newMatchState: MatchState): SQLUpdate[] {
   if (newMatchState.players.length !== 2)
     throw new Error(`persistUpdateMatchState: missing players`);
 
-  const params: IUpdateLatestMatchStateParams = {
+  const playerParams: IUpdateLobbyPlayerParams[] = newMatchState.players.map(player => ({
     lobby_id: lobbyId,
-    // TODO: support multiple players
-    player_one_points: newMatchState.players[0].points,
-    player_two_points: newMatchState.players[1].points,
-    player_one_score: newMatchState.players[0].score,
-    player_two_score: newMatchState.players[1].score,
+    nft_id: player.nftId,
+    points: player.points,
+    score: player.score,
+    turn: player.turn,
+  }));
+  const playerUpdates: SQLUpdate[] = playerParams.map(param => [updateLobbyPlayer, param]);
+
+  const lobbyParams: IUpdateLobbyParams = {
+    lobby_id: lobbyId,
     turn: newMatchState.turn,
   };
-  return [updateLatestMatchState, params];
+  const lobbyUpdates: SQLUpdate[] = [[updateLobby, lobbyParams]];
+
+  return [...playerUpdates, ...lobbyUpdates];
 }

@@ -29,6 +29,10 @@ export {
   getRandomActiveLobby,
   getFinalState,
   IGetFinalStateResult,
+  getLobbyPlayers,
+  IGetLobbyPlayersParams,
+  IGetLobbyPlayersResult,
+  IGetLobbyPlayersQuery,
 } from './select.queries.js';
 export {
   createLobby,
@@ -45,12 +49,12 @@ export {
 } from './insert.queries.js';
 export {
   executedRound,
-  updateLatestMatchState,
+  updateLobbyPlayer,
   endMatch,
   startMatch,
   closeLobby,
   IExecutedRoundParams,
-  IUpdateLatestMatchStateParams,
+  IUpdateLobbyPlayerParams,
   IStartMatchParams,
   ICloseLobbyParams,
 } from './update.queries.js';

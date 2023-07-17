@@ -8,7 +8,6 @@ import type {
   RoundStatusData,
   UserStats,
   LobbyState,
-  UserLobby,
   RoundExecutorBackendData,
   MatchState,
   TickEvent,
@@ -37,8 +36,8 @@ import type {
   PackedUserLobbies,
   PackedUserStats,
 } from '../types';
-import { isPlayersTurn } from '@dice/game-logic';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
+import type { IGetPaginatedUserLobbiesResult } from '@dice/db';
 
 async function getLobbyState(lobbyID: string): Promise<PackedLobbyState | FailedResult> {
   const errorFxn = buildEndpointErrorFxn('getLobbyState');
@@ -179,13 +178,10 @@ async function getUserLobbiesMatches(
   }
 
   try {
-    const j = (await res.json()) as { lobbies: UserLobby[] };
+    const j = (await res.json()) as { lobbies: IGetPaginatedUserLobbiesResult[] };
     return {
       success: true,
-      lobbies: j.lobbies.map(lobby => ({
-        ...lobby,
-        myTurn: isPlayersTurn(nftId, lobby),
-      })),
+      lobbies: j.lobbies,
     };
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.INVALID_RESPONSE_FROM_BACKEND, err);

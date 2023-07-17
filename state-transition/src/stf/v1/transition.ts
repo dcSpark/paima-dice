@@ -1,15 +1,22 @@
 import type { Pool } from 'pg';
 import Prando from 'paima-sdk/paima-prando';
 import { SCHEDULED_DATA_ADDRESS, type WalletAddress } from 'paima-sdk/paima-utils';
-import type { IGetLobbyByIdResult, IGetRoundDataResult, IGetRoundMovesResult } from '@dice/db';
-import { getCachedMoves, getLobbyById, getRoundData, getUserStats, endMatch } from '@dice/db';
-import type { ConciseResult, MatchState } from '@dice/utils';
+import type {
+  IGetLobbyByIdResult,
+  IGetLobbyPlayersResult,
+  IGetRoundDataResult,
+  IGetRoundMovesResult,
+} from '@dice/db';
 import {
-  initRoundExecutor,
-  extractMatchEnvironment,
-  matchResults,
-  buildCurrentMatchState,
-} from '@dice/game-logic';
+  getCachedMoves,
+  getLobbyById,
+  getRoundData,
+  getUserStats,
+  endMatch,
+  getLobbyPlayers,
+} from '@dice/db';
+import type { ConciseResult, MatchState } from '@dice/utils';
+import { initRoundExecutor, matchResults, buildCurrentMatchState } from '@dice/game-logic';
 import {
   persistUpdateMatchState,
   persistCloseLobby,
@@ -22,12 +29,14 @@ import {
   persistExecutedRound,
   persistMatchResults,
   schedulePracticeMove,
+  blankStats,
 } from './persist';
 import { isValidMove } from '@dice/game-logic';
 import type {
   ClosedLobbyInput,
   CreatedLobbyInput,
   JoinedLobbyInput,
+  NftMintInput,
   PracticeMovesInput,
   ScheduledDataInput,
   SubmittedMovesInput,
@@ -37,6 +46,16 @@ import { NFT_NAME, PRACTICE_BOT_NFT_ID } from '@dice/utils';
 import { getBlockHeight, type SQLUpdate } from 'paima-sdk/paima-db';
 import { PracticeAI } from './persist/practice-ai';
 import { getOwnedNfts } from 'paima-sdk/paima-utils-backend';
+
+// Create initial player entry after nft mint
+export const mintNft = async (input: NftMintInput): Promise<SQLUpdate[]> => {
+  try {
+    return [blankStats(Number.parseInt(input.tokenId))];
+  } catch (e) {
+    console.log(`DISCARD: error in nft mint ${e}`);
+    return [];
+  }
+};
 
 // State transition when a create lobby input is processed
 export const createdLobby = async (
@@ -106,7 +125,16 @@ export const submittedMoves = async (
 ): Promise<SQLUpdate[]> => {
   // Perform DB read queries to get needed data
   const [lobby] = await getLobbyById.run({ lobby_id: input.lobbyID }, dbConn);
-  if (!lobby) return [];
+  if (!lobby) {
+    console.log('DISCARD: lobby does not exist');
+    return [];
+  }
+  const players = await getLobbyPlayers.run({ lobby_id: input.lobbyID }, dbConn);
+  if (players.length !== 2) {
+    // TODO: allow for more than 2 players
+    console.log(`DISCARD: wrong number of players ${players.length}`);
+    return [];
+  }
 
   if (player !== SCHEDULED_DATA_ADDRESS && !(await checkUserOwns(player, input.nftId, dbConn))) {
     console.log('DISCARD: user does not own specified nft');
@@ -118,10 +146,17 @@ export const submittedMoves = async (
     dbConn
   );
   const prandoSeed = await fetchPrandoSeed(lobby, dbConn);
-  if (prandoSeed == null) return [];
+  if (prandoSeed == null) {
+    console.log('DISCARD: cannot fetch prando seed');
+    return [];
+  }
 
   // If the submitted moves are usable/all validation passes, continue
-  if (!validateSubmittedMoves(lobby, round, input, new Prando(prandoSeed))) return [];
+  if (!validateSubmittedMoves(lobby, players, round, input, new Prando(prandoSeed))) {
+    console.log('DISCARD: invalid move');
+    return [];
+  }
+
   // Generate update to persist the moves
   const persistMoveTuple = persistMoveSubmission(input, lobby);
   // We generated an SQL update for persisting the moves.
@@ -131,6 +166,7 @@ export const submittedMoves = async (
   const { sqlUpdates: roundExecutionTuples, newMatchState } = executeRound(
     blockHeight,
     lobby,
+    players,
     [newMove],
     round,
     new Prando(prandoSeed)
@@ -138,7 +174,8 @@ export const submittedMoves = async (
 
   // If a bot goes next, schedule a bot move
   const botMoves = (() => {
-    const newTurnNftId = newMatchState.turn === 1 ? lobby.lobby_creator : lobby.player_two;
+    const newTurnPlayer = players.find(player => player.turn === newMatchState.turn);
+    const newTurnNftId = newTurnPlayer?.nft_id;
     if (newTurnNftId !== PRACTICE_BOT_NFT_ID) return [];
 
     const practiceMoveSchedule = schedulePracticeMove(
@@ -163,11 +200,13 @@ export const practiceMoves = async (
   // Perform DB read queries to get needed data
   const [lobby] = await getLobbyById.run({ lobby_id: input.lobbyID }, dbConn);
   if (!lobby) return [];
+  const players = await getLobbyPlayers.run({ lobby_id: input.lobbyID }, dbConn);
+
   // note: do not try to give this Prando to submittedMoves, it has to create it again
   const prandoSeed = await fetchPrandoSeed(lobby, dbConn);
   if (prandoSeed == null) return [];
 
-  const practiceAI = new PracticeAI(buildCurrentMatchState(lobby), new Prando(prandoSeed));
+  const practiceAI = new PracticeAI(buildCurrentMatchState(lobby, players), new Prando(prandoSeed));
   const practiceMove = practiceAI.getNextMove();
   const regularInput: SubmittedMovesInput = {
     ...input,
@@ -182,26 +221,42 @@ export const practiceMoves = async (
 // Validate submitted moves in relation to player/lobby/round state
 function validateSubmittedMoves(
   lobby: IGetLobbyByIdResult,
+  players: IGetLobbyPlayersResult[],
   round: IGetRoundDataResult,
   input: SubmittedMovesInput,
   randomnessGenerator: Prando
 ): boolean {
   // If lobby not active or existing
-  if (!lobby || lobby.lobby_state !== 'active') return false;
+  if (!lobby || lobby.lobby_state !== 'active') {
+    console.log('INVALID MOVE: lobby not active');
+    return false;
+  }
 
   // Player is supposed to play this turn
-  const turnNft = lobby.turn === 1 ? lobby.lobby_creator : lobby.player_two;
-  if (input.nftId !== turnNft) return false;
+  const turnPlayer = players.find(player => player.turn === lobby.turn);
+  const turnNft = turnPlayer?.nft_id;
+  if (input.nftId !== turnNft) {
+    console.log('INVALID MOVE: not players turn');
+    return false;
+  }
 
   // Verify fetched round exists
-  if (!round) return false;
+  if (!round) {
+    console.log('INVALID MOVE: round does not exist');
+    return false;
+  }
 
   // If moves submitted don't target the current round
-  if (input.roundNumber !== lobby.current_round) return false;
+  if (input.roundNumber !== lobby.current_round) {
+    console.log('INVALID MOVE: incorrect round');
+    return false;
+  }
 
   // If a move is sent that is invalid
-  if (!isValidMove(randomnessGenerator, buildCurrentMatchState(lobby), input.rollAgain))
+  if (!isValidMove(randomnessGenerator, buildCurrentMatchState(lobby, players), input.rollAgain)) {
+    console.log('INVALID MOVE: invalid move');
     return false;
+  }
 
   return true;
 }
@@ -233,6 +288,7 @@ export const zombieRound = async (
 ): Promise<SQLUpdate[]> => {
   const [lobby] = await getLobbyById.run({ lobby_id: lobbyId }, dbConn);
   if (!lobby) return [];
+  const players = await getLobbyPlayers.run({ lobby_id: lobbyId }, dbConn);
   const [round] = await getRoundData.run(
     { lobby_id: lobby.lobby_id, round_number: lobby.current_round },
     dbConn
@@ -244,7 +300,8 @@ export const zombieRound = async (
   // We call the execute round function passing the unexecuted moves from the database, if any.
   // In practice for blackjack dice, there will be no cached moves as only one player goes per turn
   // and the round is instantly executed. As such this will simply proceed to the next round.
-  return executeRound(blockHeight, lobby, cachedMoves, round, randomnessGenerator).sqlUpdates;
+  return executeRound(blockHeight, lobby, players, cachedMoves, round, randomnessGenerator)
+    .sqlUpdates;
 };
 
 // State transition when an update stats input is processed
@@ -267,6 +324,7 @@ export const updateStats = async (
 export function executeRound(
   blockHeight: number,
   lobby: IGetLobbyByIdResult,
+  players: IGetLobbyPlayersResult[],
   moves: IGetRoundMovesResult[],
   roundData: IGetRoundDataResult,
   randomnessGenerator: Prando
@@ -274,7 +332,7 @@ export function executeRound(
   // We initialize the round executor object and run it/get the new match state via `.endState()`
   const executor = initRoundExecutor(
     lobby,
-    buildCurrentMatchState(lobby),
+    buildCurrentMatchState(lobby, players),
     moves,
     randomnessGenerator
   );
@@ -303,9 +361,7 @@ export function executeRound(
   }
 
   return {
-    sqlUpdates: [lobbyUpdate, ...executedRoundUpdate, ...roundResultUpdate].filter(
-      (item): item is SQLUpdate => !!item
-    ),
+    sqlUpdates: [...lobbyUpdate, ...executedRoundUpdate, ...roundResultUpdate],
     newMatchState,
   };
 }
@@ -316,8 +372,6 @@ function finalizeMatch(
   lobby: IGetLobbyByIdResult,
   newState: MatchState
 ): SQLUpdate[] {
-  const matchEnvironment = extractMatchEnvironment(lobby);
-
   // Create update which sets lobby state to 'finished'
   const endMatchTuple: SQLUpdate = [endMatch, { lobby_id: lobby.lobby_id }];
 
@@ -328,23 +382,16 @@ function finalizeMatch(
   }
 
   // Save the final results in the final states table
-  const results = matchResults(newState, matchEnvironment);
-  const resultsUpdate = persistMatchResults(lobby.lobby_id, results, matchEnvironment, newState);
+  const results = matchResults(newState);
+  const resultsUpdates = persistMatchResults();
 
   // Create the new scheduled data for updating user stats.
   // Stats are updated with scheduled data to support parallelism safely.
   // TODO: support multiple players
-  const statsUpdate1 = scheduleStatsUpdate(
-    matchEnvironment.user1.nftId,
-    results[0],
-    blockHeight + 1
+  const statsUpdates = newState.players.map((player, i) =>
+    scheduleStatsUpdate(player.nftId, results[i], blockHeight + 1)
   );
-  const statsUpdate2 = scheduleStatsUpdate(
-    matchEnvironment.user2.nftId,
-    results[1],
-    blockHeight + 1
-  );
-  return [endMatchTuple, resultsUpdate, statsUpdate1, statsUpdate2];
+  return [endMatchTuple, ...resultsUpdates, ...statsUpdates];
 }
 
 // Check if lobby is in final round

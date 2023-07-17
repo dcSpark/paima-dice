@@ -3,9 +3,7 @@ import type {
   IGetMovesByLobbyResult,
   IGetUserStatsResult,
   IGetNewLobbiesByUserAndBlockHeightResult,
-  IGetPaginatedUserLobbiesResult,
 } from '@dice/db';
-import type { Color } from 'chess.js';
 
 export enum RoundKind {
   initial,
@@ -49,16 +47,8 @@ export type RoundEndTickEvent = {
 
 export type TickEvent = RollTickEvent | ApplyPointsTickEvent | TurnEndTickEvent | RoundEndTickEvent;
 
-export interface MatchEnvironment {
-  // TODO: allow for more than 2 players
-  user1: PlayerInfo;
-  user2: PlayerInfo;
-}
-
-export interface PlayerInfo {
-  nftId: number;
-  color: Color;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface MatchEnvironment {}
 
 export interface MatchState {
   players: LobbyPlayer[];
@@ -73,7 +63,7 @@ export type LobbyStatus = 'open' | 'active' | 'finished' | 'closed';
 export type ConciseResult = 'w' | 't' | 'l';
 export type ExpandedResult = 'win' | 'tie' | 'loss';
 
-export type MatchResult = [ConciseResult, ConciseResult];
+export type MatchResult = ConciseResult[];
 
 export interface MatchWinnerResponse {
   match_status?: LobbyStatus;
@@ -97,7 +87,7 @@ interface ExecutorDataSeed {
 }
 
 export interface MatchExecutorData {
-  lobby: IGetLobbyByIdResult;
+  lobby: LobbyState;
   moves: IGetMovesByLobbyResult[];
   seeds: ExecutorDataSeed[];
 }
@@ -118,7 +108,7 @@ export type NewLobby = IGetNewLobbiesByUserAndBlockHeightResult;
 
 export type LobbyPlayer = {
   nftId: number;
-  turn: number;
+  turn: undefined | number;
   points: number;
   score: number;
 };
@@ -126,8 +116,4 @@ export type LobbyPlayer = {
 export interface LobbyState extends IGetLobbyByIdResult {
   round_seed: string;
   players: LobbyPlayer[];
-}
-
-export interface UserLobby extends IGetPaginatedUserLobbiesResult {
-  myTurn?: boolean;
 }

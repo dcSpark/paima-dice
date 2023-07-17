@@ -16,7 +16,7 @@ import {
   cloneMatchState,
 } from "@dice/game-logic";
 import * as Paima from "@dice/middleware";
-import { DiceLogic, DiceService } from "./GameLogic";
+import { DiceService } from "./GameLogic";
 import Prando from "paima-sdk/paima-prando";
 import Player from "./Player";
 import { DiceRef } from "./Dice";
@@ -33,10 +33,6 @@ const DiceGame: React.FC<DiceGameProps> = ({
   selectedNft,
 }) => {
   const diceRefs = useRef<Record<number, undefined | DiceRef>>({});
-  const diceLogic = useMemo(() => {
-    return new DiceLogic(selectedNft);
-  }, [selectedNft]);
-
   const [caption, setCaption] = useState<undefined | string>();
 
   // round being currently shown
@@ -69,10 +65,6 @@ const DiceGame: React.FC<DiceGameProps> = ({
     return result;
   }, [lobbyState, selectedNft]);
 
-  const isThisPlayerPlayerOne = useMemo(() => {
-    return diceLogic.isThisPlayerPlayerOne(lobbyState);
-  }, [diceLogic, lobbyState]);
-
   // "forced moves", user has to roll until he gets score 16
   const [initialRollQueue, setInitialRollQueue] = React.useState<
     [number, number][]
@@ -90,7 +82,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
   }
   async function handleRoll(): Promise<void> {
     const startingScore = getPlayerScore(displayedState);
-    const diceRef = diceRefs.current[isThisPlayerPlayerOne ? 1 : 2];
+    const diceRef = diceRefs.current[displayedState.turn];
 
     async function playInitialRollFromQueue(queue: [number, number][]) {
       setIsTickDisplaying(true);
@@ -147,7 +139,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
 
     void (async () => {
       setIsTickDisplaying(true);
-      const diceRef = diceRefs.current[isThisPlayerPlayerOne ? 1 : 2];
+      const diceRef = diceRefs.current[displayedState.turn];
       const dieRoll = genDieRoll(new Prando(lobbyState.round_seed));
       await diceRef.roll([dieRoll]);
       setDisplayedState((oldDisplayedState) => {

@@ -1,6 +1,6 @@
-import type { IGetLobbyByIdResult } from '@dice/db';
+import type { IGetLobbyByIdResult, IGetLobbyPlayersResult } from '@dice/db';
 import { RoundKind } from '@dice/utils';
-import type { MatchEnvironment, MatchState, UserLobby, DiceRolls, LobbyPlayer } from '@dice/utils';
+import type { MatchState, DiceRolls, LobbyPlayer } from '@dice/utils';
 import type { ConciseResult, MatchResult } from '@dice/utils';
 import type { IGetBlockHeightResult } from 'paima-sdk/paima-db';
 import Prando from 'paima-sdk/paima-prando';
@@ -73,57 +73,33 @@ export function isValidMove(
   return score + genDieRoll(randomnessGenerator) <= 21;
 }
 
-export function isPlayersTurn(nftId: number, lobby: UserLobby) {
-  // Note: match starts at round 1, because we use persistNewRound to start it
-  const isWhiteTurn = lobby.current_round % 2 === 1;
-  const isCreator = lobby.lobby_creator === nftId;
-  const isWhite = isCreator === lobby.player_one_iswhite;
-  return isWhite === isWhiteTurn;
-}
-
-export function matchResults(
-  matchState: MatchState,
-  matchEnvironment: MatchEnvironment
-): MatchResult {
-  // TODO: allow for more than 2 players
-
+export function matchResults(matchState: MatchState): MatchResult {
   // We compute the winner
-  const user1won = matchState.players[0] > matchState.players[1];
-  const user2won = matchState.players[1] > matchState.players[0];
-  // Assign the winner to a variable called winner. If no one won, winner is null
-  const winner = user1won
-    ? matchEnvironment.user1.nftId
-    : user2won
-    ? matchEnvironment.user2.nftId
-    : null;
-
-  console.log(`${winner} won match.`);
-
-  const results: [ConciseResult, ConciseResult] = !winner
-    ? ['t', 't']
-    : winner === matchEnvironment.user1.nftId
-    ? ['w', 'l']
-    : ['l', 'w'];
+  const maxPoints = matchState.players.reduce((acc, next) => Math.max(acc, next.points), 0);
+  const maxPlayers = matchState.players.filter(player => player.points === maxPoints);
+  const results: ConciseResult[] = matchState.players.map(player => {
+    if (player.points < maxPoints) return 'l';
+    if (maxPlayers.length > 0) return 't';
+    return 'w';
+  });
 
   return results;
 }
 
-export function buildCurrentMatchState(lobby: IGetLobbyByIdResult): MatchState {
-  const players: LobbyPlayer[] = [
-    {
-      nftId: lobby.lobby_creator,
-      turn: lobby.player_one_iswhite ? 1 : 2,
-      points: lobby.player_one_points,
-      score: lobby.player_one_score,
-    },
-  ];
-  if (lobby.player_two != null)
-    players.push({
-      nftId: lobby.player_two,
-      turn: lobby.player_one_iswhite ? 2 : 1,
-      points: lobby.player_two_points,
-      score: lobby.player_two_score,
-    });
+export function buildCurrentMatchState(
+  lobby: IGetLobbyByIdResult,
+  rawPlayers: IGetLobbyPlayersResult[]
+): MatchState {
+  const players: LobbyPlayer[] = rawPlayers.map(player => {
+    if (player.turn == null) throw new Error(`buildCurrentMatchState: player's turn is null`);
+
+    return {
+      nftId: player.nft_id,
+      turn: player.turn,
+      points: player.points,
+      score: player.score,
+    };
+  });
 
   return {
     players,

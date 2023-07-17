@@ -51,7 +51,6 @@ export function processTick(
   const turnEnds = !rollEvents[rollEvents.length - 1].rollAgain;
   // recall: we index turns from 1
   const roundEnds = turnEnds && matchState.turn === numPlayers;
-  console.log('HELLO', turnEnds, roundEnds, matchState, score);
 
   const applyPointsEvents: ApplyPointsTickEvent[] = (() => {
     if (!roundEnds) return [];

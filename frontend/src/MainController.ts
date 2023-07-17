@@ -1,6 +1,7 @@
-import { MatchState, TickEvent, LobbyState, UserLobby } from "@dice/utils";
+import { MatchState, TickEvent, LobbyState } from "@dice/utils";
 import * as Paima from "@dice/middleware";
 import { MatchExecutor } from "paima-sdk/paima-executors";
+import { IGetPaginatedUserLobbiesResult } from "@dice/db";
 
 // The MainController is a React component that will be used to control the state of the application
 // It will be used to check if the user has metamask installed and if they are connected to the correct network
@@ -197,7 +198,11 @@ class MainController {
     return response.lobbies.filter((lobby) => lobby.lobby_state === "open");
   }
 
-  async getMyGames(nftId: number, page = 0, limit = 100): Promise<UserLobby[]> {
+  async getMyGames(
+    nftId: number,
+    page = 0,
+    limit = 100
+  ): Promise<IGetPaginatedUserLobbiesResult[]> {
     await this.enforceWalletConnected();
     this.callback(null, true, null);
     const response = await Paima.default.getUserLobbiesMatches(

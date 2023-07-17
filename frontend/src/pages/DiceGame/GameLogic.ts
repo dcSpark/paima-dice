@@ -64,18 +64,10 @@ export class DiceLogic {
     }
   }
 
-  // TODO: support multiple players
   isThisPlayersTurn(lobbyState: LobbyState, turn?: number): boolean {
-    // Note: match starts at round 1, because we use persistNewRound to start it
-    const isPlayerOnesTurn = (turn ?? lobbyState.turn) === 1;
-    const isThisPlayerPlayerOne = this.isThisPlayerPlayerOne(lobbyState);
-    return isPlayerOnesTurn === isThisPlayerPlayerOne;
-  }
-
-  // TODO: support multiple players
-  isThisPlayerPlayerOne(lobbyState: LobbyState): boolean {
-    const isCreator = lobbyState.lobby_creator === this.nftId ? true : false;
-    const isCreatorWhite = lobbyState.player_one_iswhite;
-    return isCreator === isCreatorWhite;
+    const thisPlayer = lobbyState.players.find(
+      (player) => player.nftId === this.nftId
+    );
+    return thisPlayer?.turn === turn;
   }
 }

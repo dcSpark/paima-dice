@@ -1,34 +1,34 @@
 /* @name startMatch */
 UPDATE lobbies
-SET  
-lobby_state = 'active',
-player_two = :player_two!
-WHERE lobby_id = :lobby_id!
-AND player_two IS NULL
+SET
+  lobby_state = 'active'
+WHERE
+  lobby_id = :lobby_id!
 RETURNING *;
 
 /* @name closeLobby */
 UPDATE lobbies
-SET  
-lobby_state = 'closed'
-WHERE lobby_id = :lobby_id!
-AND player_two IS NULL;
+SET 
+  lobby_state = 'closed'
+WHERE 
+  lobby_id = :lobby_id!;
 
 
-/* @name updateRound */
+/* @name updateLobby */
 UPDATE lobbies
-SET current_round = :round!
-WHERE lobby_id = :lobby_id!;
+SET 
+  turn = :turn
+WHERE 
+  lobby_id = :lobby_id!;
 
-/* @name updateLatestMatchState */
-UPDATE lobbies
+/* @name updateLobbyPlayer */
+UPDATE lobby_player
 SET
-  player_one_points = :player_one_points!,
-  player_two_points = :player_two_points!,
-  player_one_score = :player_one_score!,
-  player_two_score = :player_two_score!,
-  turn = :turn!
-WHERE lobby_id = :lobby_id!;
+  points = :points,
+  score = :score,
+  turn = :turn
+WHERE 
+  lobby_id = :lobby_id! AND nft_id = :nft_id!;
 
 /* @name endMatch */
 UPDATE lobbies
