@@ -6,18 +6,18 @@ import {
   type TickEvent,
   type LobbyState,
   TickEventKind,
+  LobbyPlayer,
 } from "@dice/utils";
 import {
   applyEvent,
-  buildCurrentMatchState,
   genDieRoll,
   genInitialDiceRolls,
   getPlayerScore,
+  cloneMatchState,
 } from "@dice/game-logic";
 import * as Paima from "@dice/middleware";
-import { DiceLogic, DiceService } from "./GameLogic";
+import { DiceService } from "./GameLogic";
 import Prando from "paima-sdk/paima-prando";
-import { RoundExecutor } from "paima-sdk/paima-executors";
 import Player from "./Player";
 import { DiceRef } from "./Dice";
 
@@ -32,14 +32,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
   refetchLobbyState,
   selectedNft,
 }) => {
-  const diceRefs = useRef<{
-    1: undefined | DiceRef;
-    2: undefined | DiceRef;
-  }>({ 1: undefined, 2: undefined });
-  const diceLogic = useMemo(() => {
-    return new DiceLogic(selectedNft);
-  }, [selectedNft]);
-
+  const diceRefs = useRef<Record<number, undefined | DiceRef>>({});
   const [caption, setCaption] = useState<undefined | string>();
 
   // round being currently shown
@@ -49,9 +42,10 @@ const DiceGame: React.FC<DiceGameProps> = ({
     lobbyState.current_round
   );
   // end state of last round (latest finished round)
-  const [displayedState, setDisplayedState] = useState<MatchState>(() =>
-    buildCurrentMatchState(lobbyState)
-  );
+  const [displayedState, setDisplayedState] = useState<MatchState>({
+    turn: lobbyState.turn,
+    players: lobbyState.players,
+  });
   // cache of state that was fetched, but still needs to be displayed
   // the actual round executor is stateful so we store all it's end results instead
   const [roundExecutor, setRoundExecutor] = useState<
@@ -63,13 +57,13 @@ const DiceGame: React.FC<DiceGameProps> = ({
   >();
   const [isTickDisplaying, setIsTickDisplaying] = useState(false);
 
-  const isThisPlayerPlayerOne = useMemo(() => {
-    return diceLogic.isThisPlayerPlayerOne(lobbyState);
-  }, [diceLogic, lobbyState]);
-
-  const isPlayersTurn = useMemo(() => {
-    return diceLogic.isThisPlayersTurn(lobbyState, displayedState.turn);
-  }, [diceLogic, lobbyState, displayedRound]);
+  const thisPlayer = useMemo(() => {
+    const result = lobbyState.players.find(
+      (player) => player.nftId === selectedNft
+    );
+    if (result == null) throw new Error(`DiceGame: nft not in lobby`);
+    return result;
+  }, [lobbyState, selectedNft]);
 
   // "forced moves", user has to roll until he gets score 16
   const [initialRollQueue, setInitialRollQueue] = React.useState<
@@ -88,7 +82,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
   }
   async function handleRoll(): Promise<void> {
     const startingScore = getPlayerScore(displayedState);
-    const diceRef = diceRefs.current[isThisPlayerPlayerOne ? 1 : 2];
+    const diceRef = diceRefs.current[displayedState.turn];
 
     async function playInitialRollFromQueue(queue: [number, number][]) {
       setIsTickDisplaying(true);
@@ -96,7 +90,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
       setInitialRollQueue(restInitialRolls);
       await diceRef?.roll(playedInitialRoll);
       setDisplayedState((oldDisplayedState) => {
-        const newDisplayedState = { ...oldDisplayedState };
+        const newDisplayedState = cloneMatchState(oldDisplayedState);
         applyEvent(newDisplayedState, {
           kind: TickEventKind.roll,
           diceRolls: playedInitialRoll,
@@ -133,9 +127,9 @@ const DiceGame: React.FC<DiceGameProps> = ({
   const isExtraRoll = useMemo(
     () =>
       lobbyState.current_round === displayedRound + 1 &&
-      diceLogic.isThisPlayersTurn(lobbyState, displayedState.turn) &&
-      diceLogic.isThisPlayersTurn(lobbyState, lobbyState.turn),
-    [lobbyState, displayedRound]
+      thisPlayer.turn === displayedState.turn &&
+      thisPlayer.turn === lobbyState.turn,
+    [lobbyState, displayedRound, thisPlayer]
   );
 
   useEffect(() => {
@@ -145,11 +139,11 @@ const DiceGame: React.FC<DiceGameProps> = ({
 
     void (async () => {
       setIsTickDisplaying(true);
-      const diceRef = diceRefs.current[isThisPlayerPlayerOne ? 1 : 2];
+      const diceRef = diceRefs.current[displayedState.turn];
       const dieRoll = genDieRoll(new Prando(lobbyState.round_seed));
       await diceRef.roll([dieRoll]);
       setDisplayedState((oldDisplayedState) => {
-        const newDisplayedState = { ...oldDisplayedState };
+        const newDisplayedState = cloneMatchState(oldDisplayedState);
         applyEvent(newDisplayedState, {
           kind: TickEventKind.roll,
           diceRolls: [dieRoll],
@@ -164,7 +158,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
       setRoundExecutor(undefined);
       setIsTickDisplaying(false);
     })();
-  }, [isTickDisplaying, isPlayersTurn, displayedRound, lobbyState, diceRefs]);
+  }, [isTickDisplaying, displayedRound, lobbyState, diceRefs]);
 
   async function handlePass(): Promise<void> {
     submit(false);
@@ -189,14 +183,18 @@ const DiceGame: React.FC<DiceGameProps> = ({
 
       for (const tickEvent of tickEvents) {
         // skip replay of this player's actions that already happened interactively
-        if (isPlayersTurn && tickEvent.kind === TickEventKind.roll) continue;
+        if (
+          thisPlayer.turn === displayedState.turn &&
+          tickEvent.kind === TickEventKind.roll
+        )
+          continue;
 
         if (tickEvent.kind === TickEventKind.roll) {
           const playerRolling = displayedState.turn === 1 ? 1 : 2;
           await diceRefs.current[playerRolling].roll(tickEvent.diceRolls);
         }
         setDisplayedState((oldDisplayedState) => {
-          const newDisplayedState = { ...oldDisplayedState };
+          const newDisplayedState = cloneMatchState(oldDisplayedState);
           applyEvent(newDisplayedState, tickEvent);
           return newDisplayedState;
         });
@@ -207,14 +205,21 @@ const DiceGame: React.FC<DiceGameProps> = ({
         if (tickEvent.kind === TickEventKind.applyPoints) {
           setCaption(
             (() => {
-              const [thisPlayer, opponent] = isThisPlayerPlayerOne
-                ? [tickEvent.player1, tickEvent.player2]
-                : [tickEvent.player2, tickEvent.player1];
+              const thisPlayerIndex = displayedState.players.findIndex(
+                (player) => player.nftId === selectedNft
+              );
 
-              if (thisPlayer === 2) return "21! You get 2 points";
-              if (thisPlayer === 1) return "You win! You get a point";
-              if (opponent === 1) return "You lose! Opponent gets a point";
-              if (opponent === 2) return "You lose! Opponent gets 2 points";
+              const you = tickEvent.points[thisPlayerIndex];
+              const opponents = tickEvent.points.filter(
+                (_, i) => i !== thisPlayerIndex
+              );
+
+              if (you === 2) return "21! You get 2 points";
+              if (you === 1) return "You win! You get a point";
+              if (opponents.some((points) => points === 1))
+                return "You lose! Opponent gets a point";
+              if (opponents.some((points) => points === 2))
+                return "You lose! Opponent gets 2 points";
               return "It's a tie";
             })()
           );
@@ -232,9 +237,10 @@ const DiceGame: React.FC<DiceGameProps> = ({
   }, [isTickDisplaying, roundExecutor]);
 
   const [isFetchingRound, setIsFetchingRound] = useState(false);
-  const [fetchedEndState, setFetchedEndState] = useState<MatchState>(
-    buildCurrentMatchState(lobbyState)
-  );
+  const [fetchedEndState, setFetchedEndState] = useState<MatchState>({
+    turn: lobbyState.turn,
+    players: lobbyState.players,
+  });
   const [nextFetchedRound, setFetchedRound] = useState(
     lobbyState.current_round
   );
@@ -281,38 +287,11 @@ const DiceGame: React.FC<DiceGameProps> = ({
 
   const disableInteraction =
     displayedRound !== lobbyState.current_round ||
-    !isPlayersTurn ||
+    thisPlayer.turn !== displayedState.turn ||
     isTickDisplaying;
   const playerScore = getPlayerScore(displayedState);
   const canRoll = !disableInteraction && playerScore <= 21;
   const canPass = !disableInteraction && playerScore >= 16;
-
-  const players: Array<{
-    isThisPlayerYou: boolean;
-    score: number;
-    points: number;
-    isThisPlayersTurn: boolean;
-    diceRef: Ref<DiceRef>;
-  }> = [
-    {
-      isThisPlayerYou: isThisPlayerPlayerOne,
-      score: displayedState.player1Score,
-      points: displayedState.player1Points,
-      isThisPlayersTurn: isThisPlayerPlayerOne === isPlayersTurn,
-      diceRef: (el) => {
-        diceRefs.current[1] = el;
-      },
-    },
-    {
-      isThisPlayerYou: !isThisPlayerPlayerOne,
-      score: displayedState.player2Score,
-      points: displayedState.player2Points,
-      isThisPlayersTurn: isThisPlayerPlayerOne !== isPlayersTurn,
-      diceRef: (el) => {
-        diceRefs.current[2] = el;
-      },
-    },
-  ];
 
   if (lobbyState == null) return <></>;
 
@@ -322,7 +301,10 @@ const DiceGame: React.FC<DiceGameProps> = ({
         variant="caption"
         sx={{ fontSize: "1.25rem", lineHeight: "1.75rem" }}
       >
-        {caption ?? (isPlayersTurn ? "Your turn" : "Opponent's turn")}
+        {caption ??
+          (thisPlayer.turn === displayedState.turn
+            ? "Your turn"
+            : "Opponent's turn")}
       </Typography>
       <Box
         sx={{
@@ -331,14 +313,15 @@ const DiceGame: React.FC<DiceGameProps> = ({
           gap: 5,
         }}
       >
-        {players.map((player, i) => (
+        {displayedState.players.map((player) => (
           <Player
-            key={i}
-            isThisPlayerYou={player.isThisPlayerYou}
-            score={player.score}
-            points={player.points}
-            isThisPlayersTurn={player.isThisPlayersTurn}
-            diceRef={player.diceRef}
+            key={`player-${player.nftId}`}
+            lobbyPlayer={player}
+            thisClientPlayer={thisPlayer.nftId}
+            turn={displayedState.turn}
+            diceRef={(elem) => {
+              diceRefs.current[player.turn] = elem;
+            }}
             onRoll={canRoll ? handleRoll : undefined}
             onPass={canPass ? handlePass : undefined}
           />

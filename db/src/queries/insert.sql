@@ -2,42 +2,62 @@
   @name createLobby 
 */
 INSERT INTO lobbies(
-   lobby_id,
-   num_of_rounds,
-   round_length,
-   play_time_per_player,
-   current_round,
-   initial_random_seed,
-   creation_block_height,
-   created_at,
-   hidden,
-   practice,
-   lobby_creator,
-   player_one_iswhite,
-   lobby_state,
-   player_two)
+  lobby_id,
+  num_of_rounds,
+  round_length,
+  play_time_per_player,
+  current_round,
+  initial_random_seed,
+  creation_block_height,
+  created_at,
+  hidden,
+  practice,
+  lobby_creator,
+  lobby_state
+)
 VALUES(
- :lobby_id!,
- :num_of_rounds!,
- :round_length!,
- :play_time_per_player!,
- :current_round,
- :initial_random_seed!,
- :creation_block_height!,
- :created_at!,
- :hidden!,
- :practice!,
- :lobby_creator!,
- :player_one_iswhite!,
- :lobby_state!,
- :player_two
+  :lobby_id!,
+  :num_of_rounds!,
+  :round_length!,
+  :play_time_per_player!,
+  :current_round,
+  :initial_random_seed!,
+  :creation_block_height!,
+  :created_at!,
+  :hidden!,
+  :practice!,
+  :lobby_creator!,
+  :lobby_state!
+);
+
+/* @name joinPlayerToLobby */
+INSERT INTO lobby_player(
+  lobby_id,
+  nft_id,
+  turn
+)
+VALUES(
+  :lobby_id!,
+  :nft_id!,
+  /* TODO: decide turn order when starting a match */
+  :turn!
 );
 
 /* 
   @name newRound
 */
-INSERT INTO rounds(lobby_id, round_within_match, starting_block_height, execution_block_height)
-VALUES (:lobby_id!, :round_within_match!, :starting_block_height!, :execution_block_height)
+INSERT INTO rounds(
+  lobby_id,
+  round_within_match,
+  starting_block_height,
+  execution_block_height
+)
+VALUES (
+  :lobby_id!,
+  :round_within_match!,
+  :starting_block_height!,
+  :execution_block_height
+)
 RETURNING *;
 
 /* 

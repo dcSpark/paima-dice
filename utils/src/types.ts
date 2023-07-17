@@ -3,9 +3,7 @@ import type {
   IGetMovesByLobbyResult,
   IGetUserStatsResult,
   IGetNewLobbiesByUserAndBlockHeightResult,
-  IGetPaginatedUserLobbiesResult,
 } from '@dice/db';
-import type { Color } from 'chess.js';
 
 export enum RoundKind {
   initial,
@@ -38,8 +36,7 @@ export type RollTickEvent = {
 };
 export type ApplyPointsTickEvent = {
   kind: TickEventKind.applyPoints;
-  player1: number;
-  player2: number;
+  points: number[];
 };
 export type TurnEndTickEvent = {
   kind: TickEventKind.turnEnd;
@@ -50,22 +47,11 @@ export type RoundEndTickEvent = {
 
 export type TickEvent = RollTickEvent | ApplyPointsTickEvent | TurnEndTickEvent | RoundEndTickEvent;
 
-export interface MatchEnvironment {
-  // TODO: allow for more than 2 players
-  user1: PlayerInfo;
-  user2: PlayerInfo;
-}
-
-export interface PlayerInfo {
-  nftId: number;
-  color: Color;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface MatchEnvironment {}
 
 export interface MatchState {
-  player1Points: number;
-  player2Points: number;
-  player1Score: number;
-  player2Score: number;
+  players: LobbyPlayer[];
   turn: number; // whose turn is it
 }
 
@@ -77,7 +63,7 @@ export type LobbyStatus = 'open' | 'active' | 'finished' | 'closed';
 export type ConciseResult = 'w' | 't' | 'l';
 export type ExpandedResult = 'win' | 'tie' | 'loss';
 
-export type MatchResult = [ConciseResult, ConciseResult];
+export type MatchResult = ConciseResult[];
 
 export interface MatchWinnerResponse {
   match_status?: LobbyStatus;
@@ -101,7 +87,7 @@ interface ExecutorDataSeed {
 }
 
 export interface MatchExecutorData {
-  lobby: IGetLobbyByIdResult;
+  lobby: LobbyState;
   moves: IGetMovesByLobbyResult[];
   seeds: ExecutorDataSeed[];
 }
@@ -120,16 +106,14 @@ export type UserStats = IGetUserStatsResult;
 
 export type NewLobby = IGetNewLobbiesByUserAndBlockHeightResult;
 
-export interface LobbyState extends LobbyStateQuery {
-  round_ends_in_blocks: number;
-  round_ends_in_secs: number;
-}
+export type LobbyPlayer = {
+  nftId: number;
+  turn: undefined | number;
+  points: number;
+  score: number;
+};
 
-export interface LobbyStateQuery extends IGetLobbyByIdResult {
-  round_start_height: number;
+export interface LobbyState extends IGetLobbyByIdResult {
   round_seed: string;
-}
-
-export interface UserLobby extends IGetPaginatedUserLobbiesResult {
-  myTurn?: boolean;
+  players: LobbyPlayer[];
 }

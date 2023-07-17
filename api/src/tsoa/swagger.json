@@ -6,6 +6,32 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
+			"LobbyPlayer": {
+				"properties": {
+					"score": {
+						"type": "number",
+						"format": "double"
+					},
+					"points": {
+						"type": "number",
+						"format": "double"
+					},
+					"turn": {
+						"type": "number",
+						"format": "double"
+					},
+					"nftId": {
+						"type": "number",
+						"format": "double"
+					}
+				},
+				"required": [
+					"score",
+					"points",
+					"nftId"
+				],
+				"type": "object"
+			},
 			"lobby_status": {
 				"type": "string",
 				"enum": [
@@ -15,7 +41,7 @@
 					"open"
 				]
 			},
-			"LobbyStateQuery": {
+			"LobbyState": {
 				"properties": {
 					"created_at": {
 						"type": "string",
@@ -53,30 +79,6 @@
 						"type": "number",
 						"format": "double"
 					},
-					"player_one_iswhite": {
-						"type": "boolean"
-					},
-					"player_one_points": {
-						"type": "number",
-						"format": "double"
-					},
-					"player_one_score": {
-						"type": "number",
-						"format": "double"
-					},
-					"player_two": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
-					"player_two_points": {
-						"type": "number",
-						"format": "double"
-					},
-					"player_two_score": {
-						"type": "number",
-						"format": "double"
-					},
 					"practice": {
 						"type": "boolean"
 					},
@@ -88,12 +90,14 @@
 						"type": "number",
 						"format": "double"
 					},
-					"round_start_height": {
-						"type": "number",
-						"format": "double"
-					},
 					"round_seed": {
 						"type": "string"
+					},
+					"players": {
+						"items": {
+							"$ref": "#/components/schemas/LobbyPlayer"
+						},
+						"type": "array"
 					}
 				},
 				"required": [
@@ -107,17 +111,11 @@
 					"lobby_state",
 					"num_of_rounds",
 					"play_time_per_player",
-					"player_one_iswhite",
-					"player_one_points",
-					"player_one_score",
-					"player_two",
-					"player_two_points",
-					"player_two_score",
 					"practice",
 					"round_length",
 					"turn",
-					"round_start_height",
-					"round_seed"
+					"round_seed",
+					"players"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -127,7 +125,7 @@
 					"lobby": {
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/LobbyStateQuery"
+								"$ref": "#/components/schemas/LobbyState"
 							}
 						],
 						"nullable": true
@@ -200,18 +198,14 @@
 						"type": "number",
 						"format": "double"
 					},
-					"player_one_iswhite": {
+					"practice": {
 						"type": "boolean"
 					},
-					"player_one_points": {
-						"type": "number",
-						"format": "double"
-					},
-					"player_two_points": {
-						"type": "number",
-						"format": "double"
-					},
 					"round_length": {
+						"type": "number",
+						"format": "double"
+					},
+					"turn": {
 						"type": "number",
 						"format": "double"
 					}
@@ -227,10 +221,9 @@
 					"lobby_state",
 					"num_of_rounds",
 					"play_time_per_player",
-					"player_one_iswhite",
-					"player_one_points",
-					"player_two_points",
-					"round_length"
+					"practice",
+					"round_length",
+					"turn"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -289,30 +282,6 @@
 						"type": "number",
 						"format": "double"
 					},
-					"player_one_iswhite": {
-						"type": "boolean"
-					},
-					"player_one_points": {
-						"type": "number",
-						"format": "double"
-					},
-					"player_one_score": {
-						"type": "number",
-						"format": "double"
-					},
-					"player_two": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
-					"player_two_points": {
-						"type": "number",
-						"format": "double"
-					},
-					"player_two_score": {
-						"type": "number",
-						"format": "double"
-					},
 					"practice": {
 						"type": "boolean"
 					},
@@ -336,12 +305,6 @@
 					"lobby_state",
 					"num_of_rounds",
 					"play_time_per_player",
-					"player_one_iswhite",
-					"player_one_points",
-					"player_one_score",
-					"player_two",
-					"player_two_points",
-					"player_two_score",
 					"practice",
 					"round_length",
 					"turn"
@@ -405,18 +368,14 @@
 						"type": "number",
 						"format": "double"
 					},
-					"player_one_iswhite": {
+					"practice": {
 						"type": "boolean"
 					},
-					"player_one_points": {
-						"type": "number",
-						"format": "double"
-					},
-					"player_two_points": {
-						"type": "number",
-						"format": "double"
-					},
 					"round_length": {
+						"type": "number",
+						"format": "double"
+					},
+					"turn": {
 						"type": "number",
 						"format": "double"
 					}
@@ -432,10 +391,9 @@
 					"lobby_state",
 					"num_of_rounds",
 					"play_time_per_player",
-					"player_one_iswhite",
-					"player_one_points",
-					"player_two_points",
-					"round_length"
+					"practice",
+					"round_length",
+					"turn"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -479,18 +437,14 @@
 						"type": "number",
 						"format": "double"
 					},
-					"player_one_iswhite": {
+					"practice": {
 						"type": "boolean"
 					},
-					"player_one_points": {
-						"type": "number",
-						"format": "double"
-					},
-					"player_two_points": {
-						"type": "number",
-						"format": "double"
-					},
 					"round_length": {
+						"type": "number",
+						"format": "double"
+					},
+					"turn": {
 						"type": "number",
 						"format": "double"
 					}
@@ -506,10 +460,9 @@
 					"lobby_state",
 					"num_of_rounds",
 					"play_time_per_player",
-					"player_one_iswhite",
-					"player_one_points",
-					"player_two_points",
-					"round_length"
+					"practice",
+					"round_length",
+					"turn"
 				],
 				"type": "object",
 				"additionalProperties": false

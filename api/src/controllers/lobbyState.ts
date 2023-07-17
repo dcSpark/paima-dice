@@ -1,10 +1,10 @@
 import { Controller, Get, Query, Route } from 'tsoa';
-import { getLobbyById, getRoundData, requirePool } from '@dice/db';
-import type { LobbyStateQuery } from '@dice/utils';
+import { getLobbyById, getLobbyPlayers, getRoundData, requirePool } from '@dice/db';
+import type { LobbyPlayer, LobbyState } from '@dice/utils';
 import { getBlockHeight } from 'paima-sdk/paima-db';
 
 interface Response {
-  lobby: LobbyStateQuery | null;
+  lobby: LobbyState | null;
 }
 
 @Route('lobby_state')
@@ -12,14 +12,12 @@ export class LobbyStatecontroller extends Controller {
   @Get()
   public async get(@Query() lobbyID: string): Promise<Response> {
     const pool = requirePool();
-    const [lobby] = await getLobbyById.run({ lobby_id: lobbyID }, pool);
+    const [[lobby], rawPlayers] = await Promise.all([
+      getLobbyById.run({ lobby_id: lobbyID }, pool),
+      getLobbyPlayers.run({ lobby_id: lobbyID }, pool),
+    ]);
     if (!lobby) return { lobby: null };
     else {
-      const [round_data] = await getRoundData.run(
-        { lobby_id: lobbyID, round_number: lobby.current_round },
-        pool
-      );
-
       // null if this is first round
       const [last_round_data] = await getRoundData.run(
         { lobby_id: lobbyID, round_number: lobby.current_round - 1 },
@@ -35,11 +33,18 @@ export class LobbyStatecontroller extends Controller {
             );
       const round_seed = last_block_height?.seed ?? lobby.initial_random_seed;
 
+      const players: LobbyPlayer[] = rawPlayers.map(raw => ({
+        nftId: raw.nft_id,
+        points: raw.points,
+        score: raw.score,
+        turn: raw.turn ?? undefined,
+      }));
+
       return {
         lobby: {
           ...lobby,
-          round_start_height: round_data?.starting_block_height || 0,
           round_seed,
+          players,
         },
       };
     }

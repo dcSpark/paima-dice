@@ -1,14 +1,7 @@
 import type { Hash } from 'paima-sdk/paima-utils';
 
-import type {
-  BaseRoundStatus,
-  LobbyState,
-  LobbyStateQuery,
-  LobbyStatus,
-  NewLobby,
-  UserLobby,
-  UserStats,
-} from '@dice/utils';
+import type { BaseRoundStatus, LobbyState, LobbyStatus, NewLobby, UserStats } from '@dice/utils';
+import type { IGetPaginatedUserLobbiesResult } from '@dice/db';
 
 export interface RoundEnd {
   blocks: number;
@@ -43,12 +36,12 @@ export interface PackedRoundExecutionState {
 
 export interface LobbyStates {
   success: true;
-  lobbies: LobbyStateQuery[];
+  lobbies: LobbyState[];
 }
 
 export interface PackedUserLobbies {
   success: true;
-  lobbies: UserLobby[];
+  lobbies: IGetPaginatedUserLobbiesResult[];
 }
 
 export interface PackedUserStats {

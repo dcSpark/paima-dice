@@ -20,10 +20,12 @@ export function buildMatchExecutor({
 
   const initialState: MatchState = {
     // TODO: support multiple players
-    player1Points: 0,
-    player2Points: 0,
-    player1Score: 0,
-    player2Score: 0,
+    players: lobby.players.map(player => ({
+      nftId: player.nftId,
+      turn: player.turn,
+      points: 0,
+      score: 0,
+    })),
     turn: 1,
   };
   return matchExecutor.initialize(

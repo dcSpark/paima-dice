@@ -8,15 +8,8 @@ export function userJoinedLobby(nftId: number, lobby: PackedLobbyState): boolean
     return false;
   }
   const lobbyState = lobby.lobby;
-
-  // TODO: support multiple players
-  if (!lobbyState.hasOwnProperty('player_two')) {
-    return false;
-  }
-  if (lobbyState.player_two == null) {
-    return false;
-  }
-  return lobbyState.player_two === nftId;
+  const lobbyPlayer = lobbyState.players.find(player => player.nftId === nftId);
+  return lobbyPlayer != null;
 }
 
 export function userCreatedLobby(nftId: number, lobby: PackedLobbyState): boolean {

@@ -32,12 +32,17 @@ import * as express from 'express';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
 const models: TsoaRoute.Models = {
+    "LobbyPlayer": {
+        "dataType": "refAlias",
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"score":{"dataType":"double","required":true},"points":{"dataType":"double","required":true},"turn":{"dataType":"union","subSchemas":[{"dataType":"undefined"},{"dataType":"double"}],"required":true},"nftId":{"dataType":"double","required":true}},"validators":{}},
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "lobby_status": {
         "dataType": "refAlias",
         "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["active"]},{"dataType":"enum","enums":["closed"]},{"dataType":"enum","enums":["finished"]},{"dataType":"enum","enums":["open"]}],"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "LobbyStateQuery": {
+    "LobbyState": {
         "dataType": "refObject",
         "properties": {
             "created_at": {"dataType":"datetime","required":true},
@@ -50,17 +55,11 @@ const models: TsoaRoute.Models = {
             "lobby_state": {"ref":"lobby_status","required":true},
             "num_of_rounds": {"dataType":"double","required":true},
             "play_time_per_player": {"dataType":"double","required":true},
-            "player_one_iswhite": {"dataType":"boolean","required":true},
-            "player_one_points": {"dataType":"double","required":true},
-            "player_one_score": {"dataType":"double","required":true},
-            "player_two": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
-            "player_two_points": {"dataType":"double","required":true},
-            "player_two_score": {"dataType":"double","required":true},
             "practice": {"dataType":"boolean","required":true},
             "round_length": {"dataType":"double","required":true},
             "turn": {"dataType":"double","required":true},
-            "round_start_height": {"dataType":"double","required":true},
             "round_seed": {"dataType":"string","required":true},
+            "players": {"dataType":"array","array":{"dataType":"refAlias","ref":"LobbyPlayer"},"required":true},
         },
         "additionalProperties": false,
     },
@@ -68,7 +67,7 @@ const models: TsoaRoute.Models = {
     "Response": {
         "dataType": "refObject",
         "properties": {
-            "lobby": {"dataType":"union","subSchemas":[{"ref":"LobbyStateQuery"},{"dataType":"enum","enums":[null]}],"required":true},
+            "lobby": {"dataType":"union","subSchemas":[{"ref":"LobbyState"},{"dataType":"enum","enums":[null]}],"required":true},
         },
         "additionalProperties": false,
     },
@@ -100,10 +99,9 @@ const models: TsoaRoute.Models = {
             "lobby_state": {"ref":"lobby_status","required":true},
             "num_of_rounds": {"dataType":"double","required":true},
             "play_time_per_player": {"dataType":"double","required":true},
-            "player_one_iswhite": {"dataType":"boolean","required":true},
-            "player_one_points": {"dataType":"double","required":true},
-            "player_two_points": {"dataType":"double","required":true},
+            "practice": {"dataType":"boolean","required":true},
             "round_length": {"dataType":"double","required":true},
+            "turn": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
     },
@@ -129,12 +127,6 @@ const models: TsoaRoute.Models = {
             "lobby_state": {"ref":"lobby_status","required":true},
             "num_of_rounds": {"dataType":"double","required":true},
             "play_time_per_player": {"dataType":"double","required":true},
-            "player_one_iswhite": {"dataType":"boolean","required":true},
-            "player_one_points": {"dataType":"double","required":true},
-            "player_one_score": {"dataType":"double","required":true},
-            "player_two": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
-            "player_two_points": {"dataType":"double","required":true},
-            "player_two_score": {"dataType":"double","required":true},
             "practice": {"dataType":"boolean","required":true},
             "round_length": {"dataType":"double","required":true},
             "turn": {"dataType":"double","required":true},
@@ -163,10 +155,9 @@ const models: TsoaRoute.Models = {
             "lobby_state": {"ref":"lobby_status","required":true},
             "num_of_rounds": {"dataType":"double","required":true},
             "play_time_per_player": {"dataType":"double","required":true},
-            "player_one_iswhite": {"dataType":"boolean","required":true},
-            "player_one_points": {"dataType":"double","required":true},
-            "player_two_points": {"dataType":"double","required":true},
+            "practice": {"dataType":"boolean","required":true},
             "round_length": {"dataType":"double","required":true},
+            "turn": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
     },
@@ -184,10 +175,9 @@ const models: TsoaRoute.Models = {
             "lobby_state": {"ref":"lobby_status","required":true},
             "num_of_rounds": {"dataType":"double","required":true},
             "play_time_per_player": {"dataType":"double","required":true},
-            "player_one_iswhite": {"dataType":"boolean","required":true},
-            "player_one_points": {"dataType":"double","required":true},
-            "player_two_points": {"dataType":"double","required":true},
+            "practice": {"dataType":"boolean","required":true},
             "round_length": {"dataType":"double","required":true},
+            "turn": {"dataType":"double","required":true},
         },
         "additionalProperties": false,
     },

@@ -7,8 +7,7 @@ import type {
   MatchExecutorData,
   RoundStatusData,
   UserStats,
-  LobbyStateQuery,
-  UserLobby,
+  LobbyState,
   RoundExecutorBackendData,
   MatchState,
   TickEvent,
@@ -37,20 +36,16 @@ import type {
   PackedUserLobbies,
   PackedUserStats,
 } from '../types';
-import { isPlayersTurn } from '@dice/game-logic';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
+import type { IGetPaginatedUserLobbiesResult } from '@dice/db';
 
 async function getLobbyState(lobbyID: string): Promise<PackedLobbyState | FailedResult> {
   const errorFxn = buildEndpointErrorFxn('getLobbyState');
 
   let packedLobbyState: PackedLobbyState | FailedResult;
-  let latestBlockHeight: number;
 
   try {
-    [packedLobbyState, latestBlockHeight] = await Promise.all([
-      getRawLobbyState(lobbyID),
-      getBlockNumber(),
-    ]);
+    packedLobbyState = await getRawLobbyState(lobbyID);
 
     if (!packedLobbyState.success) {
       return errorFxn(packedLobbyState.errorMessage);
@@ -61,22 +56,10 @@ async function getLobbyState(lobbyID: string): Promise<PackedLobbyState | Failed
 
   try {
     const { lobby } = packedLobbyState;
-    let [start, length] = [0, 0];
-
-    if (lobby.lobby_state === 'active') {
-      start = lobby.round_start_height;
-      length = lobby.round_length;
-    }
-
-    const end = calculateRoundEnd(start, length, latestBlockHeight);
 
     return {
       success: true,
-      lobby: {
-        ...lobby,
-        round_ends_in_blocks: end.blocks,
-        round_ends_in_secs: end.seconds,
-      },
+      lobby,
     };
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.INVALID_RESPONSE_FROM_BACKEND, err);
@@ -100,7 +83,7 @@ async function getLobbySearch(
   }
 
   try {
-    const j = (await response.json()) as { lobbies: LobbyStateQuery[] };
+    const j = (await response.json()) as { lobbies: LobbyState[] };
     return {
       success: true,
       lobbies: j.lobbies,
@@ -195,13 +178,10 @@ async function getUserLobbiesMatches(
   }
 
   try {
-    const j = (await res.json()) as { lobbies: UserLobby[] };
+    const j = (await res.json()) as { lobbies: IGetPaginatedUserLobbiesResult[] };
     return {
       success: true,
-      lobbies: j.lobbies.map(lobby => ({
-        ...lobby,
-        myTurn: isPlayersTurn(nftId, lobby),
-      })),
+      lobbies: j.lobbies,
     };
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.INVALID_RESPONSE_FROM_BACKEND, err);
@@ -224,7 +204,7 @@ async function getOpenLobbies(
   }
 
   try {
-    const j = (await res.json()) as { lobbies: LobbyStateQuery[] };
+    const j = (await res.json()) as { lobbies: LobbyState[] };
     return {
       success: true,
       lobbies: j.lobbies,

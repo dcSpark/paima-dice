@@ -1,5 +1,6 @@
+import type { IGetLobbyByIdResult, IGetLobbyPlayersResult } from '@dice/db';
 import { RoundKind } from '@dice/utils';
-import type { MatchEnvironment, MatchState, UserLobby, DiceRolls } from '@dice/utils';
+import type { MatchState, DiceRolls, LobbyPlayer } from '@dice/utils';
 import type { ConciseResult, MatchResult } from '@dice/utils';
 import type { IGetBlockHeightResult } from 'paima-sdk/paima-db';
 import Prando from 'paima-sdk/paima-prando';
@@ -72,51 +73,56 @@ export function isValidMove(
   return score + genDieRoll(randomnessGenerator) <= 21;
 }
 
-export function isPlayersTurn(nftId: number, lobby: UserLobby) {
-  // Note: match starts at round 1, because we use persistNewRound to start it
-  const isWhiteTurn = lobby.current_round % 2 === 1;
-  const isCreator = lobby.lobby_creator === nftId;
-  const isWhite = isCreator === lobby.player_one_iswhite;
-  return isWhite === isWhiteTurn;
-}
-
-export function matchResults(
-  matchState: MatchState,
-  matchEnvironment: MatchEnvironment
-): MatchResult {
-  // TODO: allow for more than 2 players
-
+export function matchResults(matchState: MatchState): MatchResult {
   // We compute the winner
-  const user1won = matchState.player1Points > matchState.player2Points;
-  const user2won = matchState.player2Points > matchState.player1Points;
-  // Assign the winner to a variable called winner. If no one won, winner is null
-  const winner = user1won
-    ? matchEnvironment.user1.nftId
-    : user2won
-    ? matchEnvironment.user2.nftId
-    : null;
-
-  console.log(`${winner} won match.`);
-
-  const results: [ConciseResult, ConciseResult] = !winner
-    ? ['t', 't']
-    : winner === matchEnvironment.user1.nftId
-    ? ['w', 'l']
-    : ['l', 'w'];
+  const maxPoints = matchState.players.reduce((acc, next) => Math.max(acc, next.points), 0);
+  const maxPlayers = matchState.players.filter(player => player.points === maxPoints);
+  const results: ConciseResult[] = matchState.players.map(player => {
+    if (player.points < maxPoints) return 'l';
+    if (maxPlayers.length > 0) return 't';
+    return 'w';
+  });
 
   return results;
 }
 
-export function buildCurrentMatchState(lobby: UserLobby): MatchState {
+export function buildCurrentMatchState(
+  lobby: IGetLobbyByIdResult,
+  rawPlayers: IGetLobbyPlayersResult[]
+): MatchState {
+  const players: LobbyPlayer[] = rawPlayers.map(player => {
+    if (player.turn == null) throw new Error(`buildCurrentMatchState: player's turn is null`);
+
+    return {
+      nftId: player.nft_id,
+      turn: player.turn,
+      points: player.points,
+      score: player.score,
+    };
+  });
+
   return {
-    player1Points: lobby.player_one_points,
-    player2Points: lobby.player_two_points,
-    player1Score: lobby.player_one_score,
-    player2Score: lobby.player_two_score,
+    players,
     turn: lobby.turn,
   };
 }
 
+export function cloneMatchState(template: MatchState): MatchState {
+  return {
+    ...template,
+    players: template.players.map(template => ({
+      ...template,
+    })),
+  };
+}
+
 export function getPlayerScore(matchState: MatchState): number {
-  return matchState.turn === 1 ? matchState.player1Score : matchState.player2Score;
+  const turnPlayer = getTurnPlayer(matchState);
+  return turnPlayer.score;
+}
+
+export function getTurnPlayer(matchState: MatchState): LobbyPlayer {
+  const turnPlayer = matchState.players.find(player => player.turn === matchState.turn);
+  if (turnPlayer == null) throw new Error(`getTurnPlayer: missing player for turn`);
+  return turnPlayer;
 }

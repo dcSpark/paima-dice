@@ -10,7 +10,7 @@ import {
   TableRow,
 } from "@mui/material";
 import MainController from "@src/MainController";
-import { LobbyStatus, UserLobby } from "@dice/utils";
+import { LobbyStatus } from "@dice/utils";
 import Navbar from "@src/components/Navbar";
 import SearchBar from "@src/components/SearchBar";
 import { AppContext } from "@src/main";
@@ -18,9 +18,10 @@ import Wrapper from "@src/components/Wrapper";
 import Button from "@src/components/Button";
 import { formatDate } from "@src/utils";
 import { useGlobalStateContext } from "@src/GlobalStateContext";
+import { IGetPaginatedUserLobbiesResult } from "@dice/db";
 
 type Column = {
-  id: keyof UserLobby | "action";
+  id: keyof IGetPaginatedUserLobbiesResult | "action";
   label: string;
   minWidth: number;
 };
@@ -30,7 +31,6 @@ const columns: Column[] = [
   { id: "lobby_state", label: "Status", minWidth: 50 },
   { id: "created_at", label: "Created At", minWidth: 50 },
   { id: "lobby_creator", label: "Host", minWidth: 50 },
-  { id: "myTurn", label: "My Turn?", minWidth: 50 },
   { id: "action", label: "", minWidth: 50 },
 ];
 
@@ -41,13 +41,19 @@ const actionMap: Record<LobbyStatus, string[]> = {
   closed: [],
 };
 
-const ActionButton: React.FC<{ lobby: UserLobby }> = (props) => {
+const ActionButton: React.FC<{ lobby: IGetPaginatedUserLobbiesResult }> = (
+  props
+) => {
   const mainController: MainController = useContext(AppContext);
   const {
     selectedNftState: [selectedNft],
   } = useGlobalStateContext();
 
-  const handleLobbyAction = (action: string, status: LobbyStatus, lobbyId: string) => {
+  const handleLobbyAction = (
+    action: string,
+    status: LobbyStatus,
+    lobbyId: string
+  ) => {
     if (action === "Close") {
       mainController.closeLobby(selectedNft, lobbyId);
     } else if (action === "Enter") {
@@ -60,10 +66,10 @@ const ActionButton: React.FC<{ lobby: UserLobby }> = (props) => {
     return <></>;
   }
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: "flex" }}>
       {actions.map((action, i) => (
         <>
-          {i > 0 && <Box sx={{ marginLeft: '8px' }} />}
+          {i > 0 && <Box sx={{ marginLeft: "8px" }} />}
           <Button
             key={action}
             disabled={props.lobby.lobby_state === "closed"}
@@ -81,7 +87,7 @@ const ActionButton: React.FC<{ lobby: UserLobby }> = (props) => {
       ))}
     </Box>
   );
-}
+};
 
 const MyGames: React.FC = () => {
   const mainController: MainController = useContext(AppContext);
@@ -89,7 +95,7 @@ const MyGames: React.FC = () => {
     selectedNftState: [selectedNft],
   } = useGlobalStateContext();
 
-  const [lobbies, setLobbies] = useState<UserLobby[]>([]);
+  const [lobbies, setLobbies] = useState<IGetPaginatedUserLobbiesResult[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [searchText, setSearchText] = useState("");
@@ -121,15 +127,15 @@ const MyGames: React.FC = () => {
     return rowValues.toLowerCase().includes(searchText.toLowerCase());
   });
 
-  const expandValue = (id: keyof UserLobby, value: unknown) => {
+  const expandValue = (
+    id: keyof IGetPaginatedUserLobbiesResult,
+    value: unknown
+  ) => {
     if (id === "lobby_creator" && typeof value === "number") {
       return value === selectedNft ? "Yes" : "No";
     }
     if (id === "created_at" && typeof value === "string") {
       return formatDate(value);
-    }
-    if (id === "myTurn") {
-      return value ? "Yes" : "No";
     }
     if (typeof value === "string") {
       return value;

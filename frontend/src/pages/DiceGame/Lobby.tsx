@@ -44,7 +44,8 @@ export function Lobby({
         {lobbyState.lobby_state === "open" && (
           <>
             <div>
-              Waiting for another player<span className="loading-text">...</span>
+              Waiting for another player
+              <span className="loading-text">...</span>
             </div>
           </>
         )}

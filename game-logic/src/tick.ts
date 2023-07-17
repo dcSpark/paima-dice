@@ -9,6 +9,9 @@ import { type MatchState, type MatchEnvironment, type TickEvent, TickEventKind }
 import type { IGetCachedMovesResult } from '@dice/db';
 import { genDiceRolls, getPlayerScore } from '.';
 
+// TODO: variable number of players
+const numPlayers = 2;
+
 // Executes a round executor tick and generates a tick event as a result
 export function processTick(
   matchEnvironment: MatchEnvironment,
@@ -46,35 +49,37 @@ export function processTick(
   }
 
   const turnEnds = !rollEvents[rollEvents.length - 1].rollAgain;
-  const roundEnds = turnEnds && matchState.turn === 2; // TODO: last player in turn order
+  // recall: we index turns from 1
+  const roundEnds = turnEnds && matchState.turn === numPlayers;
 
   const applyPointsEvents: ApplyPointsTickEvent[] = (() => {
     if (!roundEnds) return [];
 
-    let player1 = 0;
-    let player2 = 0;
+    // rules:
+    // Anyone who scored 21 gets 2 points.
+    // If nobody scored 21:
+    //   Over 21 gets 0 points.
+    //   Closest to 21 gets 1 point, but tie is 0 points.
 
-    // replace going over with -1 score, simplifies logic
-    const score1 = matchState.player1Score > 21 ? -1 : matchState.player1Score;
-    const score2 = matchState.player2Score > 21 ? -1 : matchState.player2Score;
+    const points = (() => {
+      // replace going over 21 with -1 score, simplifies logic
+      const scores = matchState.players.map(player => (player.score > 21 ? -1 : player.score));
+      const someoneScored21 = scores.some(score => score === 21);
+      if (someoneScored21) {
+        return scores.map(score => (score === 21 ? 2 : 0));
+      } else {
+        const max = Math.max(...scores);
 
-    const someoneScored21 = [score1, score2].some(score => score === 21);
-    // each player scoring 21 in the round gets 2 points.
-    if (someoneScored21) {
-      if (score1 === 21) player1 += 2;
-      if (score2 === 21) player2 += 2;
-    } else {
-      // if more than one player have the same score, then no point is given to any player.
-      // the player closest to 21 gets 1 point.
-      if (score1 > score2) player1 += 1;
-      if (score2 > score1) player2 += 1;
-    }
+        if (scores.filter(value => value === max).length > 1) return scores.map(() => 0);
+
+        return scores.map(score => (score === max ? 1 : 0));
+      }
+    })();
 
     return [
       {
         kind: TickEventKind.applyPoints,
-        player1,
-        player2,
+        points,
       },
     ];
   })();
@@ -104,23 +109,30 @@ export function processTick(
 export function applyEvent(matchState: MatchState, event: TickEvent): void {
   if (event.kind === TickEventKind.roll) {
     const addedScore = event.diceRolls.reduce((acc, next) => acc + next, 0);
-    matchState[matchState.turn === 1 ? 'player1Score' : 'player2Score'] += addedScore;
+    matchState.players[
+      // recall: we index turns from 1
+      matchState.turn - 1
+    ].score += addedScore;
     return;
   }
 
   if (event.kind === TickEventKind.applyPoints) {
-    matchState.player1Points += event.player1;
-    matchState.player2Points += event.player2;
+    for (const i in matchState.players) {
+      matchState.players[i].points += event.points[i];
+    }
   }
 
   if (event.kind === TickEventKind.turnEnd) {
-    matchState.turn = matchState.turn === 1 ? 2 : 1;
+    // recall: we index turns from 1
+    const numPlayers = 2;
+    matchState.turn = (matchState.turn % numPlayers) + 1;
     return;
   }
 
   if (event.kind === TickEventKind.roundEnd) {
     // reset scores
-    matchState.player1Score = 0;
-    matchState.player2Score = 0;
+    for (const i in matchState.players) {
+      matchState.players[i].score = 0;
+    }
   }
 }

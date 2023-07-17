@@ -1,5 +1,5 @@
-import { genDiceRolls } from '@dice/game-logic';
-import type { MatchState } from '@dice/utils';
+import { genDiceRolls, getTurnPlayer } from '@dice/game-logic';
+import { PRACTICE_BOT_NFT_ID, type MatchState } from '@dice/utils';
 import type Prando from 'paima-sdk/paima-prando';
 
 //
@@ -19,9 +19,10 @@ export class PracticeAI {
   // Return next move
   // Return null to not send next move.
   public getNextMove(): boolean {
-    const score =
-      this.matchState.turn === 1 ? this.matchState.player1Score : this.matchState.player2Score;
-    const diceRolls = genDiceRolls(score, this.randomnessGenerator);
+    const me = getTurnPlayer(this.matchState);
+    if (me.nftId !== PRACTICE_BOT_NFT_ID)
+      throw new Error(`getNextMove: bot move for non-bot player`);
+    const diceRolls = genDiceRolls(me.score, this.randomnessGenerator);
     return diceRolls.finalScore < 19;
   }
 }

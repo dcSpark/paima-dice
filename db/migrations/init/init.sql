@@ -14,20 +14,12 @@ CREATE TABLE lobbies (
   play_time_per_player INTEGER NOT NULL,
   current_round INTEGER NOT NULL DEFAULT 0,
   initial_random_seed TEXT NOT NULL,
-  -- TODO: support multiple players
-  player_one_points INTEGER NOT NULL DEFAULT 0,
-  player_two_points INTEGER NOT NULL DEFAULT 0,
-  player_one_score INTEGER NOT NULL DEFAULT 0,
-  player_two_score INTEGER NOT NULL DEFAULT 0,
   turn INTEGER NOT NULL DEFAULT 1,
   created_at TIMESTAMP NOT NULL,
   creation_block_height INTEGER NOT NULL,
   hidden BOOLEAN NOT NULL DEFAULT false,
   practice BOOLEAN NOT NULL DEFAULT false,
   lobby_creator INTEGER NOT NULL,
-  -- TODO: support multiple players
-  player_one_iswhite BOOLEAN NOT NULL,
-  player_two INTEGER,
   lobby_state lobby_status NOT NULL
 );
 
@@ -40,18 +32,7 @@ CREATE TABLE rounds(
 );
 
 CREATE TYPE match_result AS ENUM ('win', 'tie', 'loss');
-CREATE TABLE final_match_state (
-   lobby_id TEXT NOT NULL references lobbies(lobby_id),
-   -- TODO: support multiple players
-   player_one_iswhite BOOLEAN NOT NULL,
-   player_one_nft_id INTEGER NOT NULL,
-   player_one_result match_result NOT NULL,
-   player_one_elapsed_time INTEGER NOT NULL,
-   player_two_nft_id INTEGER NOT NULL,
-   player_two_result match_result NOT NULL,
-   player_two_elapsed_time INTEGER NOT NULL,
-   UNIQUE (lobby_id)
-);
+
 CREATE TABLE match_moves (
    id SERIAL PRIMARY KEY,
    lobby_id TEXT NOT NULL references lobbies(lobby_id),
@@ -67,6 +48,16 @@ CREATE TABLE global_user_state (
   ties INTEGER NOT NULL DEFAULT 0
 );
 
+CREATE TABLE lobby_player (
+  id SERIAL PRIMARY KEY,
+  lobby_id TEXT NOT NULL references lobbies(lobby_id),
+  -- TODO: should ref global_user_state, but bot does not have an entry
+  nft_id INTEGER NOT NULL,
+  points INTEGER NOT NULL DEFAULT 0,
+  score INTEGER NOT NULL DEFAULT 0,
+  turn INTEGER,
+  UNIQUE (lobby_id, nft_id)
+);
 
 CREATE FUNCTION update_lobby_round() RETURNS TRIGGER AS $$
 BEGIN

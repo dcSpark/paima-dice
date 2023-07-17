@@ -1,19 +1,5 @@
 /* @name getPaginatedOpenLobbies */
-SELECT 
-lobbies.lobby_id,
-lobbies.num_of_rounds,
-lobbies.round_length,
-lobbies.play_time_per_player,
-lobbies.current_round,
-lobbies.initial_random_seed,
-lobbies.player_one_points,
-lobbies.player_two_points,
-lobbies.created_at,
-lobbies.creation_block_height,
-lobbies.hidden,
-lobbies.lobby_creator,
-lobbies.player_one_iswhite,
-lobbies.lobby_state
+SELECT *
 FROM lobbies
 WHERE lobbies.lobby_state = 'open' AND lobbies.hidden IS FALSE AND lobbies.lobby_creator != :nft_id
 ORDER BY created_at DESC
@@ -21,21 +7,7 @@ LIMIT :count
 OFFSET :page;
 
 /* @name searchPaginatedOpenLobbies */
-SELECT 
-lobbies.lobby_id,
-lobbies.num_of_rounds,
-lobbies.round_length,
-lobbies.play_time_per_player,
-lobbies.current_round,
-lobbies.initial_random_seed,
-lobbies.player_one_points,
-lobbies.player_two_points,
-lobbies.created_at,
-lobbies.creation_block_height,
-lobbies.hidden,
-lobbies.lobby_creator,
-lobbies.player_one_iswhite,
-lobbies.lobby_state
+SELECT *
 FROM lobbies
 WHERE lobbies.lobby_state = 'open' AND lobbies.hidden IS FALSE AND lobbies.lobby_creator != :nft_id AND lobbies.lobby_id LIKE :searchQuery
 ORDER BY created_at DESC
@@ -43,40 +15,17 @@ LIMIT :count
 OFFSET :page;
 
 /* @name getOpenLobbyById */
-SELECT 
-lobbies.lobby_id,
-lobbies.num_of_rounds,
-lobbies.round_length,
-lobbies.play_time_per_player,
-lobbies.current_round,
-lobbies.initial_random_seed,
-lobbies.player_one_points,
-lobbies.player_two_points,
-lobbies.created_at,
-lobbies.creation_block_height,
-lobbies.hidden,
-lobbies.lobby_creator,
-lobbies.player_one_iswhite,
-lobbies.lobby_state
+SELECT *
 FROM lobbies
 WHERE lobbies.lobby_state = 'open' AND lobbies.lobby_id = :searchQuery AND lobbies.lobby_creator != :nft_id;
 
+/* @name getLobbyPlayers */
+SELECT *
+FROM lobby_player
+WHERE lobby_player.lobby_id = :lobby_id!;
+
 /* @name getRandomLobby */
-SELECT
-lobbies.lobby_id,
-lobbies.num_of_rounds,
-lobbies.round_length,
-lobbies.play_time_per_player,
-lobbies.current_round,
-lobbies.initial_random_seed,
-lobbies.player_one_points,
-lobbies.player_two_points,
-lobbies.created_at,
-lobbies.creation_block_height,
-lobbies.hidden,
-lobbies.lobby_creator,
-lobbies.player_one_iswhite,
-lobbies.lobby_state
+SELECT *
 FROM lobbies
 WHERE random() < 0.1
 AND lobbies.lobby_state = 'open' AND lobbies.hidden is FALSE
@@ -89,31 +38,39 @@ AND lobbies.lobby_state = 'active'
 LIMIT 1;
 
 /* @name getUserLobbies */
-SELECT * FROM lobbies
+SELECT lobbies.*
+FROM lobbies JOIN lobby_player
+  ON lobbies.lobby_id = lobby_player.lobby_id
 WHERE lobbies.lobby_state != 'finished'
 AND lobbies.lobby_state != 'closed'
-AND (lobbies.lobby_creator = :nft_id
-OR lobbies.player_two = :nft_id)
+AND lobby_player.nft_id = :nft_id!
 ORDER BY created_at DESC;
 
 /* @name getPaginatedUserLobbies */
-SELECT * FROM lobbies
-WHERE lobbies.lobby_state != 'finished'
-AND lobbies.lobby_state != 'closed'
-AND (lobbies.lobby_creator = :nft_id
-OR lobbies.player_two = :nft_id)
+SELECT lobbies.*
+FROM lobbies JOIN lobby_player
+  ON lobbies.lobby_id = lobby_player.lobby_id
+WHERE 
+  lobbies.lobby_state != 'finished' AND
+  lobbies.lobby_state != 'closed' AND
+  lobby_player.nft_id = :nft_id!
+GROUP BY lobbies.lobby_id
 ORDER BY created_at DESC
 LIMIT :count
 OFFSET :page;
 
 /* @name getAllPaginatedUserLobbies */
-SELECT * FROM lobbies
-WHERE (lobbies.lobby_creator = :nft_id
-OR lobbies.player_two = :nft_id)
-ORDER BY lobby_state = 'active' DESC,
-         lobby_state = 'open' DESC,
-         lobby_state = 'finished' DESC,
-         created_at DESC
+SELECT lobbies.*
+FROM 
+  lobbies JOIN lobby_player
+    ON lobbies.lobby_id = lobby_player.lobby_id
+WHERE lobby_player.nft_id = :nft_id!
+GROUP BY lobbies.lobby_id
+ORDER BY 
+  lobby_state = 'active' DESC,
+  lobby_state = 'open' DESC,
+  lobby_state = 'finished' DESC,
+  created_at DESC
 LIMIT :count
 OFFSET :page;
 
@@ -134,14 +91,6 @@ SELECT global_user_state.nft_id, wins, losses, ties
 FROM global_user_state
 WHERE global_user_state.nft_id = :nft_id_1
 OR global_user_state.nft_id = :nft_id_2;
-
-
-/* @name getMatchUserStats */
-SELECT * FROM global_user_state
-INNER JOIN lobbies
-ON lobbies.lobby_creator = global_user_state.nft_id
-OR lobbies.player_two = global_user_state.nft_id
-WHERE global_user_state.nft_id = :nft_id;
 
 /* @name getRoundMoves */
 SELECT * FROM match_moves

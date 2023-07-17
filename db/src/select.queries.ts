@@ -24,10 +24,9 @@ export interface IGetPaginatedOpenLobbiesResult {
   lobby_state: lobby_status;
   num_of_rounds: number;
   play_time_per_player: number;
-  player_one_iswhite: boolean;
-  player_one_points: number;
-  player_two_points: number;
+  practice: boolean;
   round_length: number;
+  turn: number;
 }
 
 /** 'GetPaginatedOpenLobbies' query type */
@@ -36,26 +35,12 @@ export interface IGetPaginatedOpenLobbiesQuery {
   result: IGetPaginatedOpenLobbiesResult;
 }
 
-const getPaginatedOpenLobbiesIR: any = {"usedParamSet":{"nft_id":true,"count":true,"page":true},"params":[{"name":"nft_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":450,"b":456}]},{"name":"count","required":false,"transform":{"type":"scalar"},"locs":[{"a":489,"b":494}]},{"name":"page","required":false,"transform":{"type":"scalar"},"locs":[{"a":503,"b":507}]}],"statement":"SELECT \nlobbies.lobby_id,\nlobbies.num_of_rounds,\nlobbies.round_length,\nlobbies.play_time_per_player,\nlobbies.current_round,\nlobbies.initial_random_seed,\nlobbies.player_one_points,\nlobbies.player_two_points,\nlobbies.created_at,\nlobbies.creation_block_height,\nlobbies.hidden,\nlobbies.lobby_creator,\nlobbies.player_one_iswhite,\nlobbies.lobby_state\nFROM lobbies\nWHERE lobbies.lobby_state = 'open' AND lobbies.hidden IS FALSE AND lobbies.lobby_creator != :nft_id\nORDER BY created_at DESC\nLIMIT :count\nOFFSET :page"};
+const getPaginatedOpenLobbiesIR: any = {"usedParamSet":{"nft_id":true,"count":true,"page":true},"params":[{"name":"nft_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":114,"b":120}]},{"name":"count","required":false,"transform":{"type":"scalar"},"locs":[{"a":153,"b":158}]},{"name":"page","required":false,"transform":{"type":"scalar"},"locs":[{"a":167,"b":171}]}],"statement":"SELECT *\nFROM lobbies\nWHERE lobbies.lobby_state = 'open' AND lobbies.hidden IS FALSE AND lobbies.lobby_creator != :nft_id\nORDER BY created_at DESC\nLIMIT :count\nOFFSET :page"};
 
 /**
  * Query generated from SQL:
  * ```
- * SELECT 
- * lobbies.lobby_id,
- * lobbies.num_of_rounds,
- * lobbies.round_length,
- * lobbies.play_time_per_player,
- * lobbies.current_round,
- * lobbies.initial_random_seed,
- * lobbies.player_one_points,
- * lobbies.player_two_points,
- * lobbies.created_at,
- * lobbies.creation_block_height,
- * lobbies.hidden,
- * lobbies.lobby_creator,
- * lobbies.player_one_iswhite,
- * lobbies.lobby_state
+ * SELECT *
  * FROM lobbies
  * WHERE lobbies.lobby_state = 'open' AND lobbies.hidden IS FALSE AND lobbies.lobby_creator != :nft_id
  * ORDER BY created_at DESC
@@ -86,10 +71,9 @@ export interface ISearchPaginatedOpenLobbiesResult {
   lobby_state: lobby_status;
   num_of_rounds: number;
   play_time_per_player: number;
-  player_one_iswhite: boolean;
-  player_one_points: number;
-  player_two_points: number;
+  practice: boolean;
   round_length: number;
+  turn: number;
 }
 
 /** 'SearchPaginatedOpenLobbies' query type */
@@ -98,26 +82,12 @@ export interface ISearchPaginatedOpenLobbiesQuery {
   result: ISearchPaginatedOpenLobbiesResult;
 }
 
-const searchPaginatedOpenLobbiesIR: any = {"usedParamSet":{"nft_id":true,"searchQuery":true,"count":true,"page":true},"params":[{"name":"nft_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":450,"b":456}]},{"name":"searchQuery","required":false,"transform":{"type":"scalar"},"locs":[{"a":484,"b":495}]},{"name":"count","required":false,"transform":{"type":"scalar"},"locs":[{"a":528,"b":533}]},{"name":"page","required":false,"transform":{"type":"scalar"},"locs":[{"a":542,"b":546}]}],"statement":"SELECT \nlobbies.lobby_id,\nlobbies.num_of_rounds,\nlobbies.round_length,\nlobbies.play_time_per_player,\nlobbies.current_round,\nlobbies.initial_random_seed,\nlobbies.player_one_points,\nlobbies.player_two_points,\nlobbies.created_at,\nlobbies.creation_block_height,\nlobbies.hidden,\nlobbies.lobby_creator,\nlobbies.player_one_iswhite,\nlobbies.lobby_state\nFROM lobbies\nWHERE lobbies.lobby_state = 'open' AND lobbies.hidden IS FALSE AND lobbies.lobby_creator != :nft_id AND lobbies.lobby_id LIKE :searchQuery\nORDER BY created_at DESC\nLIMIT :count\nOFFSET :page"};
+const searchPaginatedOpenLobbiesIR: any = {"usedParamSet":{"nft_id":true,"searchQuery":true,"count":true,"page":true},"params":[{"name":"nft_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":114,"b":120}]},{"name":"searchQuery","required":false,"transform":{"type":"scalar"},"locs":[{"a":148,"b":159}]},{"name":"count","required":false,"transform":{"type":"scalar"},"locs":[{"a":192,"b":197}]},{"name":"page","required":false,"transform":{"type":"scalar"},"locs":[{"a":206,"b":210}]}],"statement":"SELECT *\nFROM lobbies\nWHERE lobbies.lobby_state = 'open' AND lobbies.hidden IS FALSE AND lobbies.lobby_creator != :nft_id AND lobbies.lobby_id LIKE :searchQuery\nORDER BY created_at DESC\nLIMIT :count\nOFFSET :page"};
 
 /**
  * Query generated from SQL:
  * ```
- * SELECT 
- * lobbies.lobby_id,
- * lobbies.num_of_rounds,
- * lobbies.round_length,
- * lobbies.play_time_per_player,
- * lobbies.current_round,
- * lobbies.initial_random_seed,
- * lobbies.player_one_points,
- * lobbies.player_two_points,
- * lobbies.created_at,
- * lobbies.creation_block_height,
- * lobbies.hidden,
- * lobbies.lobby_creator,
- * lobbies.player_one_iswhite,
- * lobbies.lobby_state
+ * SELECT *
  * FROM lobbies
  * WHERE lobbies.lobby_state = 'open' AND lobbies.hidden IS FALSE AND lobbies.lobby_creator != :nft_id AND lobbies.lobby_id LIKE :searchQuery
  * ORDER BY created_at DESC
@@ -146,10 +116,9 @@ export interface IGetOpenLobbyByIdResult {
   lobby_state: lobby_status;
   num_of_rounds: number;
   play_time_per_player: number;
-  player_one_iswhite: boolean;
-  player_one_points: number;
-  player_two_points: number;
+  practice: boolean;
   round_length: number;
+  turn: number;
 }
 
 /** 'GetOpenLobbyById' query type */
@@ -158,31 +127,51 @@ export interface IGetOpenLobbyByIdQuery {
   result: IGetOpenLobbyByIdResult;
 }
 
-const getOpenLobbyByIdIR: any = {"usedParamSet":{"searchQuery":true,"nft_id":true},"params":[{"name":"searchQuery","required":false,"transform":{"type":"scalar"},"locs":[{"a":416,"b":427}]},{"name":"nft_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":458,"b":464}]}],"statement":"SELECT \nlobbies.lobby_id,\nlobbies.num_of_rounds,\nlobbies.round_length,\nlobbies.play_time_per_player,\nlobbies.current_round,\nlobbies.initial_random_seed,\nlobbies.player_one_points,\nlobbies.player_two_points,\nlobbies.created_at,\nlobbies.creation_block_height,\nlobbies.hidden,\nlobbies.lobby_creator,\nlobbies.player_one_iswhite,\nlobbies.lobby_state\nFROM lobbies\nWHERE lobbies.lobby_state = 'open' AND lobbies.lobby_id = :searchQuery AND lobbies.lobby_creator != :nft_id"};
+const getOpenLobbyByIdIR: any = {"usedParamSet":{"searchQuery":true,"nft_id":true},"params":[{"name":"searchQuery","required":false,"transform":{"type":"scalar"},"locs":[{"a":80,"b":91}]},{"name":"nft_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":122,"b":128}]}],"statement":"SELECT *\nFROM lobbies\nWHERE lobbies.lobby_state = 'open' AND lobbies.lobby_id = :searchQuery AND lobbies.lobby_creator != :nft_id"};
 
 /**
  * Query generated from SQL:
  * ```
- * SELECT 
- * lobbies.lobby_id,
- * lobbies.num_of_rounds,
- * lobbies.round_length,
- * lobbies.play_time_per_player,
- * lobbies.current_round,
- * lobbies.initial_random_seed,
- * lobbies.player_one_points,
- * lobbies.player_two_points,
- * lobbies.created_at,
- * lobbies.creation_block_height,
- * lobbies.hidden,
- * lobbies.lobby_creator,
- * lobbies.player_one_iswhite,
- * lobbies.lobby_state
+ * SELECT *
  * FROM lobbies
  * WHERE lobbies.lobby_state = 'open' AND lobbies.lobby_id = :searchQuery AND lobbies.lobby_creator != :nft_id
  * ```
  */
 export const getOpenLobbyById = new PreparedQuery<IGetOpenLobbyByIdParams,IGetOpenLobbyByIdResult>(getOpenLobbyByIdIR);
+
+
+/** 'GetLobbyPlayers' parameters type */
+export interface IGetLobbyPlayersParams {
+  lobby_id: string;
+}
+
+/** 'GetLobbyPlayers' return type */
+export interface IGetLobbyPlayersResult {
+  id: number;
+  lobby_id: string;
+  nft_id: number;
+  points: number;
+  score: number;
+  turn: number | null;
+}
+
+/** 'GetLobbyPlayers' query type */
+export interface IGetLobbyPlayersQuery {
+  params: IGetLobbyPlayersParams;
+  result: IGetLobbyPlayersResult;
+}
+
+const getLobbyPlayersIR: any = {"usedParamSet":{"lobby_id":true},"params":[{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":57,"b":66}]}],"statement":"SELECT *\nFROM lobby_player\nWHERE lobby_player.lobby_id = :lobby_id!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT *
+ * FROM lobby_player
+ * WHERE lobby_player.lobby_id = :lobby_id!
+ * ```
+ */
+export const getLobbyPlayers = new PreparedQuery<IGetLobbyPlayersParams,IGetLobbyPlayersResult>(getLobbyPlayersIR);
 
 
 /** 'GetRandomLobby' parameters type */
@@ -200,10 +189,9 @@ export interface IGetRandomLobbyResult {
   lobby_state: lobby_status;
   num_of_rounds: number;
   play_time_per_player: number;
-  player_one_iswhite: boolean;
-  player_one_points: number;
-  player_two_points: number;
+  practice: boolean;
   round_length: number;
+  turn: number;
 }
 
 /** 'GetRandomLobby' query type */
@@ -212,26 +200,12 @@ export interface IGetRandomLobbyQuery {
   result: IGetRandomLobbyResult;
 }
 
-const getRandomLobbyIR: any = {"usedParamSet":{},"params":[],"statement":"SELECT\nlobbies.lobby_id,\nlobbies.num_of_rounds,\nlobbies.round_length,\nlobbies.play_time_per_player,\nlobbies.current_round,\nlobbies.initial_random_seed,\nlobbies.player_one_points,\nlobbies.player_two_points,\nlobbies.created_at,\nlobbies.creation_block_height,\nlobbies.hidden,\nlobbies.lobby_creator,\nlobbies.player_one_iswhite,\nlobbies.lobby_state\nFROM lobbies\nWHERE random() < 0.1\nAND lobbies.lobby_state = 'open' AND lobbies.hidden is FALSE\nLIMIT 1"};
+const getRandomLobbyIR: any = {"usedParamSet":{},"params":[],"statement":"SELECT *\nFROM lobbies\nWHERE random() < 0.1\nAND lobbies.lobby_state = 'open' AND lobbies.hidden is FALSE\nLIMIT 1"};
 
 /**
  * Query generated from SQL:
  * ```
- * SELECT
- * lobbies.lobby_id,
- * lobbies.num_of_rounds,
- * lobbies.round_length,
- * lobbies.play_time_per_player,
- * lobbies.current_round,
- * lobbies.initial_random_seed,
- * lobbies.player_one_points,
- * lobbies.player_two_points,
- * lobbies.created_at,
- * lobbies.creation_block_height,
- * lobbies.hidden,
- * lobbies.lobby_creator,
- * lobbies.player_one_iswhite,
- * lobbies.lobby_state
+ * SELECT *
  * FROM lobbies
  * WHERE random() < 0.1
  * AND lobbies.lobby_state = 'open' AND lobbies.hidden is FALSE
@@ -256,12 +230,6 @@ export interface IGetRandomActiveLobbyResult {
   lobby_state: lobby_status;
   num_of_rounds: number;
   play_time_per_player: number;
-  player_one_iswhite: boolean;
-  player_one_points: number;
-  player_one_score: number;
-  player_two: number | null;
-  player_two_points: number;
-  player_two_score: number;
   practice: boolean;
   round_length: number;
   turn: number;
@@ -289,7 +257,7 @@ export const getRandomActiveLobby = new PreparedQuery<IGetRandomActiveLobbyParam
 
 /** 'GetUserLobbies' parameters type */
 export interface IGetUserLobbiesParams {
-  nft_id: number | null | void;
+  nft_id: number;
 }
 
 /** 'GetUserLobbies' return type */
@@ -304,12 +272,6 @@ export interface IGetUserLobbiesResult {
   lobby_state: lobby_status;
   num_of_rounds: number;
   play_time_per_player: number;
-  player_one_iswhite: boolean;
-  player_one_points: number;
-  player_one_score: number;
-  player_two: number | null;
-  player_two_points: number;
-  player_two_score: number;
   practice: boolean;
   round_length: number;
   turn: number;
@@ -321,16 +283,17 @@ export interface IGetUserLobbiesQuery {
   result: IGetUserLobbiesResult;
 }
 
-const getUserLobbiesIR: any = {"usedParamSet":{"nft_id":true},"params":[{"name":"nft_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":127,"b":133},{"a":159,"b":165}]}],"statement":"SELECT * FROM lobbies\nWHERE lobbies.lobby_state != 'finished'\nAND lobbies.lobby_state != 'closed'\nAND (lobbies.lobby_creator = :nft_id\nOR lobbies.player_two = :nft_id)\nORDER BY created_at DESC"};
+const getUserLobbiesIR: any = {"usedParamSet":{"nft_id":true},"params":[{"name":"nft_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":196,"b":203}]}],"statement":"SELECT lobbies.*\nFROM lobbies JOIN lobby_player\n  ON lobbies.lobby_id = lobby_player.lobby_id\nWHERE lobbies.lobby_state != 'finished'\nAND lobbies.lobby_state != 'closed'\nAND lobby_player.nft_id = :nft_id!\nORDER BY created_at DESC"};
 
 /**
  * Query generated from SQL:
  * ```
- * SELECT * FROM lobbies
+ * SELECT lobbies.*
+ * FROM lobbies JOIN lobby_player
+ *   ON lobbies.lobby_id = lobby_player.lobby_id
  * WHERE lobbies.lobby_state != 'finished'
  * AND lobbies.lobby_state != 'closed'
- * AND (lobbies.lobby_creator = :nft_id
- * OR lobbies.player_two = :nft_id)
+ * AND lobby_player.nft_id = :nft_id!
  * ORDER BY created_at DESC
  * ```
  */
@@ -340,7 +303,7 @@ export const getUserLobbies = new PreparedQuery<IGetUserLobbiesParams,IGetUserLo
 /** 'GetPaginatedUserLobbies' parameters type */
 export interface IGetPaginatedUserLobbiesParams {
   count: string | null | void;
-  nft_id: number | null | void;
+  nft_id: number;
   page: string | null | void;
 }
 
@@ -356,12 +319,6 @@ export interface IGetPaginatedUserLobbiesResult {
   lobby_state: lobby_status;
   num_of_rounds: number;
   play_time_per_player: number;
-  player_one_iswhite: boolean;
-  player_one_points: number;
-  player_one_score: number;
-  player_two: number | null;
-  player_two_points: number;
-  player_two_score: number;
   practice: boolean;
   round_length: number;
   turn: number;
@@ -373,16 +330,19 @@ export interface IGetPaginatedUserLobbiesQuery {
   result: IGetPaginatedUserLobbiesResult;
 }
 
-const getPaginatedUserLobbiesIR: any = {"usedParamSet":{"nft_id":true,"count":true,"page":true},"params":[{"name":"nft_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":127,"b":133},{"a":159,"b":165}]},{"name":"count","required":false,"transform":{"type":"scalar"},"locs":[{"a":199,"b":204}]},{"name":"page","required":false,"transform":{"type":"scalar"},"locs":[{"a":213,"b":217}]}],"statement":"SELECT * FROM lobbies\nWHERE lobbies.lobby_state != 'finished'\nAND lobbies.lobby_state != 'closed'\nAND (lobbies.lobby_creator = :nft_id\nOR lobbies.player_two = :nft_id)\nORDER BY created_at DESC\nLIMIT :count\nOFFSET :page"};
+const getPaginatedUserLobbiesIR: any = {"usedParamSet":{"nft_id":true,"count":true,"page":true},"params":[{"name":"nft_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":203,"b":210}]},{"name":"count","required":false,"transform":{"type":"scalar"},"locs":[{"a":269,"b":274}]},{"name":"page","required":false,"transform":{"type":"scalar"},"locs":[{"a":283,"b":287}]}],"statement":"SELECT lobbies.*\nFROM lobbies JOIN lobby_player\n  ON lobbies.lobby_id = lobby_player.lobby_id\nWHERE \n  lobbies.lobby_state != 'finished' AND\n  lobbies.lobby_state != 'closed' AND\n  lobby_player.nft_id = :nft_id!\nGROUP BY lobbies.lobby_id\nORDER BY created_at DESC\nLIMIT :count\nOFFSET :page"};
 
 /**
  * Query generated from SQL:
  * ```
- * SELECT * FROM lobbies
- * WHERE lobbies.lobby_state != 'finished'
- * AND lobbies.lobby_state != 'closed'
- * AND (lobbies.lobby_creator = :nft_id
- * OR lobbies.player_two = :nft_id)
+ * SELECT lobbies.*
+ * FROM lobbies JOIN lobby_player
+ *   ON lobbies.lobby_id = lobby_player.lobby_id
+ * WHERE 
+ *   lobbies.lobby_state != 'finished' AND
+ *   lobbies.lobby_state != 'closed' AND
+ *   lobby_player.nft_id = :nft_id!
+ * GROUP BY lobbies.lobby_id
  * ORDER BY created_at DESC
  * LIMIT :count
  * OFFSET :page
@@ -394,7 +354,7 @@ export const getPaginatedUserLobbies = new PreparedQuery<IGetPaginatedUserLobbie
 /** 'GetAllPaginatedUserLobbies' parameters type */
 export interface IGetAllPaginatedUserLobbiesParams {
   count: string | null | void;
-  nft_id: number | null | void;
+  nft_id: number;
   page: string | null | void;
 }
 
@@ -410,12 +370,6 @@ export interface IGetAllPaginatedUserLobbiesResult {
   lobby_state: lobby_status;
   num_of_rounds: number;
   play_time_per_player: number;
-  player_one_iswhite: boolean;
-  player_one_points: number;
-  player_one_score: number;
-  player_two: number | null;
-  player_two_points: number;
-  player_two_score: number;
   practice: boolean;
   round_length: number;
   turn: number;
@@ -427,18 +381,22 @@ export interface IGetAllPaginatedUserLobbiesQuery {
   result: IGetAllPaginatedUserLobbiesResult;
 }
 
-const getAllPaginatedUserLobbiesIR: any = {"usedParamSet":{"nft_id":true,"count":true,"page":true},"params":[{"name":"nft_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":53,"b":59},{"a":85,"b":91}]},{"name":"count","required":false,"transform":{"type":"scalar"},"locs":[{"a":239,"b":244}]},{"name":"page","required":false,"transform":{"type":"scalar"},"locs":[{"a":253,"b":257}]}],"statement":"SELECT * FROM lobbies\nWHERE (lobbies.lobby_creator = :nft_id\nOR lobbies.player_two = :nft_id)\nORDER BY lobby_state = 'active' DESC,\n         lobby_state = 'open' DESC,\n         lobby_state = 'finished' DESC,\n         created_at DESC\nLIMIT :count\nOFFSET :page"};
+const getAllPaginatedUserLobbiesIR: any = {"usedParamSet":{"nft_id":true,"count":true,"page":true},"params":[{"name":"nft_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":127,"b":134}]},{"name":"count","required":false,"transform":{"type":"scalar"},"locs":[{"a":289,"b":294}]},{"name":"page","required":false,"transform":{"type":"scalar"},"locs":[{"a":303,"b":307}]}],"statement":"SELECT lobbies.*\nFROM \n  lobbies JOIN lobby_player\n    ON lobbies.lobby_id = lobby_player.lobby_id\nWHERE lobby_player.nft_id = :nft_id!\nGROUP BY lobbies.lobby_id\nORDER BY \n  lobby_state = 'active' DESC,\n  lobby_state = 'open' DESC,\n  lobby_state = 'finished' DESC,\n  created_at DESC\nLIMIT :count\nOFFSET :page"};
 
 /**
  * Query generated from SQL:
  * ```
- * SELECT * FROM lobbies
- * WHERE (lobbies.lobby_creator = :nft_id
- * OR lobbies.player_two = :nft_id)
- * ORDER BY lobby_state = 'active' DESC,
- *          lobby_state = 'open' DESC,
- *          lobby_state = 'finished' DESC,
- *          created_at DESC
+ * SELECT lobbies.*
+ * FROM 
+ *   lobbies JOIN lobby_player
+ *     ON lobbies.lobby_id = lobby_player.lobby_id
+ * WHERE lobby_player.nft_id = :nft_id!
+ * GROUP BY lobbies.lobby_id
+ * ORDER BY 
+ *   lobby_state = 'active' DESC,
+ *   lobby_state = 'open' DESC,
+ *   lobby_state = 'finished' DESC,
+ *   created_at DESC
  * LIMIT :count
  * OFFSET :page
  * ```
@@ -461,12 +419,6 @@ export interface IGetActiveLobbiesResult {
   lobby_state: lobby_status;
   num_of_rounds: number;
   play_time_per_player: number;
-  player_one_iswhite: boolean;
-  player_one_points: number;
-  player_one_score: number;
-  player_two: number | null;
-  player_two_points: number;
-  player_two_score: number;
   practice: boolean;
   round_length: number;
   turn: number;
@@ -507,12 +459,6 @@ export interface IGetLobbyByIdResult {
   lobby_state: lobby_status;
   num_of_rounds: number;
   play_time_per_player: number;
-  player_one_iswhite: boolean;
-  player_one_points: number;
-  player_one_score: number;
-  player_two: number | null;
-  player_two_points: number;
-  player_two_score: number;
   practice: boolean;
   round_length: number;
   turn: number;
@@ -599,59 +545,6 @@ const getBothUserStatsIR: any = {"usedParamSet":{"nft_id_1":true,"nft_id_2":true
  * ```
  */
 export const getBothUserStats = new PreparedQuery<IGetBothUserStatsParams,IGetBothUserStatsResult>(getBothUserStatsIR);
-
-
-/** 'GetMatchUserStats' parameters type */
-export interface IGetMatchUserStatsParams {
-  nft_id: number | null | void;
-}
-
-/** 'GetMatchUserStats' return type */
-export interface IGetMatchUserStatsResult {
-  created_at: Date;
-  creation_block_height: number;
-  current_round: number;
-  hidden: boolean;
-  initial_random_seed: string;
-  lobby_creator: number;
-  lobby_id: string;
-  lobby_state: lobby_status;
-  losses: number;
-  nft_id: number;
-  num_of_rounds: number;
-  play_time_per_player: number;
-  player_one_iswhite: boolean;
-  player_one_points: number;
-  player_one_score: number;
-  player_two: number | null;
-  player_two_points: number;
-  player_two_score: number;
-  practice: boolean;
-  round_length: number;
-  ties: number;
-  turn: number;
-  wins: number;
-}
-
-/** 'GetMatchUserStats' query type */
-export interface IGetMatchUserStatsQuery {
-  params: IGetMatchUserStatsParams;
-  result: IGetMatchUserStatsResult;
-}
-
-const getMatchUserStatsIR: any = {"usedParamSet":{"nft_id":true},"params":[{"name":"nft_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":185,"b":191}]}],"statement":"SELECT * FROM global_user_state\nINNER JOIN lobbies\nON lobbies.lobby_creator = global_user_state.nft_id\nOR lobbies.player_two = global_user_state.nft_id\nWHERE global_user_state.nft_id = :nft_id"};
-
-/**
- * Query generated from SQL:
- * ```
- * SELECT * FROM global_user_state
- * INNER JOIN lobbies
- * ON lobbies.lobby_creator = global_user_state.nft_id
- * OR lobbies.player_two = global_user_state.nft_id
- * WHERE global_user_state.nft_id = :nft_id
- * ```
- */
-export const getMatchUserStats = new PreparedQuery<IGetMatchUserStatsParams,IGetMatchUserStatsResult>(getMatchUserStatsIR);
 
 
 /** 'GetRoundMoves' parameters type */

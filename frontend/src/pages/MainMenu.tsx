@@ -85,21 +85,7 @@ const HasNFTMenu = () => {
     <>
       <Button
         sx={(theme) => ({ backgroundColor: theme.palette.menuButton.main })}
-        // onClick={() => navigate(Page.CreateLobby)}
-        onClick={async () => {
-          // Creating a lobby is temporarily here, because none of the options are implemented properly
-          // so it makes no sense to have a separate page to create a lobby.
-          // Note: the number values are not going to be used, hidden lobbies aren't implemented
-          // and AI doesn't work on oasis chain because it scheduled inputs don't work there.
-          await mainController.createLobby(
-            selectedNft,
-            10,
-            100,
-            100,
-            false,
-            false
-          );
-        }}
+        onClick={() => navigate(Page.CreateLobby)}
       >
         Create
       </Button>
