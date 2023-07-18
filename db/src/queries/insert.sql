@@ -3,6 +3,7 @@
 */
 INSERT INTO lobbies(
   lobby_id,
+  max_players,
   num_of_rounds,
   round_length,
   play_time_per_player,
@@ -17,6 +18,7 @@ INSERT INTO lobbies(
 )
 VALUES(
   :lobby_id!,
+  :max_players!,
   :num_of_rounds!,
   :round_length!,
   :play_time_per_player!,

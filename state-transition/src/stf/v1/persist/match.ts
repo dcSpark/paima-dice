@@ -13,6 +13,15 @@ import { scheduleZombieRound } from './zombie.js';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
 import { updateLobby, type IUpdateLobbyParams } from '@dice/db/src/update.queries.js';
 
+export function persistInitialMatchState(
+  lobbyId: string,
+  roundLength: number,
+  blockHeight: number
+): SQLUpdate[] {
+  const newRoundTuples = persistNewRound(lobbyId, 0, roundLength, blockHeight);
+  return newRoundTuples;
+}
+
 // This function inserts a new empty round in the database.
 // We also schedule a future zombie round execution.
 export function persistNewRound(

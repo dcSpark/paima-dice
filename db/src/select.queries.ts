@@ -20,6 +20,7 @@ export interface IGetPaginatedOpenLobbiesResult {
   lobby_creator: number;
   lobby_id: string;
   lobby_state: lobby_status;
+  max_players: number;
   num_of_rounds: number;
   play_time_per_player: number;
   practice: boolean;
@@ -67,6 +68,7 @@ export interface ISearchPaginatedOpenLobbiesResult {
   lobby_creator: number;
   lobby_id: string;
   lobby_state: lobby_status;
+  max_players: number;
   num_of_rounds: number;
   play_time_per_player: number;
   practice: boolean;
@@ -112,6 +114,7 @@ export interface IGetOpenLobbyByIdResult {
   lobby_creator: number;
   lobby_id: string;
   lobby_state: lobby_status;
+  max_players: number;
   num_of_rounds: number;
   play_time_per_player: number;
   practice: boolean;
@@ -185,6 +188,7 @@ export interface IGetRandomLobbyResult {
   lobby_creator: number;
   lobby_id: string;
   lobby_state: lobby_status;
+  max_players: number;
   num_of_rounds: number;
   play_time_per_player: number;
   practice: boolean;
@@ -226,6 +230,7 @@ export interface IGetRandomActiveLobbyResult {
   lobby_creator: number;
   lobby_id: string;
   lobby_state: lobby_status;
+  max_players: number;
   num_of_rounds: number;
   play_time_per_player: number;
   practice: boolean;
@@ -268,6 +273,7 @@ export interface IGetUserLobbiesResult {
   lobby_creator: number;
   lobby_id: string;
   lobby_state: lobby_status;
+  max_players: number;
   num_of_rounds: number;
   play_time_per_player: number;
   practice: boolean;
@@ -315,6 +321,7 @@ export interface IGetPaginatedUserLobbiesResult {
   lobby_creator: number;
   lobby_id: string;
   lobby_state: lobby_status;
+  max_players: number;
   num_of_rounds: number;
   play_time_per_player: number;
   practice: boolean;
@@ -366,6 +373,7 @@ export interface IGetAllPaginatedUserLobbiesResult {
   lobby_creator: number;
   lobby_id: string;
   lobby_state: lobby_status;
+  max_players: number;
   num_of_rounds: number;
   play_time_per_player: number;
   practice: boolean;
@@ -415,6 +423,7 @@ export interface IGetActiveLobbiesResult {
   lobby_creator: number;
   lobby_id: string;
   lobby_state: lobby_status;
+  max_players: number;
   num_of_rounds: number;
   play_time_per_player: number;
   practice: boolean;
@@ -455,6 +464,7 @@ export interface IGetLobbyByIdResult {
   lobby_creator: number;
   lobby_id: string;
   lobby_state: lobby_status;
+  max_players: number;
   num_of_rounds: number;
   play_time_per_player: number;
   practice: boolean;

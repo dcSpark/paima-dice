@@ -30,6 +30,7 @@ import {
   persistMatchResults,
   schedulePracticeMove,
   blankStats,
+  persistActivateLobby,
 } from './persist';
 import { isValidMove } from '@dice/game-logic';
 import type {
@@ -85,12 +86,37 @@ export const joinedLobby = async (
     return [];
   }
 
+  const players = await getLobbyPlayers.run({ lobby_id: input.lobbyID }, dbConn);
+  if (lobby.lobby_state !== 'open' || players.length >= lobby.max_players) {
+    console.log('DISCARD: lobby does not accept more players');
+    return [];
+  }
+
   if (!(await checkUserOwns(player, input.nftId, dbConn))) {
     console.log('DISCARD: user does not own specified nft');
     return [];
   }
 
-  return persistLobbyJoin(blockHeight, input, lobby);
+  const joinUpdates = persistLobbyJoin({
+    lobby_id: input.lobbyID,
+    nft_id: input.nftId,
+    // TODO: index turn from 0
+    // TODO: set turns at match start
+    turn: players.length + 1,
+  });
+  const isFull = players.length + 1 >= lobby.max_players;
+
+  const closeLobbyUpdates: SQLUpdate[] = isFull
+    ? persistCloseLobby({ lobby_id: input.lobbyID })
+    : [];
+
+  // Automatically activate a lobby when it fills up.
+  // Note: this could be replaced by some input from creator.
+  const activateLobbyUpdates: SQLUpdate[] = isFull
+    ? persistActivateLobby(input.lobbyID, lobby.round_length, blockHeight)
+    : [];
+
+  return [...joinUpdates, ...closeLobbyUpdates, ...activateLobbyUpdates];
 };
 
 // State transition when a close lobby input is processed
@@ -110,10 +136,9 @@ export const closedLobby = async (
     return [];
   }
 
-  const query = persistCloseLobby(lobby);
-  if (query == null) return [];
+  const closeUpdates = persistCloseLobby(lobby);
 
-  return [query];
+  return closeUpdates;
 };
 
 // State transition when a submit moves input is processed

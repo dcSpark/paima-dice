@@ -71,6 +71,10 @@
 					"lobby_state": {
 						"$ref": "#/components/schemas/lobby_status"
 					},
+					"max_players": {
+						"type": "number",
+						"format": "double"
+					},
 					"num_of_rounds": {
 						"type": "number",
 						"format": "double"
@@ -109,6 +113,7 @@
 					"lobby_creator",
 					"lobby_id",
 					"lobby_state",
+					"max_players",
 					"num_of_rounds",
 					"play_time_per_player",
 					"practice",
@@ -168,6 +173,10 @@
 					"lobby_state": {
 						"$ref": "#/components/schemas/lobby_status"
 					},
+					"max_players": {
+						"type": "number",
+						"format": "double"
+					},
 					"num_of_rounds": {
 						"type": "number",
 						"format": "double"
@@ -197,6 +206,7 @@
 					"lobby_creator",
 					"lobby_id",
 					"lobby_state",
+					"max_players",
 					"num_of_rounds",
 					"play_time_per_player",
 					"practice",
@@ -252,6 +262,10 @@
 					"lobby_state": {
 						"$ref": "#/components/schemas/lobby_status"
 					},
+					"max_players": {
+						"type": "number",
+						"format": "double"
+					},
 					"num_of_rounds": {
 						"type": "number",
 						"format": "double"
@@ -281,6 +295,7 @@
 					"lobby_creator",
 					"lobby_id",
 					"lobby_state",
+					"max_players",
 					"num_of_rounds",
 					"play_time_per_player",
 					"practice",
@@ -338,6 +353,10 @@
 					"lobby_state": {
 						"$ref": "#/components/schemas/lobby_status"
 					},
+					"max_players": {
+						"type": "number",
+						"format": "double"
+					},
 					"num_of_rounds": {
 						"type": "number",
 						"format": "double"
@@ -367,6 +386,7 @@
 					"lobby_creator",
 					"lobby_id",
 					"lobby_state",
+					"max_players",
 					"num_of_rounds",
 					"play_time_per_player",
 					"practice",
@@ -407,6 +427,10 @@
 					"lobby_state": {
 						"$ref": "#/components/schemas/lobby_status"
 					},
+					"max_players": {
+						"type": "number",
+						"format": "double"
+					},
 					"num_of_rounds": {
 						"type": "number",
 						"format": "double"
@@ -436,6 +460,7 @@
 					"lobby_creator",
 					"lobby_id",
 					"lobby_state",
+					"max_players",
 					"num_of_rounds",
 					"play_time_per_player",
 					"practice",

@@ -18,6 +18,7 @@ export interface IStartMatchResult {
   lobby_creator: number;
   lobby_id: string;
   lobby_state: lobby_status;
+  max_players: number;
   num_of_rounds: number;
   play_time_per_player: number;
   practice: boolean;

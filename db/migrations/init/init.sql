@@ -9,6 +9,7 @@ CREATE TABLE block_heights (
 CREATE TYPE lobby_status AS ENUM ('open', 'active', 'finished', 'closed');
 CREATE TABLE lobbies (
   lobby_id TEXT PRIMARY KEY,
+  max_players INTEGER NOT NULL,
   num_of_rounds INTEGER NOT NULL,
   round_length INTEGER NOT NULL,
   play_time_per_player INTEGER NOT NULL,
@@ -55,8 +56,7 @@ CREATE TABLE lobby_player (
   nft_id INTEGER NOT NULL,
   points INTEGER NOT NULL DEFAULT 0,
   score INTEGER NOT NULL DEFAULT 0,
-  turn INTEGER,
-  UNIQUE (lobby_id, nft_id)
+  turn INTEGER
 );
 
 CREATE FUNCTION update_lobby_round() RETURNS TRIGGER AS $$
