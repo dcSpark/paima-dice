@@ -133,7 +133,3 @@ INNER JOIN block_heights
 ON block_heights.block_height = rounds.execution_block_height
 WHERE rounds.lobby_id = :lobby_id
 ORDER BY rounds.round_within_match ASC;
-
-/* @name getFinalState */
-SELECT * FROM final_match_state
-WHERE lobby_id = :lobby_id;

@@ -67,31 +67,6 @@ RETURNING *;
 INSERT INTO match_moves(lobby_id, nft_id, round, roll_again)
 VALUES :new_move;
 
-/* 
-  @name newFinalState
-  @param final_state -> (
-    lobby_id!,
-    player_one_iswhite!,
-    player_one_nft_id!,
-    player_one_result!,
-    player_one_elapsed_time!,
-    player_two_nft_id!,
-    player_two_result!,
-    player_two_elapsed_time!
-  )
-*/
-INSERT INTO final_match_state(
-  lobby_id,
-  player_one_iswhite,
-  player_one_nft_id,
-  player_one_result,
-  player_one_elapsed_time,
-  player_two_nft_id,
-  player_two_result,
-  player_two_elapsed_time
-)
-VALUES :final_state;
-
 /* @name newStats
   @param stats -> (nft_id!, wins!, losses!, ties!)
 */

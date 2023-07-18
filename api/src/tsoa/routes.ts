@@ -7,8 +7,6 @@ import { LobbyStatecontroller } from './../controllers/lobbyState';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { MatchExecutorController } from './../controllers/matchExecutor';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { MatchWinnerController } from './../controllers/matchWinner';
-// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { LobbyNFTController } from './../controllers/nfts';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { OpenLobbiesController } from './../controllers/openLobbies';
@@ -68,20 +66,6 @@ const models: TsoaRoute.Models = {
         "dataType": "refObject",
         "properties": {
             "lobby": {"dataType":"union","subSchemas":[{"ref":"LobbyState"},{"dataType":"enum","enums":[null]}],"required":true},
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "LobbyStatus": {
-        "dataType": "refAlias",
-        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["open"]},{"dataType":"enum","enums":["active"]},{"dataType":"enum","enums":["finished"]},{"dataType":"enum","enums":["closed"]}],"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "MatchWinnerResponse": {
-        "dataType": "refObject",
-        "properties": {
-            "match_status": {"ref":"LobbyStatus"},
-            "winner_nft_id": {"dataType":"union","subSchemas":[{"dataType":"undefined"},{"dataType":"double"}]},
         },
         "additionalProperties": false,
     },
@@ -241,31 +225,6 @@ export function RegisterRoutes(app: express.Router) {
                 validatedArgs = getValidatedArgs(args, request, response);
 
                 const controller = new MatchExecutorController();
-
-
-              const promise = controller.get.apply(controller, validatedArgs as any);
-              promiseHandler(controller, promise, response, undefined, next);
-            } catch (err) {
-                return next(err);
-            }
-        });
-        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-        app.get('/match_winner',
-            ...(fetchMiddlewares<RequestHandler>(MatchWinnerController)),
-            ...(fetchMiddlewares<RequestHandler>(MatchWinnerController.prototype.get)),
-
-            function MatchWinnerController_get(request: any, response: any, next: any) {
-            const args = {
-                    lobbyID: {"in":"query","name":"lobbyID","required":true,"dataType":"string"},
-            };
-
-            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = getValidatedArgs(args, request, response);
-
-                const controller = new MatchWinnerController();
 
 
               const promise = controller.get.apply(controller, validatedArgs as any);

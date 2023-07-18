@@ -3,8 +3,6 @@ import { PreparedQuery } from '@pgtyped/query';
 
 export type lobby_status = 'active' | 'closed' | 'finished' | 'open';
 
-export type match_result = 'loss' | 'tie' | 'win';
-
 /** 'GetPaginatedOpenLobbies' parameters type */
 export interface IGetPaginatedOpenLobbiesParams {
   count: string | null | void;
@@ -756,40 +754,5 @@ const getMatchSeedsIR: any = {"usedParamSet":{"lobby_id":true},"params":[{"name"
  * ```
  */
 export const getMatchSeeds = new PreparedQuery<IGetMatchSeedsParams,IGetMatchSeedsResult>(getMatchSeedsIR);
-
-
-/** 'GetFinalState' parameters type */
-export interface IGetFinalStateParams {
-  lobby_id: string | null | void;
-}
-
-/** 'GetFinalState' return type */
-export interface IGetFinalStateResult {
-  lobby_id: string;
-  player_one_elapsed_time: number;
-  player_one_iswhite: boolean;
-  player_one_nft_id: number;
-  player_one_result: match_result;
-  player_two_elapsed_time: number;
-  player_two_nft_id: number;
-  player_two_result: match_result;
-}
-
-/** 'GetFinalState' query type */
-export interface IGetFinalStateQuery {
-  params: IGetFinalStateParams;
-  result: IGetFinalStateResult;
-}
-
-const getFinalStateIR: any = {"usedParamSet":{"lobby_id":true},"params":[{"name":"lobby_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":49,"b":57}]}],"statement":"SELECT * FROM final_match_state\nWHERE lobby_id = :lobby_id"};
-
-/**
- * Query generated from SQL:
- * ```
- * SELECT * FROM final_match_state
- * WHERE lobby_id = :lobby_id
- * ```
- */
-export const getFinalState = new PreparedQuery<IGetFinalStateParams,IGetFinalStateResult>(getFinalStateIR);
 
 

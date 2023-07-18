@@ -96,14 +96,6 @@ export function backendQueryMatchExecutor(lobbyID: string): string {
   return buildBackendQuery(endpoint, options);
 }
 
-export function backendQueryMatchWinner(lobbyID: string): string {
-  const endpoint = 'match_winner';
-  const options = {
-    lobbyID,
-  };
-  return buildBackendQuery(endpoint, options);
-}
-
 export function backendQueryNftsForWallet(wallet: WalletAddress): string {
   const endpoint = 'nfts/wallet';
   const options = {

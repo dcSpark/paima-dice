@@ -3,8 +3,6 @@ import { PreparedQuery } from '@pgtyped/query';
 
 export type lobby_status = 'active' | 'closed' | 'finished' | 'open';
 
-export type match_result = 'loss' | 'tie' | 'win';
-
 /** 'CreateLobby' parameters type */
 export interface ICreateLobbyParams {
   created_at: Date;
@@ -180,50 +178,6 @@ const newMatchMoveIR: any = {"usedParamSet":{"new_move":true},"params":[{"name":
  * ```
  */
 export const newMatchMove = new PreparedQuery<INewMatchMoveParams,INewMatchMoveResult>(newMatchMoveIR);
-
-
-/** 'NewFinalState' parameters type */
-export interface INewFinalStateParams {
-  final_state: {
-    lobby_id: string,
-    player_one_iswhite: boolean,
-    player_one_nft_id: number,
-    player_one_result: match_result,
-    player_one_elapsed_time: number,
-    player_two_nft_id: number,
-    player_two_result: match_result,
-    player_two_elapsed_time: number
-  };
-}
-
-/** 'NewFinalState' return type */
-export type INewFinalStateResult = void;
-
-/** 'NewFinalState' query type */
-export interface INewFinalStateQuery {
-  params: INewFinalStateParams;
-  result: INewFinalStateResult;
-}
-
-const newFinalStateIR: any = {"usedParamSet":{"final_state":true},"params":[{"name":"final_state","required":false,"transform":{"type":"pick_tuple","keys":[{"name":"lobby_id","required":true},{"name":"player_one_iswhite","required":true},{"name":"player_one_nft_id","required":true},{"name":"player_one_result","required":true},{"name":"player_one_elapsed_time","required":true},{"name":"player_two_nft_id","required":true},{"name":"player_two_result","required":true},{"name":"player_two_elapsed_time","required":true}]},"locs":[{"a":211,"b":222}]}],"statement":"INSERT INTO final_match_state(\n  lobby_id,\n  player_one_iswhite,\n  player_one_nft_id,\n  player_one_result,\n  player_one_elapsed_time,\n  player_two_nft_id,\n  player_two_result,\n  player_two_elapsed_time\n)\nVALUES :final_state"};
-
-/**
- * Query generated from SQL:
- * ```
- * INSERT INTO final_match_state(
- *   lobby_id,
- *   player_one_iswhite,
- *   player_one_nft_id,
- *   player_one_result,
- *   player_one_elapsed_time,
- *   player_two_nft_id,
- *   player_two_result,
- *   player_two_elapsed_time
- * )
- * VALUES :final_state
- * ```
- */
-export const newFinalState = new PreparedQuery<INewFinalStateParams,INewFinalStateResult>(newFinalStateIR);
 
 
 /** 'NewStats' parameters type */

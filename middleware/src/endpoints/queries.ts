@@ -3,7 +3,6 @@ import { PaimaMiddlewareErrorCode, getBlockNumber } from 'paima-sdk/paima-mw-cor
 import type { MatchExecutor, RoundExecutor } from 'paima-sdk/paima-executors';
 
 import type {
-  MatchWinnerResponse,
   MatchExecutorData,
   RoundStatusData,
   UserStats,
@@ -19,7 +18,6 @@ import { calculateRoundEnd } from '../helpers/utility-functions';
 import { buildMatchExecutor, buildRoundExecutor } from '../helpers/executors';
 import {
   backendQueryMatchExecutor,
-  backendQueryMatchWinner,
   backendQueryNftsForWallet,
   backendQueryOpenLobbies,
   backendQueryRoundExecutor,
@@ -214,28 +212,6 @@ async function getOpenLobbies(
   }
 }
 
-async function getMatchWinner(lobbyId: string): Promise<Result<MatchWinnerResponse>> {
-  const errorFxn = buildEndpointErrorFxn('getMatchWinner');
-
-  let res: Response;
-  try {
-    const query = backendQueryMatchWinner(lobbyId);
-    res = await fetch(query);
-  } catch (err) {
-    return errorFxn(PaimaMiddlewareErrorCode.ERROR_QUERYING_BACKEND_ENDPOINT, err);
-  }
-
-  try {
-    const j = (await res.json()) as MatchWinnerResponse;
-    return {
-      success: true,
-      result: j,
-    };
-  } catch (err) {
-    return errorFxn(PaimaMiddlewareErrorCode.INVALID_RESPONSE_FROM_BACKEND, err);
-  }
-}
-
 async function getRoundExecutor(
   lobbyId: string,
   roundNumber: number,
@@ -337,7 +313,6 @@ export const queryEndpoints = {
   getOpenLobbies,
   getUserLobbiesMatches,
   getNewLobbies,
-  getMatchWinner,
   getRoundExecutor,
   getMatchExecutor,
   getNftsForWallet,
