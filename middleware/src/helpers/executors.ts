@@ -3,7 +3,13 @@ import { matchExecutor } from 'paima-sdk/paima-executors';
 import Prando from 'paima-sdk/paima-prando';
 
 import { extractMatchEnvironment, initRoundExecutor, processTick } from '@dice/game-logic';
-import type { MatchExecutorData, RoundExecutorData, MatchState, TickEvent } from '@dice/utils';
+import {
+  type MatchExecutorData,
+  type RoundExecutorData,
+  type MatchState,
+  type TickEvent,
+  genPermutation,
+} from '@dice/utils';
 
 export function buildRoundExecutor(data: RoundExecutorData): RoundExecutor<MatchState, TickEvent> {
   const seed = data.seed;
@@ -18,10 +24,12 @@ export function buildMatchExecutor({
 }: MatchExecutorData): MatchExecutor<MatchState, TickEvent> {
   console.log(seeds, 'seeds used for the match executor at the middleware');
 
+  const randomnessGenerator = new Prando(seeds[0].seed);
+  const matchTurnOrder = genPermutation(lobby.players.length, randomnessGenerator);
   const initialState: MatchState = {
-    players: lobby.players.map(player => ({
+    players: lobby.players.map((player, i) => ({
       nftId: player.nftId,
-      turn: player.turn,
+      turn: matchTurnOrder[i],
       points: 0,
       score: 0,
     })),
