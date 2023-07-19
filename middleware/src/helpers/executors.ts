@@ -19,14 +19,13 @@ export function buildMatchExecutor({
   console.log(seeds, 'seeds used for the match executor at the middleware');
 
   const initialState: MatchState = {
-    // TODO: support multiple players
     players: lobby.players.map(player => ({
       nftId: player.nftId,
       turn: player.turn,
       points: 0,
       score: 0,
     })),
-    turn: 1,
+    turn: 0,
   };
   return matchExecutor.initialize(
     extractMatchEnvironment(lobby),

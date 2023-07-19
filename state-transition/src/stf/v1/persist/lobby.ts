@@ -42,9 +42,8 @@ export function persistLobbyCreation(
   const joinParams: IJoinPlayerToLobbyParams = {
     lobby_id,
     nft_id: nftId,
-    // TODO: index turn from 0
     // TODO: set turns at match start
-    turn: playersInLobby + 1,
+    turn: playersInLobby,
   };
   const joinCreatorTuple: SQLUpdate = [joinPlayerToLobby, joinParams];
   playersInLobby++;
@@ -53,9 +52,8 @@ export function persistLobbyCreation(
   const joinBots: SQLUpdate[] = Array(numBots)
     .fill(null)
     .flatMap(() => {
-      // TODO: index turn from 0
       // TODO: set turns at match start
-      const turn = playersInLobby + 1;
+      const turn = playersInLobby;
       playersInLobby++;
       return persistLobbyJoin({
         lobby_id,

@@ -49,8 +49,7 @@ export function processTick(
   }
 
   const turnEnds = !rollEvents[rollEvents.length - 1].rollAgain;
-  // recall: we index turns from 1
-  const roundEnds = turnEnds && matchState.turn === numPlayers;
+  const roundEnds = turnEnds && matchState.turn === numPlayers - 1;
 
   const applyPointsEvents: ApplyPointsTickEvent[] = (() => {
     if (!roundEnds) return [];
@@ -109,10 +108,8 @@ export function processTick(
 export function applyEvent(matchState: MatchState, event: TickEvent): void {
   if (event.kind === TickEventKind.roll) {
     const addedScore = event.diceRolls.reduce((acc, next) => acc + next, 0);
-    matchState.players[
-      // recall: we index turns from 1
-      matchState.turn - 1
-    ].score += addedScore;
+    const turnPlayerIndex = matchState.players.findIndex(player => player.turn === matchState.turn);
+    matchState.players[turnPlayerIndex].score += addedScore;
     return;
   }
 
@@ -123,9 +120,7 @@ export function applyEvent(matchState: MatchState, event: TickEvent): void {
   }
 
   if (event.kind === TickEventKind.turnEnd) {
-    // recall: we index turns from 1
-    const numPlayers = 2;
-    matchState.turn = (matchState.turn % numPlayers) + 1;
+    matchState.turn = (matchState.turn + 1) % numPlayers;
     return;
   }
 

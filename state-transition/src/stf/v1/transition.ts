@@ -100,9 +100,8 @@ export const joinedLobby = async (
   const joinUpdates = persistLobbyJoin({
     lobby_id: input.lobbyID,
     nft_id: input.nftId,
-    // TODO: index turn from 0
     // TODO: set turns at match start
-    turn: players.length + 1,
+    turn: players.length,
   });
   const isFull = players.length + 1 >= lobby.max_players;
 

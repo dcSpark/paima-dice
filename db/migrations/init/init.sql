@@ -15,7 +15,7 @@ CREATE TABLE lobbies (
   play_time_per_player INTEGER NOT NULL,
   current_round INTEGER NOT NULL DEFAULT 0,
   initial_random_seed TEXT NOT NULL,
-  turn INTEGER NOT NULL DEFAULT 1,
+  turn INTEGER NOT NULL DEFAULT 0,
   created_at TIMESTAMP NOT NULL,
   creation_block_height INTEGER NOT NULL,
   hidden BOOLEAN NOT NULL DEFAULT false,

@@ -190,8 +190,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
           continue;
 
         if (tickEvent.kind === TickEventKind.roll) {
-          const playerRolling = displayedState.turn === 1 ? 1 : 2;
-          await diceRefs.current[playerRolling].roll(tickEvent.diceRolls);
+          await diceRefs.current[displayedState.turn].roll(tickEvent.diceRolls);
         }
         setDisplayedState((oldDisplayedState) => {
           const newDisplayedState = cloneMatchState(oldDisplayedState);
