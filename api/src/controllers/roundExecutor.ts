@@ -1,7 +1,7 @@
 import { Controller, Get, Query, Route, ValidateError } from 'tsoa';
 import { requirePool, getLobbyById, getRoundData, getRoundMoves } from '@dice/db';
 import { isLeft } from 'fp-ts/Either';
-import { psqlNum } from '../validation.js';
+import { psqlInt } from '../validation.js';
 import type { RoundExecutorBackendData } from '@dice/utils';
 import { getBlockHeight } from 'paima-sdk/paima-db';
 
@@ -15,8 +15,8 @@ interface Error {
 export class RoundExecutorController extends Controller {
   @Get()
   public async get(@Query() lobbyID: string, @Query() round: number): Promise<Response> {
-    const valRound = psqlNum.decode(round);
-    if (isLeft(valRound) || !(round > 0)) {
+    const valRound = psqlInt.decode(round);
+    if (isLeft(valRound)) {
       throw new ValidateError({ round: { message: 'invalid number' } }, '');
     }
 
@@ -26,11 +26,10 @@ export class RoundExecutorController extends Controller {
       return { error: 'lobby not found' };
     }
 
-    // null if this is first round
-    const [last_round_data] = await getRoundData.run(
-      { lobby_id: lobbyID, round_number: round - 1 },
-      pool
-    );
+    const [last_round_data] =
+      round === 0
+        ? [undefined]
+        : await getRoundData.run({ lobby_id: lobbyID, round_number: round - 1 }, pool);
 
     const [last_block_height] =
       last_round_data == null

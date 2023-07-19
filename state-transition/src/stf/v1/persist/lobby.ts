@@ -72,12 +72,7 @@ export function persistLobbyCreation(
       ? []
       : persistActivateLobby(lobby_id, lobbyParams.round_length, blockHeight);
 
-  console.log(
-    `Created lobby ${lobby_id}`,
-    joinBots.length,
-    closeLobbyUpdates.length,
-    activateLobbyUpdates.length
-  );
+  console.log(`Created lobby ${lobby_id}`);
   return [
     createLobbyTuple,
     joinCreatorTuple,

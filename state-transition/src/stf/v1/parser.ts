@@ -11,6 +11,7 @@ import type {
   UserStats,
   ZombieRound,
 } from './types';
+import { SAFE_NUMBER } from '@dice/utils';
 
 const myGrammar = `
 nftMint             = nftmint|address|tokenId
@@ -45,12 +46,12 @@ const closedLobby: ParserRecord<ClosedLobbyInput> = {
 const submittedMoves: ParserRecord<SubmittedMovesInput> = {
   nftId: PaimaParser.NumberParser(),
   lobbyID: PaimaParser.NCharsParser(12, 12),
-  roundNumber: PaimaParser.NumberParser(1, 10000),
+  roundNumber: PaimaParser.NumberParser(0, SAFE_NUMBER),
   rollAgain: PaimaParser.TrueFalseParser(),
 };
 const practiceMoves: ParserRecord<PracticeMovesInput> = {
   lobbyID: PaimaParser.NCharsParser(12, 12),
-  roundNumber: PaimaParser.NumberParser(1, 10000),
+  roundNumber: PaimaParser.NumberParser(0, SAFE_NUMBER),
 };
 const zombieScheduledData: ParserRecord<ZombieRound> = {
   renameCommand: 'scheduledData',

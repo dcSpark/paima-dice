@@ -378,7 +378,7 @@ export function executeRound(
   else {
     roundResultUpdate = persistNewRound(
       lobby.lobby_id,
-      lobby.current_round,
+      lobby.current_round + 1,
       lobby.round_length,
       blockHeight
     );
@@ -435,8 +435,7 @@ async function fetchPrandoSeed(
   lobby: IGetLobbyByIdResult,
   dbConn: Pool
 ): Promise<undefined | string> {
-  // Note: match starts at round 1, because we use persistNewRound to start it
-  if (lobby.current_round === 1) {
+  if (lobby.current_round === 0) {
     return lobby.initial_random_seed;
   }
 

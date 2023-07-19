@@ -58,18 +58,3 @@ CREATE TABLE lobby_player (
   score INTEGER NOT NULL DEFAULT 0,
   turn INTEGER
 );
-
-CREATE FUNCTION update_lobby_round() RETURNS TRIGGER AS $$
-BEGIN
-  UPDATE lobbies 
-  SET 
-  current_round = NEW.round_within_match
-  WHERE lobbies.lobby_id = NEW.lobby_id;
-  RETURN NULL;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER update_current_round
-AFTER INSERT ON rounds
-FOR EACH ROW 
-EXECUTE FUNCTION update_lobby_round();

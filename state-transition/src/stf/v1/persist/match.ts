@@ -11,7 +11,11 @@ import { newMatchMove, newRound, executedRound, updateLobbyPlayer } from '@dice/
 import type { ConciseResult, ExpandedResult, MatchState } from '@dice/utils';
 import { scheduleZombieRound } from './zombie.js';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
-import { updateLobby, type IUpdateLobbyParams } from '@dice/db/src/update.queries.js';
+import { updateLobbyTurn, updateLobbyCurrentRound } from '@dice/db/src/update.queries.js';
+import type {
+  IUpdateLobbyCurrentRoundParams,
+  IUpdateLobbyTurnParams,
+} from '@dice/db/src/update.queries.js';
 
 export function persistInitialMatchState(
   lobbyId: string,
@@ -26,24 +30,32 @@ export function persistInitialMatchState(
 // We also schedule a future zombie round execution.
 export function persistNewRound(
   lobbyId: string,
-  currentRound: number,
+  roundWithinMatch: number,
   roundLength: number,
   blockHeight: number
 ): SQLUpdate[] {
   // Creation of the next round
   const nrParams: INewRoundParams = {
     lobby_id: lobbyId,
-    round_within_match: currentRound + 1,
+    round_within_match: roundWithinMatch,
     starting_block_height: blockHeight,
     execution_block_height: null,
   };
-  const newRoundTuple: SQLUpdate = [newRound, nrParams];
+  const newRoundTuple: SQLUpdate[] = [[newRound, nrParams]];
+
+  const updateCurrentRoundParams: IUpdateLobbyCurrentRoundParams = {
+    lobby_id: lobbyId,
+    current_round: roundWithinMatch,
+  };
+  const updateCurrentRoundTuple: SQLUpdate[] = [
+    [updateLobbyCurrentRound, updateCurrentRoundParams],
+  ];
 
   // Scheduling of the zombie round execution in the future
   const zombie_block_height = blockHeight + roundLength;
   const zombieRoundUpdate: SQLUpdate = scheduleZombieRound(lobbyId, zombie_block_height);
 
-  return [newRoundTuple /* , zombieRoundUpdate TODO */];
+  return [...newRoundTuple, ...updateCurrentRoundTuple /* , zombieRoundUpdate TODO */];
 }
 
 // Persist moves sent by player to an active match
@@ -110,11 +122,11 @@ export function persistUpdateMatchState(lobbyId: string, newMatchState: MatchSta
   }));
   const playerUpdates: SQLUpdate[] = playerParams.map(param => [updateLobbyPlayer, param]);
 
-  const lobbyParams: IUpdateLobbyParams = {
+  const lobbyParams: IUpdateLobbyTurnParams = {
     lobby_id: lobbyId,
     turn: newMatchState.turn,
   };
-  const lobbyUpdates: SQLUpdate[] = [[updateLobby, lobbyParams]];
+  const lobbyUpdates: SQLUpdate[] = [[updateLobbyTurn, lobbyParams]];
 
   return [...playerUpdates, ...lobbyUpdates];
 }

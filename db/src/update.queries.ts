@@ -77,22 +77,22 @@ const closeLobbyIR: any = {"usedParamSet":{"lobby_id":true},"params":[{"name":"l
 export const closeLobby = new PreparedQuery<ICloseLobbyParams,ICloseLobbyResult>(closeLobbyIR);
 
 
-/** 'UpdateLobby' parameters type */
-export interface IUpdateLobbyParams {
+/** 'UpdateLobbyTurn' parameters type */
+export interface IUpdateLobbyTurnParams {
   lobby_id: string;
   turn: number | null | void;
 }
 
-/** 'UpdateLobby' return type */
-export type IUpdateLobbyResult = void;
+/** 'UpdateLobbyTurn' return type */
+export type IUpdateLobbyTurnResult = void;
 
-/** 'UpdateLobby' query type */
-export interface IUpdateLobbyQuery {
-  params: IUpdateLobbyParams;
-  result: IUpdateLobbyResult;
+/** 'UpdateLobbyTurn' query type */
+export interface IUpdateLobbyTurnQuery {
+  params: IUpdateLobbyTurnParams;
+  result: IUpdateLobbyTurnResult;
 }
 
-const updateLobbyIR: any = {"usedParamSet":{"turn":true,"lobby_id":true},"params":[{"name":"turn","required":false,"transform":{"type":"scalar"},"locs":[{"a":29,"b":33}]},{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":55,"b":64}]}],"statement":"UPDATE lobbies\nSET \n  turn = :turn\nWHERE \n  lobby_id = :lobby_id!"};
+const updateLobbyTurnIR: any = {"usedParamSet":{"turn":true,"lobby_id":true},"params":[{"name":"turn","required":false,"transform":{"type":"scalar"},"locs":[{"a":29,"b":33}]},{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":55,"b":64}]}],"statement":"UPDATE lobbies\nSET \n  turn = :turn\nWHERE \n  lobby_id = :lobby_id!"};
 
 /**
  * Query generated from SQL:
@@ -104,7 +104,37 @@ const updateLobbyIR: any = {"usedParamSet":{"turn":true,"lobby_id":true},"params
  *   lobby_id = :lobby_id!
  * ```
  */
-export const updateLobby = new PreparedQuery<IUpdateLobbyParams,IUpdateLobbyResult>(updateLobbyIR);
+export const updateLobbyTurn = new PreparedQuery<IUpdateLobbyTurnParams,IUpdateLobbyTurnResult>(updateLobbyTurnIR);
+
+
+/** 'UpdateLobbyCurrentRound' parameters type */
+export interface IUpdateLobbyCurrentRoundParams {
+  current_round: number | null | void;
+  lobby_id: string;
+}
+
+/** 'UpdateLobbyCurrentRound' return type */
+export type IUpdateLobbyCurrentRoundResult = void;
+
+/** 'UpdateLobbyCurrentRound' query type */
+export interface IUpdateLobbyCurrentRoundQuery {
+  params: IUpdateLobbyCurrentRoundParams;
+  result: IUpdateLobbyCurrentRoundResult;
+}
+
+const updateLobbyCurrentRoundIR: any = {"usedParamSet":{"current_round":true,"lobby_id":true},"params":[{"name":"current_round","required":false,"transform":{"type":"scalar"},"locs":[{"a":38,"b":51}]},{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":73,"b":82}]}],"statement":"UPDATE lobbies\nSET \n  current_round = :current_round\nWHERE \n  lobby_id = :lobby_id!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * UPDATE lobbies
+ * SET 
+ *   current_round = :current_round
+ * WHERE 
+ *   lobby_id = :lobby_id!
+ * ```
+ */
+export const updateLobbyCurrentRound = new PreparedQuery<IUpdateLobbyCurrentRoundParams,IUpdateLobbyCurrentRoundResult>(updateLobbyCurrentRoundIR);
 
 
 /** 'UpdateLobbyPlayer' parameters type */

@@ -13,11 +13,17 @@ SET
 WHERE 
   lobby_id = :lobby_id!;
 
-
-/* @name updateLobby */
+/* @name updateLobbyTurn */
 UPDATE lobbies
 SET 
   turn = :turn
+WHERE 
+  lobby_id = :lobby_id!;
+
+/* @name updateLobbyCurrentRound */
+UPDATE lobbies
+SET 
+  current_round = :current_round
 WHERE 
   lobby_id = :lobby_id!;
 
