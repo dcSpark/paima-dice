@@ -6,20 +6,21 @@ import type {
   IGetLobbyPlayersResult,
   IGetRoundDataResult,
   IGetRoundMovesResult,
+  IUpdateLobbyStateParams,
 } from '@dice/db';
 import {
   getCachedMoves,
   getLobbyById,
   getRoundData,
   getUserStats,
-  endMatch,
   getLobbyPlayers,
+  updateLobbyState,
 } from '@dice/db';
 import type { ConciseResult, MatchState } from '@dice/utils';
 import { initRoundExecutor, matchResults, buildCurrentMatchState } from '@dice/game-logic';
 import {
   persistUpdateMatchState,
-  persistCloseLobby,
+  persistLobbyState,
   persistLobbyCreation,
   persistLobbyJoin,
   persistMoveSubmission,
@@ -30,7 +31,7 @@ import {
   persistMatchResults,
   schedulePracticeMove,
   blankStats,
-  persistActivateLobby,
+  persistStartMatch,
 } from './persist';
 import { isValidMove } from '@dice/game-logic';
 import type {
@@ -106,13 +107,13 @@ export const joinedLobby = async (
   const isFull = players.length + 1 >= lobby.max_players;
 
   const closeLobbyUpdates: SQLUpdate[] = isFull
-    ? persistCloseLobby({ lobby_id: input.lobbyID })
+    ? persistLobbyState({ lobby_id: input.lobbyID, lobby_state: 'closed' })
     : [];
 
   // Automatically activate a lobby when it fills up.
   // Note: this could be replaced by some input from creator.
   const activateLobbyUpdates: SQLUpdate[] = isFull
-    ? persistActivateLobby(input.lobbyID, lobby.round_length, blockHeight)
+    ? persistStartMatch(input.lobbyID, lobby.round_length, blockHeight)
     : [];
 
   return [...joinUpdates, ...closeLobbyUpdates, ...activateLobbyUpdates];
@@ -135,7 +136,7 @@ export const closedLobby = async (
     return [];
   }
 
-  const closeUpdates = persistCloseLobby(lobby);
+  const closeUpdates = persistLobbyState(lobby);
 
   return closeUpdates;
 };
@@ -397,12 +398,16 @@ function finalizeMatch(
   newState: MatchState
 ): SQLUpdate[] {
   // Create update which sets lobby state to 'finished'
-  const endMatchTuple: SQLUpdate = [endMatch, { lobby_id: lobby.lobby_id }];
+  const updateStateParams: IUpdateLobbyStateParams = {
+    lobby_id: lobby.lobby_id,
+    lobby_state: 'finished',
+  };
+  const lobbyStateUpdates: SQLUpdate[] = [[updateLobbyState, updateStateParams]];
 
   // If practice lobby, then no extra results/stats need to be updated
   if (lobby.practice) {
     console.log(`Practice match ended, ignoring results`);
-    return [endMatchTuple];
+    return [...lobbyStateUpdates];
   }
 
   // Save the final results in the final states table
@@ -415,7 +420,7 @@ function finalizeMatch(
   const statsUpdates = newState.players.map((player, i) =>
     scheduleStatsUpdate(player.nftId, results[i], blockHeight + 1)
   );
-  return [endMatchTuple, ...resultsUpdates, ...statsUpdates];
+  return [...lobbyStateUpdates, ...resultsUpdates, ...statsUpdates];
 }
 
 // Check if lobby is in final round

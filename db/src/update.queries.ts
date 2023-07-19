@@ -3,78 +3,32 @@ import { PreparedQuery } from '@pgtyped/query';
 
 export type lobby_status = 'active' | 'closed' | 'finished' | 'open';
 
-/** 'StartMatch' parameters type */
-export interface IStartMatchParams {
-  lobby_id: string;
-}
-
-/** 'StartMatch' return type */
-export interface IStartMatchResult {
-  created_at: Date;
-  creation_block_height: number;
-  current_round: number;
-  hidden: boolean;
-  initial_random_seed: string;
-  lobby_creator: number;
+/** 'UpdateLobbyState' parameters type */
+export interface IUpdateLobbyStateParams {
   lobby_id: string;
   lobby_state: lobby_status;
-  max_players: number;
-  num_of_rounds: number;
-  play_time_per_player: number;
-  practice: boolean;
-  round_length: number;
-  turn: number;
 }
 
-/** 'StartMatch' query type */
-export interface IStartMatchQuery {
-  params: IStartMatchParams;
-  result: IStartMatchResult;
+/** 'UpdateLobbyState' return type */
+export type IUpdateLobbyStateResult = void;
+
+/** 'UpdateLobbyState' query type */
+export interface IUpdateLobbyStateQuery {
+  params: IUpdateLobbyStateParams;
+  result: IUpdateLobbyStateResult;
 }
 
-const startMatchIR: any = {"usedParamSet":{"lobby_id":true},"params":[{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":63,"b":72}]}],"statement":"UPDATE lobbies\nSET\n  lobby_state = 'active'\nWHERE\n  lobby_id = :lobby_id!\nRETURNING *"};
+const updateLobbyStateIR: any = {"usedParamSet":{"lobby_state":true,"lobby_id":true},"params":[{"name":"lobby_state","required":true,"transform":{"type":"scalar"},"locs":[{"a":33,"b":45}]},{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":64,"b":73}]}],"statement":"UPDATE lobbies\nSET lobby_state = :lobby_state!\nWHERE lobby_id = :lobby_id!"};
 
 /**
  * Query generated from SQL:
  * ```
  * UPDATE lobbies
- * SET
- *   lobby_state = 'active'
- * WHERE
- *   lobby_id = :lobby_id!
- * RETURNING *
+ * SET lobby_state = :lobby_state!
+ * WHERE lobby_id = :lobby_id!
  * ```
  */
-export const startMatch = new PreparedQuery<IStartMatchParams,IStartMatchResult>(startMatchIR);
-
-
-/** 'CloseLobby' parameters type */
-export interface ICloseLobbyParams {
-  lobby_id: string;
-}
-
-/** 'CloseLobby' return type */
-export type ICloseLobbyResult = void;
-
-/** 'CloseLobby' query type */
-export interface ICloseLobbyQuery {
-  params: ICloseLobbyParams;
-  result: ICloseLobbyResult;
-}
-
-const closeLobbyIR: any = {"usedParamSet":{"lobby_id":true},"params":[{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":65,"b":74}]}],"statement":"UPDATE lobbies\nSET \n  lobby_state = 'closed'\nWHERE \n  lobby_id = :lobby_id!"};
-
-/**
- * Query generated from SQL:
- * ```
- * UPDATE lobbies
- * SET 
- *   lobby_state = 'closed'
- * WHERE 
- *   lobby_id = :lobby_id!
- * ```
- */
-export const closeLobby = new PreparedQuery<ICloseLobbyParams,ICloseLobbyResult>(closeLobbyIR);
+export const updateLobbyState = new PreparedQuery<IUpdateLobbyStateParams,IUpdateLobbyStateResult>(updateLobbyStateIR);
 
 
 /** 'UpdateLobbyTurn' parameters type */
@@ -170,33 +124,6 @@ const updateLobbyPlayerIR: any = {"usedParamSet":{"points":true,"score":true,"tu
  * ```
  */
 export const updateLobbyPlayer = new PreparedQuery<IUpdateLobbyPlayerParams,IUpdateLobbyPlayerResult>(updateLobbyPlayerIR);
-
-
-/** 'EndMatch' parameters type */
-export interface IEndMatchParams {
-  lobby_id: string;
-}
-
-/** 'EndMatch' return type */
-export type IEndMatchResult = void;
-
-/** 'EndMatch' query type */
-export interface IEndMatchQuery {
-  params: IEndMatchParams;
-  result: IEndMatchResult;
-}
-
-const endMatchIR: any = {"usedParamSet":{"lobby_id":true},"params":[{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":62,"b":71}]}],"statement":"UPDATE lobbies\nSET  lobby_state = 'finished'\nWHERE lobby_id = :lobby_id!"};
-
-/**
- * Query generated from SQL:
- * ```
- * UPDATE lobbies
- * SET  lobby_state = 'finished'
- * WHERE lobby_id = :lobby_id!
- * ```
- */
-export const endMatch = new PreparedQuery<IEndMatchParams,IEndMatchResult>(endMatchIR);
 
 
 /** 'ExecutedRound' parameters type */

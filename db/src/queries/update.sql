@@ -1,17 +1,7 @@
-/* @name startMatch */
+/* @name updateLobbyState */
 UPDATE lobbies
-SET
-  lobby_state = 'active'
-WHERE
-  lobby_id = :lobby_id!
-RETURNING *;
-
-/* @name closeLobby */
-UPDATE lobbies
-SET 
-  lobby_state = 'closed'
-WHERE 
-  lobby_id = :lobby_id!;
+SET lobby_state = :lobby_state!
+WHERE lobby_id = :lobby_id!;
 
 /* @name updateLobbyTurn */
 UPDATE lobbies
@@ -35,11 +25,6 @@ SET
   turn = :turn
 WHERE 
   lobby_id = :lobby_id! AND nft_id = :nft_id!;
-
-/* @name endMatch */
-UPDATE lobbies
-SET  lobby_state = 'finished'
-WHERE lobby_id = :lobby_id!;
 
 /* @name executedRound */
 UPDATE rounds

@@ -11,11 +11,31 @@ import { newMatchMove, newRound, executedRound, updateLobbyPlayer } from '@dice/
 import type { ConciseResult, ExpandedResult, MatchState } from '@dice/utils';
 import { scheduleZombieRound } from './zombie.js';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
-import { updateLobbyTurn, updateLobbyCurrentRound } from '@dice/db/src/update.queries.js';
+import {
+  updateLobbyTurn,
+  updateLobbyCurrentRound,
+  updateLobbyState,
+} from '@dice/db/src/update.queries.js';
 import type {
   IUpdateLobbyCurrentRoundParams,
+  IUpdateLobbyStateParams,
   IUpdateLobbyTurnParams,
 } from '@dice/db/src/update.queries.js';
+
+export function persistStartMatch(
+  lobbyId: string,
+  roundLength: number,
+  blockHeight: number
+): SQLUpdate[] {
+  const lobbyStateParams: IUpdateLobbyStateParams = {
+    lobby_id: lobbyId,
+    lobby_state: 'active',
+  };
+  const lobbyStateUpdates: SQLUpdate[] = [[updateLobbyState, lobbyStateParams]];
+
+  const initialMatchStateUpdates = persistInitialMatchState(lobbyId, roundLength, blockHeight);
+  return [...lobbyStateUpdates, ...initialMatchStateUpdates];
+}
 
 export function persistInitialMatchState(
   lobbyId: string,
@@ -23,6 +43,11 @@ export function persistInitialMatchState(
   blockHeight: number
 ): SQLUpdate[] {
   const newRoundTuples = persistNewRound(lobbyId, 0, roundLength, blockHeight);
+
+  // TODO: set initial seed
+  // TODO: gen turn order for players
+  // TODO: reset players
+
   return newRoundTuples;
 }
 

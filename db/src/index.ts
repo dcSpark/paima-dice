@@ -45,15 +45,12 @@ export {
   INewMatchMoveParams,
 } from './insert.queries.js';
 export {
-  executedRound,
   updateLobbyPlayer,
-  endMatch,
-  startMatch,
-  closeLobby,
+  executedRound,
+  updateLobbyState,
+  IUpdateLobbyStateParams,
   IExecutedRoundParams,
   IUpdateLobbyPlayerParams,
-  IStartMatchParams,
-  ICloseLobbyParams,
 } from './update.queries.js';
 import type Pool from 'pg';
 import { creds, requirePool } from './pgPool.js';

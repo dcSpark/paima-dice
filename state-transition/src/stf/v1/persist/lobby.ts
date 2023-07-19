@@ -1,10 +1,10 @@
 import type { CreatedLobbyInput } from '../types.js';
-import type { IStartMatchParams, ICloseLobbyParams } from '@dice/db';
-import { createLobby, startMatch, closeLobby, ICreateLobbyParams } from '@dice/db';
+import type { IUpdateLobbyStateParams, ICreateLobbyParams } from '@dice/db';
+import { createLobby, updateLobbyState } from '@dice/db';
 import Prando from 'paima-sdk/paima-prando';
 import type { LobbyStatus } from '@dice/utils';
 import { PRACTICE_BOT_NFT_ID } from '@dice/utils';
-import { persistInitialMatchState } from './match.js';
+import { persistStartMatch } from './match.js';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
 import type { IJoinPlayerToLobbyParams } from '@dice/db/src/insert.queries.js';
 import { joinPlayerToLobby } from '@dice/db/src/insert.queries.js';
@@ -20,7 +20,7 @@ export function persistLobbyCreation(
   let playersInLobby = 0;
 
   // create the lobby
-  const lobbyParams = {
+  const lobbyParams: ICreateLobbyParams = {
     lobby_id: lobby_id,
     // note: can be adjusted, but we don't have frontend for more
     max_players: 2,
@@ -35,7 +35,7 @@ export function persistLobbyCreation(
     practice: inputData.isPractice,
     lobby_creator: nftId,
     lobby_state: 'open' as LobbyStatus,
-  } satisfies ICreateLobbyParams;
+  };
   const createLobbyTuple: SQLUpdate = [createLobby, lobbyParams];
 
   // join creator to lobby
@@ -63,14 +63,16 @@ export function persistLobbyCreation(
     });
 
   const closeLobbyUpdates: SQLUpdate[] =
-    playersInLobby < lobbyParams.max_players ? [] : persistCloseLobby({ lobby_id });
+    playersInLobby < lobbyParams.max_players
+      ? []
+      : persistLobbyState({ lobby_id, lobby_state: 'closed' });
 
   // Automatically activate a lobby when it fills up.
   // Note: This could be replaced by some input from creator.
   const activateLobbyUpdates: SQLUpdate[] =
     playersInLobby < lobbyParams.max_players
       ? []
-      : persistActivateLobby(lobby_id, lobbyParams.round_length, blockHeight);
+      : persistStartMatch(lobby_id, lobbyParams.round_length, blockHeight);
 
   console.log(`Created lobby ${lobby_id}`);
   return [
@@ -86,24 +88,6 @@ export function persistLobbyJoin(params: IJoinPlayerToLobbyParams): SQLUpdate[] 
   return [[joinPlayerToLobby, params]];
 }
 
-export function persistCloseLobby(params: ICloseLobbyParams): SQLUpdate[] {
-  return [[closeLobby, params]];
-}
-
-// TODO: change to "start match"
-export function persistActivateLobby(
-  lobbyId: string,
-  roundLength: number,
-  blockHeight: number
-): SQLUpdate[] {
-  // Set lobby state to active
-  const startMatchParams: IStartMatchParams = {
-    lobby_id: lobbyId,
-  };
-  const newMatchTuple: SQLUpdate = [startMatch, startMatchParams];
-
-  // Set initial match state
-  const initialMatchStateUpdates = persistInitialMatchState(lobbyId, roundLength, blockHeight);
-
-  return [newMatchTuple, ...initialMatchStateUpdates];
+export function persistLobbyState(params: IUpdateLobbyStateParams): SQLUpdate[] {
+  return [[updateLobbyState, params]];
 }
