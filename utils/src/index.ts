@@ -15,3 +15,4 @@ export const SAFE_NUMBER = 2 ** 31 - 1;
 
 export * from './types.js';
 export * from './typecheck.js';
+export * from './helpers.js';

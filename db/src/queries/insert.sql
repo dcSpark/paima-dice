@@ -31,14 +31,11 @@ VALUES(
 /* @name joinPlayerToLobby */
 INSERT INTO lobby_player(
   lobby_id,
-  nft_id,
-  turn
+  nft_id
 )
 VALUES(
   :lobby_id!,
-  :nft_id!,
-  /* TODO: decide turn order when starting a match */
-  :turn!
+  :nft_id!
 );
 
 /* @name newMatch */

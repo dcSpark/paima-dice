@@ -67,7 +67,6 @@ export const createLobby = new PreparedQuery<ICreateLobbyParams,ICreateLobbyResu
 export interface IJoinPlayerToLobbyParams {
   lobby_id: string;
   nft_id: number;
-  turn: number;
 }
 
 /** 'JoinPlayerToLobby' return type */
@@ -79,21 +78,18 @@ export interface IJoinPlayerToLobbyQuery {
   result: IJoinPlayerToLobbyResult;
 }
 
-const joinPlayerToLobbyIR: any = {"usedParamSet":{"lobby_id":true,"nft_id":true,"turn":true},"params":[{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":67,"b":76}]},{"name":"nft_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":81,"b":88}]},{"name":"turn","required":true,"transform":{"type":"scalar"},"locs":[{"a":147,"b":152}]}],"statement":"INSERT INTO lobby_player(\n  lobby_id,\n  nft_id,\n  turn\n)\nVALUES(\n  :lobby_id!,\n  :nft_id!,\n                                                     \n  :turn!\n)"};
+const joinPlayerToLobbyIR: any = {"usedParamSet":{"lobby_id":true,"nft_id":true},"params":[{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":59,"b":68}]},{"name":"nft_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":73,"b":80}]}],"statement":"INSERT INTO lobby_player(\n  lobby_id,\n  nft_id\n)\nVALUES(\n  :lobby_id!,\n  :nft_id!\n)"};
 
 /**
  * Query generated from SQL:
  * ```
  * INSERT INTO lobby_player(
  *   lobby_id,
- *   nft_id,
- *   turn
+ *   nft_id
  * )
  * VALUES(
  *   :lobby_id!,
- *   :nft_id!,
- *                                                      
- *   :turn!
+ *   :nft_id!
  * )
  * ```
  */

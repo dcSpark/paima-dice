@@ -2,7 +2,7 @@ import type { CreatedLobbyInput } from '../types.js';
 import type { IUpdateLobbyStateParams, ICreateLobbyParams } from '@dice/db';
 import { createLobby, updateLobbyState } from '@dice/db';
 import Prando from 'paima-sdk/paima-prando';
-import type { LobbyStatus } from '@dice/utils';
+import type { LobbyPlayer, LobbyStatus } from '@dice/utils';
 import { PRACTICE_BOT_NFT_ID } from '@dice/utils';
 import { persistStartMatch } from './match.js';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
@@ -14,10 +14,11 @@ export function persistLobbyCreation(
   nftId: number,
   blockHeight: number,
   inputData: CreatedLobbyInput,
-  seed: string
+  seed: string,
+  randomnessGenerator: Prando
 ): SQLUpdate[] {
   const lobby_id = new Prando(seed).nextString(12);
-  let playersInLobby = 0;
+  const lobbyPlayers: LobbyPlayer[] = [];
 
   // create the lobby
   const lobbyParams: ICreateLobbyParams = {
@@ -40,37 +41,50 @@ export function persistLobbyCreation(
   const joinParams: IJoinPlayerToLobbyParams = {
     lobby_id,
     nft_id: nftId,
-    // TODO: set turns at match start
-    turn: playersInLobby,
   };
+  lobbyPlayers.push({
+    nftId,
+    points: 0,
+    score: 0,
+    turn: undefined,
+  });
   const joinCreatorTuple: SQLUpdate = [joinPlayerToLobby, joinParams];
-  playersInLobby++;
 
-  const numBots = inputData.isPractice ? lobbyParams.max_players - playersInLobby : 0;
+  // TODO: We reference players by nftId, so you can't have more than 1 bot
+  const numBots = inputData.isPractice ? lobbyParams.max_players - lobbyPlayers.length : 0;
   const joinBots: SQLUpdate[] = Array(numBots)
     .fill(null)
     .flatMap(() => {
-      // TODO: set turns at match start
-      const turn = playersInLobby;
-      playersInLobby++;
+      lobbyPlayers.push({
+        nftId: PRACTICE_BOT_NFT_ID,
+        points: 0,
+        score: 0,
+        turn: undefined,
+      });
       return persistLobbyJoin({
         lobby_id,
         nft_id: PRACTICE_BOT_NFT_ID,
-        turn,
       });
     });
 
   const closeLobbyUpdates: SQLUpdate[] =
-    playersInLobby < lobbyParams.max_players
+    lobbyPlayers.length < lobbyParams.max_players
       ? []
       : persistLobbyState({ lobby_id, lobby_state: 'closed' });
 
   // Automatically activate a lobby when it fills up.
   // Note: This could be replaced by some input from creator.
   const activateLobbyUpdates: SQLUpdate[] =
-    playersInLobby < lobbyParams.max_players
+    lobbyPlayers.length < lobbyParams.max_players
       ? []
-      : persistStartMatch(lobby_id, null, lobbyParams.round_length, blockHeight);
+      : persistStartMatch(
+          lobby_id,
+          lobbyPlayers,
+          null,
+          lobbyParams.round_length,
+          blockHeight,
+          randomnessGenerator
+        );
 
   console.log(`Created lobby ${lobby_id}`);
   return [

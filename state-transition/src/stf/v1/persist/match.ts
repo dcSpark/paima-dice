@@ -1,7 +1,15 @@
 import type { SubmittedMovesInput } from '../types.js';
 import type { INewRoundParams, IExecutedRoundParams, IUpdateLobbyPlayerParams } from '@dice/db';
 import { newRound, executedRound, updateLobbyPlayer } from '@dice/db';
-import type { ActiveLobby, ConciseResult, ExpandedResult, MatchState } from '@dice/utils';
+import type { LobbyPlayer } from '@dice/utils';
+import {
+  genPermutation,
+  type ActiveLobby,
+  type ConciseResult,
+  type ExpandedResult,
+  type MatchState,
+  PRACTICE_BOT_NFT_ID,
+} from '@dice/utils';
 import { scheduleZombieRound } from './zombie.js';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
 import {
@@ -19,12 +27,16 @@ import type {
 import type { INewMatchParams, INewMoveParams } from '@dice/db/src/insert.queries.js';
 import { newMatch, newMove } from '@dice/db/src/insert.queries.js';
 import type { IGetRoundResult } from '@dice/db/src/select.queries.js';
+import type Prando from 'paima-sdk/paima-prando';
+import { schedulePracticeMove } from './practice.js';
 
 export function persistStartMatch(
   lobbyId: string,
+  players: LobbyPlayer[],
   current_match: null | number,
   roundLength: number,
-  blockHeight: number
+  blockHeight: number,
+  randomnessGenerator: Prando
 ): SQLUpdate[] {
   const matchWithinLobby = current_match == null ? 0 : current_match + 1;
   const newMatchParams: INewMatchParams = {
@@ -36,18 +48,22 @@ export function persistStartMatch(
 
   const initialMatchStateUpdates = persistInitialMatchState(
     lobbyId,
+    players,
     matchWithinLobby,
     roundLength,
-    blockHeight
+    blockHeight,
+    randomnessGenerator
   );
   return [...newMatchUpdates, ...initialMatchStateUpdates];
 }
 
 export function persistInitialMatchState(
   lobbyId: string,
+  players: LobbyPlayer[],
   matchWithinLobby: number,
   roundLength: number,
-  blockHeight: number
+  blockHeight: number,
+  randomnessGenerator: Prando
 ): SQLUpdate[] {
   const lobbyStateParams: IUpdateLobbyStateParams = {
     lobby_id: lobbyId,
@@ -63,24 +79,41 @@ export function persistInitialMatchState(
     [updateLobbyCurrentMatch, lobbyCurrentMatchParams],
   ];
 
-  // TODO: use persistUpdateMatchState (and reset everything else)
-  const lobbyCurrentTurnParams: IUpdateLobbyCurrentTurnParams = {
-    lobby_id: lobbyId,
-    current_turn: 0,
+  const newTurnOrder = genPermutation(players.length, randomnessGenerator);
+  const newMatchState: MatchState = {
+    turn: 0,
+    players: players.map((player, i) => ({
+      nftId: player.nftId,
+      turn: newTurnOrder[i],
+      points: 0,
+      score: 0,
+    })),
   };
-  const lobbyCurrentTurnUpdates: SQLUpdate[] = [[updateLobbyCurrentTurn, lobbyCurrentTurnParams]];
+  const matchStateUpdates = persistUpdateMatchState(lobbyId, newMatchState);
 
   const newRoundUpdates = persistNewRound(lobbyId, matchWithinLobby, 0, roundLength, blockHeight);
 
-  // TODO: set initial seed
-  // TODO: gen turn order for players
-  // TODO: reset players
+  // If a bot goes first, schedule a bot move
+  const botMoves = (() => {
+    const newTurnPlayer = newMatchState.players.find(player => player.turn === 0);
+    const newTurnNftId = newTurnPlayer?.nftId;
+    if (newTurnNftId !== PRACTICE_BOT_NFT_ID) return [];
+
+    const practiceMoveSchedule = schedulePracticeMove(
+      lobbyId,
+      matchWithinLobby,
+      0,
+      blockHeight + 1
+    );
+    return [practiceMoveSchedule];
+  })();
 
   return [
     ...lobbyStateUpdates,
     ...lobbyCurrentMatchUpdates,
-    ...lobbyCurrentTurnUpdates,
+    ...matchStateUpdates,
     ...newRoundUpdates,
+    ...botMoves,
   ];
 }
 

@@ -8,7 +8,7 @@ import type {
   IUpdateLobbyStateParams,
 } from '@dice/db';
 import { getLobbyById, getUserStats, getLobbyPlayers, updateLobbyState } from '@dice/db';
-import type { ActiveLobby, ConciseResult, MatchState } from '@dice/utils';
+import type { ActiveLobby, ConciseResult, LobbyPlayer, MatchState } from '@dice/utils';
 import { initRoundExecutor, matchResults, buildCurrentMatchState } from '@dice/game-logic';
 import {
   persistUpdateMatchState,
@@ -58,14 +58,21 @@ export const createdLobby = async (
   player: WalletAddress,
   blockHeight: number,
   input: CreatedLobbyInput,
-  dbConn: Pool
+  dbConn: Pool,
+  randomnessGenerator: Prando
 ): Promise<SQLUpdate[]> => {
   const [block] = await getBlockHeight.run({ block_height: blockHeight }, dbConn);
   if (!(await checkUserOwns(player, input.creatorNftId, dbConn))) {
     console.log('DISCARD: user does not own specified nft');
     return [];
   }
-  return persistLobbyCreation(input.creatorNftId, blockHeight, input, block.seed);
+  return persistLobbyCreation(
+    input.creatorNftId,
+    blockHeight,
+    input,
+    block.seed,
+    randomnessGenerator
+  );
 };
 
 // State transition when a join lobby input is processed
@@ -73,7 +80,8 @@ export const joinedLobby = async (
   player: WalletAddress,
   blockHeight: number,
   input: JoinedLobbyInput,
-  dbConn: Pool
+  dbConn: Pool,
+  randomnessGenerator: Prando
 ): Promise<SQLUpdate[]> => {
   const [lobby] = await getLobbyById.run({ lobby_id: input.lobbyID }, dbConn);
   if (lobby == null) {
@@ -81,11 +89,17 @@ export const joinedLobby = async (
     return [];
   }
 
-  const players = await getLobbyPlayers.run({ lobby_id: input.lobbyID }, dbConn);
-  if (lobby.lobby_state !== 'open' || players.length >= lobby.max_players) {
+  const rawPlayers = await getLobbyPlayers.run({ lobby_id: input.lobbyID }, dbConn);
+  if (lobby.lobby_state !== 'open' || rawPlayers.length >= lobby.max_players) {
     console.log('DISCARD: lobby does not accept more players');
     return [];
   }
+  const lobbyPlayers: LobbyPlayer[] = rawPlayers.map(player => ({
+    nftId: player.nft_id,
+    points: player.points,
+    score: player.score,
+    turn: player.turn ?? undefined,
+  }));
 
   if (!(await checkUserOwns(player, input.nftId, dbConn))) {
     console.log('DISCARD: user does not own specified nft');
@@ -95,10 +109,14 @@ export const joinedLobby = async (
   const joinUpdates = persistLobbyJoin({
     lobby_id: input.lobbyID,
     nft_id: input.nftId,
-    // TODO: set turns at match start
-    turn: players.length,
   });
-  const isFull = players.length + 1 >= lobby.max_players;
+  lobbyPlayers.push({
+    nftId: input.nftId,
+    points: 0,
+    score: 0,
+    turn: undefined,
+  });
+  const isFull = rawPlayers.length + 1 >= lobby.max_players;
 
   const closeLobbyUpdates: SQLUpdate[] = isFull
     ? persistLobbyState({ lobby_id: input.lobbyID, lobby_state: 'closed' })
@@ -106,8 +124,16 @@ export const joinedLobby = async (
 
   // Automatically activate a lobby when it fills up.
   // Note: this could be replaced by some input from creator.
+  // TODO: even when doing it automatically, we should schedule it to avoid passing players in a weird way
   const activateLobbyUpdates: SQLUpdate[] = isFull
-    ? persistStartMatch(input.lobbyID, lobby.current_match, lobby.round_length, blockHeight)
+    ? persistStartMatch(
+        input.lobbyID,
+        lobbyPlayers,
+        lobby.current_match,
+        lobby.round_length,
+        blockHeight,
+        randomnessGenerator
+      )
     : [];
 
   return [...joinUpdates, ...closeLobbyUpdates, ...activateLobbyUpdates];
