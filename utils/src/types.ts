@@ -120,6 +120,6 @@ export type ActiveLobby = Omit<IGetLobbyByIdResult, ActiveLobbyRequirements> &
   PropertiesNonNullable<Pick<IGetLobbyByIdResult, ActiveLobbyRequirements>>;
 
 export interface LobbyState extends ActiveLobby {
-  round_seed: string;
+  roundSeed: string;
   players: LobbyPlayer[];
 }

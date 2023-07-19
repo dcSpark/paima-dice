@@ -27,7 +27,6 @@ export function persistLobbyCreation(
     num_of_rounds: inputData.numOfRounds,
     round_length: inputData.roundLength,
     play_time_per_player: inputData.playTimePerPlayer,
-    initial_random_seed: seed,
     created_at: new Date(),
     creation_block_height: blockHeight,
     hidden: inputData.isHidden,

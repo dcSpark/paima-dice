@@ -42,7 +42,7 @@ const models: TsoaRoute.Models = {
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Pick_IGetLobbyByIdResult.Exclude_keyofIGetLobbyByIdResult.ActiveLobbyRequirements__": {
         "dataType": "refAlias",
-        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"created_at":{"dataType":"datetime","required":true},"creation_block_height":{"dataType":"double","required":true},"hidden":{"dataType":"boolean","required":true},"initial_random_seed":{"dataType":"string","required":true},"lobby_creator":{"dataType":"double","required":true},"lobby_id":{"dataType":"string","required":true},"lobby_state":{"ref":"lobby_status","required":true},"max_players":{"dataType":"double","required":true},"num_of_rounds":{"dataType":"double","required":true},"play_time_per_player":{"dataType":"double","required":true},"practice":{"dataType":"boolean","required":true},"round_length":{"dataType":"double","required":true}},"validators":{}},
+        "type": {"dataType":"nestedObjectLiteral","nestedProperties":{"created_at":{"dataType":"datetime","required":true},"creation_block_height":{"dataType":"double","required":true},"hidden":{"dataType":"boolean","required":true},"lobby_creator":{"dataType":"double","required":true},"lobby_id":{"dataType":"string","required":true},"lobby_state":{"ref":"lobby_status","required":true},"max_players":{"dataType":"double","required":true},"num_of_rounds":{"dataType":"double","required":true},"play_time_per_player":{"dataType":"double","required":true},"practice":{"dataType":"boolean","required":true},"round_length":{"dataType":"double","required":true}},"validators":{}},
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "Omit_IGetLobbyByIdResult.ActiveLobbyRequirements_": {
@@ -58,7 +58,7 @@ const models: TsoaRoute.Models = {
     "LobbyState": {
         "dataType": "refObject",
         "properties": {
-            "round_seed": {"dataType":"string","required":true},
+            "roundSeed": {"dataType":"string","required":true},
             "players": {"dataType":"array","array":{"dataType":"refAlias","ref":"LobbyPlayer"},"required":true},
         },
         "additionalProperties": false,
@@ -81,7 +81,6 @@ const models: TsoaRoute.Models = {
             "current_round": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
             "current_turn": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
             "hidden": {"dataType":"boolean","required":true},
-            "initial_random_seed": {"dataType":"string","required":true},
             "lobby_creator": {"dataType":"double","required":true},
             "lobby_id": {"dataType":"string","required":true},
             "lobby_state": {"ref":"lobby_status","required":true},
@@ -111,7 +110,6 @@ const models: TsoaRoute.Models = {
             "current_round": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
             "current_turn": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
             "hidden": {"dataType":"boolean","required":true},
-            "initial_random_seed": {"dataType":"string","required":true},
             "lobby_creator": {"dataType":"double","required":true},
             "lobby_id": {"dataType":"string","required":true},
             "lobby_state": {"ref":"lobby_status","required":true},
@@ -141,7 +139,6 @@ const models: TsoaRoute.Models = {
             "current_round": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
             "current_turn": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
             "hidden": {"dataType":"boolean","required":true},
-            "initial_random_seed": {"dataType":"string","required":true},
             "lobby_creator": {"dataType":"double","required":true},
             "lobby_id": {"dataType":"string","required":true},
             "lobby_state": {"ref":"lobby_status","required":true},
@@ -163,7 +160,6 @@ const models: TsoaRoute.Models = {
             "current_round": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
             "current_turn": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
             "hidden": {"dataType":"boolean","required":true},
-            "initial_random_seed": {"dataType":"string","required":true},
             "lobby_creator": {"dataType":"double","required":true},
             "lobby_id": {"dataType":"string","required":true},
             "lobby_state": {"ref":"lobby_status","required":true},

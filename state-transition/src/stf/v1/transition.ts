@@ -41,7 +41,7 @@ import { getBlockHeight, type SQLUpdate } from 'paima-sdk/paima-db';
 import { PracticeAI } from './persist/practice-ai';
 import { getOwnedNfts } from 'paima-sdk/paima-utils-backend';
 import type { IGetRoundResult } from '@dice/db/src/select.queries';
-import { getRound, getRoundMoves } from '@dice/db/src/select.queries';
+import { getMatch, getRound, getRoundMoves } from '@dice/db/src/select.queries';
 
 // Create initial player entry after nft mint
 export const mintNft = async (input: NftMintInput): Promise<SQLUpdate[]> => {
@@ -479,10 +479,13 @@ function isFinalRound(lobby: IGetLobbyByIdResult): boolean {
  * decided before he decides and submits his moves.
  */
 async function fetchPrandoSeed(lobby: ActiveLobby, dbConn: Pool): Promise<undefined | string> {
-  if (lobby.current_round === 0) {
-    return lobby.initial_random_seed;
-  }
-
+  const [match] = await getMatch.run(
+    {
+      lobby_id: lobby.lobby_id,
+      match_within_lobby: lobby.current_match,
+    },
+    dbConn
+  );
   const [lastRound] = await getRound.run(
     {
       lobby_id: lobby.lobby_id,
@@ -491,13 +494,12 @@ async function fetchPrandoSeed(lobby: ActiveLobby, dbConn: Pool): Promise<undefi
     },
     dbConn
   );
-  if (lastRound == null) return;
-  const [lastRoundBlock] = await getBlockHeight.run(
-    { block_height: lastRound.execution_block_height },
-    dbConn
-  );
-  if (lastRoundBlock == null) return;
-  return lastRoundBlock.seed;
+  const seedBlockHeight =
+    lobby.current_round === 0 ? match.starting_block_height : lastRound.execution_block_height;
+  if (seedBlockHeight == null) return;
+  const [seedBlock] = await getBlockHeight.run({ block_height: seedBlockHeight }, dbConn);
+  if (seedBlock == null) return;
+  return seedBlock.seed;
 }
 
 async function checkUserOwns(user: WalletAddress, nftId: number, dbConn: Pool): Promise<boolean> {

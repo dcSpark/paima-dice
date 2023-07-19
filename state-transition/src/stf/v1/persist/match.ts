@@ -30,6 +30,7 @@ export function persistStartMatch(
   const newMatchParams: INewMatchParams = {
     lobby_id: lobbyId,
     match_within_lobby: matchWithinLobby,
+    starting_block_height: blockHeight,
   };
   const newMatchUpdates: SQLUpdate[] = [[newMatch, newMatchParams]];
 

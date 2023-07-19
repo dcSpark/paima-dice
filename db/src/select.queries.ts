@@ -18,7 +18,6 @@ export interface IGetPaginatedOpenLobbiesResult {
   current_round: number | null;
   current_turn: number | null;
   hidden: boolean;
-  initial_random_seed: string;
   lobby_creator: number;
   lobby_id: string;
   lobby_state: lobby_status;
@@ -67,7 +66,6 @@ export interface ISearchPaginatedOpenLobbiesResult {
   current_round: number | null;
   current_turn: number | null;
   hidden: boolean;
-  initial_random_seed: string;
   lobby_creator: number;
   lobby_id: string;
   lobby_state: lobby_status;
@@ -114,7 +112,6 @@ export interface IGetOpenLobbyByIdResult {
   current_round: number | null;
   current_turn: number | null;
   hidden: boolean;
-  initial_random_seed: string;
   lobby_creator: number;
   lobby_id: string;
   lobby_state: lobby_status;
@@ -189,7 +186,6 @@ export interface IGetRandomLobbyResult {
   current_round: number | null;
   current_turn: number | null;
   hidden: boolean;
-  initial_random_seed: string;
   lobby_creator: number;
   lobby_id: string;
   lobby_state: lobby_status;
@@ -232,7 +228,6 @@ export interface IGetRandomActiveLobbyResult {
   current_round: number | null;
   current_turn: number | null;
   hidden: boolean;
-  initial_random_seed: string;
   lobby_creator: number;
   lobby_id: string;
   lobby_state: lobby_status;
@@ -276,7 +271,6 @@ export interface IGetUserLobbiesResult {
   current_round: number | null;
   current_turn: number | null;
   hidden: boolean;
-  initial_random_seed: string;
   lobby_creator: number;
   lobby_id: string;
   lobby_state: lobby_status;
@@ -325,7 +319,6 @@ export interface IGetPaginatedUserLobbiesResult {
   current_round: number | null;
   current_turn: number | null;
   hidden: boolean;
-  initial_random_seed: string;
   lobby_creator: number;
   lobby_id: string;
   lobby_state: lobby_status;
@@ -378,7 +371,6 @@ export interface IGetAllPaginatedUserLobbiesResult {
   current_round: number | null;
   current_turn: number | null;
   hidden: boolean;
-  initial_random_seed: string;
   lobby_creator: number;
   lobby_id: string;
   lobby_state: lobby_status;
@@ -429,7 +421,6 @@ export interface IGetActiveLobbiesResult {
   current_round: number | null;
   current_turn: number | null;
   hidden: boolean;
-  initial_random_seed: string;
   lobby_creator: number;
   lobby_id: string;
   lobby_state: lobby_status;
@@ -460,7 +451,7 @@ export const getActiveLobbies = new PreparedQuery<IGetActiveLobbiesParams,IGetAc
 
 /** 'GetLobbyById' parameters type */
 export interface IGetLobbyByIdParams {
-  lobby_id: string | null | void;
+  lobby_id: string;
 }
 
 /** 'GetLobbyById' return type */
@@ -471,7 +462,6 @@ export interface IGetLobbyByIdResult {
   current_round: number | null;
   current_turn: number | null;
   hidden: boolean;
-  initial_random_seed: string;
   lobby_creator: number;
   lobby_id: string;
   lobby_state: lobby_status;
@@ -488,16 +478,50 @@ export interface IGetLobbyByIdQuery {
   result: IGetLobbyByIdResult;
 }
 
-const getLobbyByIdIR: any = {"usedParamSet":{"lobby_id":true},"params":[{"name":"lobby_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":39,"b":47}]}],"statement":"SELECT * FROM lobbies\nWHERE lobby_id = :lobby_id"};
+const getLobbyByIdIR: any = {"usedParamSet":{"lobby_id":true},"params":[{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":39,"b":48}]}],"statement":"SELECT * FROM lobbies\nWHERE lobby_id = :lobby_id!"};
 
 /**
  * Query generated from SQL:
  * ```
  * SELECT * FROM lobbies
- * WHERE lobby_id = :lobby_id
+ * WHERE lobby_id = :lobby_id!
  * ```
  */
 export const getLobbyById = new PreparedQuery<IGetLobbyByIdParams,IGetLobbyByIdResult>(getLobbyByIdIR);
+
+
+/** 'GetMatch' parameters type */
+export interface IGetMatchParams {
+  lobby_id: string;
+  match_within_lobby: number;
+}
+
+/** 'GetMatch' return type */
+export interface IGetMatchResult {
+  id: number;
+  lobby_id: string;
+  match_within_lobby: number;
+  starting_block_height: number;
+}
+
+/** 'GetMatch' query type */
+export interface IGetMatchQuery {
+  params: IGetMatchParams;
+  result: IGetMatchResult;
+}
+
+const getMatchIR: any = {"usedParamSet":{"lobby_id":true,"match_within_lobby":true},"params":[{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":46,"b":55}]},{"name":"match_within_lobby","required":true,"transform":{"type":"scalar"},"locs":[{"a":84,"b":103}]}],"statement":"SELECT * FROM lobby_match\nWHERE \n  lobby_id = :lobby_id! AND\n  match_within_lobby = :match_within_lobby!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT * FROM lobby_match
+ * WHERE 
+ *   lobby_id = :lobby_id! AND
+ *   match_within_lobby = :match_within_lobby!
+ * ```
+ */
+export const getMatch = new PreparedQuery<IGetMatchParams,IGetMatchResult>(getMatchIR);
 
 
 /** 'GetUserStats' parameters type */

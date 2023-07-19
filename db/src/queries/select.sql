@@ -80,7 +80,13 @@ WHERE lobbies.lobby_state = 'active';
 
 /* @name getLobbyById */
 SELECT * FROM lobbies
-WHERE lobby_id = :lobby_id;
+WHERE lobby_id = :lobby_id!;
+
+/* @name getMatch */
+SELECT * FROM lobby_match
+WHERE 
+  lobby_id = :lobby_id! AND
+  match_within_lobby = :match_within_lobby!;
 
 /* @name getUserStats */
 SELECT * FROM global_user_state

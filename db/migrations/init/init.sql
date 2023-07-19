@@ -16,7 +16,6 @@ CREATE TABLE lobbies (
   current_match INTEGER,
   current_round INTEGER,
   current_turn INTEGER,
-  initial_random_seed TEXT NOT NULL,
   created_at TIMESTAMP NOT NULL,
   creation_block_height INTEGER NOT NULL,
   hidden BOOLEAN NOT NULL DEFAULT false,
@@ -28,7 +27,8 @@ CREATE TABLE lobbies (
 CREATE TABLE lobby_match(
   id SERIAL PRIMARY KEY,
   lobby_id TEXT NOT NULL references lobbies(lobby_id),
-  match_within_lobby INTEGER NOT NULL
+  match_within_lobby INTEGER NOT NULL,
+  starting_block_height INTEGER NOT NULL references block_heights(block_height)
 );
 
 CREATE TABLE match_round(

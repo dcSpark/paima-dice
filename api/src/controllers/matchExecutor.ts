@@ -3,7 +3,8 @@ import { requirePool, getLobbyById, getMatchSeeds, getLobbyPlayers } from '@dice
 import { isLobbyActive, type LobbyPlayer, type MatchExecutorData } from '@dice/utils';
 import { psqlInt } from '../validation';
 import { isLeft } from 'fp-ts/lib/Either';
-import { getMatchMoves } from '@dice/db/src/select.queries';
+import { getMatch, getMatchMoves } from '@dice/db/src/select.queries';
+import { getBlockHeight } from 'paima-sdk/paima-db';
 
 type Response = MatchExecutorData | null;
 
@@ -18,8 +19,12 @@ export class MatchExecutorController extends Controller {
 
     const pool = requirePool();
     const [lobby] = await getLobbyById.run({ lobby_id: lobbyID }, pool);
+    const [match] = await getMatch.run(
+      { lobby_id: lobbyID, match_within_lobby: matchWithinLobby },
+      pool
+    );
     const rawPlayers = await getLobbyPlayers.run({ lobby_id: lobbyID }, pool);
-    if (!lobby || !isLobbyActive(lobby)) {
+    if (lobby == null || !isLobbyActive(lobby) || match == null) {
       return null;
     }
     const players: LobbyPlayer[] = rawPlayers.map(raw => ({
@@ -29,12 +34,16 @@ export class MatchExecutorController extends Controller {
       turn: raw.turn ?? undefined,
     }));
 
+    const [initialSeed] = await getBlockHeight.run(
+      { block_height: match.starting_block_height },
+      pool
+    );
     const matchSeeds = await getMatchSeeds.run(
       { lobby_id: lobbyID, match_within_lobby: matchWithinLobby },
       pool
     );
     const seeds = matchSeeds.map((seed, i) => ({
-      seed: i === 0 ? lobby.initial_random_seed : matchSeeds[i - 1].seed,
+      seed: i === 0 ? initialSeed.seed : matchSeeds[i - 1].seed,
       block_height: seed.block_height,
       round: seed.round_within_match,
     }));
@@ -45,7 +54,7 @@ export class MatchExecutorController extends Controller {
     );
 
     return {
-      lobby: { ...lobby, round_seed: lobby.initial_random_seed, players },
+      lobby: { ...lobby, roundSeed: initialSeed.seed, players },
       seeds,
       moves,
     };

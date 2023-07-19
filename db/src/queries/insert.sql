@@ -7,7 +7,6 @@ INSERT INTO lobbies(
   num_of_rounds,
   round_length,
   play_time_per_player,
-  initial_random_seed,
   creation_block_height,
   created_at,
   hidden,
@@ -21,7 +20,6 @@ VALUES(
   :num_of_rounds!,
   :round_length!,
   :play_time_per_player!,
-  :initial_random_seed!,
   :creation_block_height!,
   :created_at!,
   :hidden!,
@@ -46,11 +44,13 @@ VALUES(
 /* @name newMatch */
 INSERT INTO lobby_match(
   lobby_id,
-  match_within_lobby
+  match_within_lobby,
+  starting_block_height
 )
 VALUES (
   :lobby_id!,
-  :match_within_lobby!
+  :match_within_lobby!,
+  :starting_block_height!
 )
 RETURNING *;
 

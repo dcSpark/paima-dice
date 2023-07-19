@@ -54,9 +54,6 @@
 					"hidden": {
 						"type": "boolean"
 					},
-					"initial_random_seed": {
-						"type": "string"
-					},
 					"lobby_creator": {
 						"type": "number",
 						"format": "double"
@@ -91,7 +88,6 @@
 					"created_at",
 					"creation_block_height",
 					"hidden",
-					"initial_random_seed",
 					"lobby_creator",
 					"lobby_id",
 					"lobby_state",
@@ -135,7 +131,7 @@
 			},
 			"LobbyState": {
 				"properties": {
-					"round_seed": {
+					"roundSeed": {
 						"type": "string"
 					},
 					"players": {
@@ -146,7 +142,7 @@
 					}
 				},
 				"required": [
-					"round_seed",
+					"roundSeed",
 					"players"
 				],
 				"type": "object",
@@ -198,9 +194,6 @@
 					"hidden": {
 						"type": "boolean"
 					},
-					"initial_random_seed": {
-						"type": "string"
-					},
 					"lobby_creator": {
 						"type": "number",
 						"format": "double"
@@ -238,7 +231,6 @@
 					"current_round",
 					"current_turn",
 					"hidden",
-					"initial_random_seed",
 					"lobby_creator",
 					"lobby_id",
 					"lobby_state",
@@ -295,9 +287,6 @@
 					"hidden": {
 						"type": "boolean"
 					},
-					"initial_random_seed": {
-						"type": "string"
-					},
 					"lobby_creator": {
 						"type": "number",
 						"format": "double"
@@ -335,7 +324,6 @@
 					"current_round",
 					"current_turn",
 					"hidden",
-					"initial_random_seed",
 					"lobby_creator",
 					"lobby_id",
 					"lobby_state",
@@ -394,9 +382,6 @@
 					"hidden": {
 						"type": "boolean"
 					},
-					"initial_random_seed": {
-						"type": "string"
-					},
 					"lobby_creator": {
 						"type": "number",
 						"format": "double"
@@ -434,7 +419,6 @@
 					"current_round",
 					"current_turn",
 					"hidden",
-					"initial_random_seed",
 					"lobby_creator",
 					"lobby_id",
 					"lobby_state",
@@ -476,9 +460,6 @@
 					"hidden": {
 						"type": "boolean"
 					},
-					"initial_random_seed": {
-						"type": "string"
-					},
 					"lobby_creator": {
 						"type": "number",
 						"format": "double"
@@ -516,7 +497,6 @@
 					"current_round",
 					"current_turn",
 					"hidden",
-					"initial_random_seed",
 					"lobby_creator",
 					"lobby_id",
 					"lobby_state",

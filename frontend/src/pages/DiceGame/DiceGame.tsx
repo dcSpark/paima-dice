@@ -104,7 +104,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
     // create initial roll queue and roll first
     if (startingScore === 0 && initialRollQueue.length === 0) {
       const newInitialRolls = genInitialDiceRolls(
-        new Prando(lobbyState.round_seed)
+        new Prando(lobbyState.roundSeed)
       ).dice;
       playInitialRollFromQueue(newInitialRolls);
       return;
@@ -139,7 +139,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
     void (async () => {
       setIsTickDisplaying(true);
       const diceRef = diceRefs.current[displayedState.turn];
-      const dieRoll = genDieRoll(new Prando(lobbyState.round_seed));
+      const dieRoll = genDieRoll(new Prando(lobbyState.roundSeed));
       await diceRef.roll([dieRoll]);
       setDisplayedState((oldDisplayedState) => {
         const newDisplayedState = cloneMatchState(oldDisplayedState);

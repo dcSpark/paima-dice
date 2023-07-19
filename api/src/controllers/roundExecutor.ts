@@ -4,12 +4,17 @@ import { isLeft } from 'fp-ts/Either';
 import { psqlInt } from '../validation.js';
 import type { RoundExecutorBackendData } from '@dice/utils';
 import { getBlockHeight } from 'paima-sdk/paima-db';
-import { getRound } from '@dice/db/src/select.queries.js';
+import { getMatch, getRound } from '@dice/db/src/select.queries.js';
 
 type Response = RoundExecutorBackendData | Error;
 
 interface Error {
-  error: 'lobby not found' | 'bad round number' | 'round not found';
+  error:
+    | 'lobby not found'
+    | 'bad round number'
+    | 'round not found'
+    | 'match not found'
+    | 'internal error';
 }
 
 @Route('round_executor')
@@ -31,8 +36,15 @@ export class RoundExecutorController extends Controller {
 
     const pool = requirePool();
     const [lobby] = await getLobbyById.run({ lobby_id: lobbyID }, pool);
+    const [match] = await getMatch.run(
+      { lobby_id: lobbyID, match_within_lobby: matchWithinLobby },
+      pool
+    );
     if (!lobby) {
       return { error: 'lobby not found' };
+    }
+    if (match == null) {
+      return { error: 'match not found' };
     }
 
     const [last_round_data] =
@@ -47,12 +59,16 @@ export class RoundExecutorController extends Controller {
             pool
           );
 
-    const [last_block_height] =
-      last_round_data == null
-        ? [undefined]
-        : await getBlockHeight.run({ block_height: last_round_data.execution_block_height }, pool);
-    const seed = last_block_height?.seed ?? lobby.initial_random_seed;
+    const seedBlockHeight =
+      roundWithinMatch === 0
+        ? match.starting_block_height
+        : last_round_data?.execution_block_height;
+    if (seedBlockHeight == null) {
+      return { error: 'internal error' };
+    }
 
+    const [seedBlockRow] = await getBlockHeight.run({ block_height: seedBlockHeight }, pool);
+    const seed = seedBlockRow.seed;
     const moves = await getRoundMoves.run(
       {
         lobby_id: lobbyID,
