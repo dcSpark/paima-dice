@@ -87,32 +87,35 @@ const updateLobbyCurrentRoundIR: any = {"usedParamSet":{"current_round":true,"lo
 export const updateLobbyCurrentRound = new PreparedQuery<IUpdateLobbyCurrentRoundParams,IUpdateLobbyCurrentRoundResult>(updateLobbyCurrentRoundIR);
 
 
-/** 'UpdateLobbyCurrentTurn' parameters type */
-export interface IUpdateLobbyCurrentTurnParams {
-  current_turn: number | null | void;
+/** 'UpdateLobbyMatchState' parameters type */
+export interface IUpdateLobbyMatchStateParams {
+  current_proper_round: number;
+  current_turn: number;
   lobby_id: string;
 }
 
-/** 'UpdateLobbyCurrentTurn' return type */
-export type IUpdateLobbyCurrentTurnResult = void;
+/** 'UpdateLobbyMatchState' return type */
+export type IUpdateLobbyMatchStateResult = void;
 
-/** 'UpdateLobbyCurrentTurn' query type */
-export interface IUpdateLobbyCurrentTurnQuery {
-  params: IUpdateLobbyCurrentTurnParams;
-  result: IUpdateLobbyCurrentTurnResult;
+/** 'UpdateLobbyMatchState' query type */
+export interface IUpdateLobbyMatchStateQuery {
+  params: IUpdateLobbyMatchStateParams;
+  result: IUpdateLobbyMatchStateResult;
 }
 
-const updateLobbyCurrentTurnIR: any = {"usedParamSet":{"current_turn":true,"lobby_id":true},"params":[{"name":"current_turn","required":false,"transform":{"type":"scalar"},"locs":[{"a":34,"b":46}]},{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":65,"b":74}]}],"statement":"UPDATE lobbies\nSET current_turn = :current_turn\nWHERE lobby_id = :lobby_id!"};
+const updateLobbyMatchStateIR: any = {"usedParamSet":{"current_turn":true,"current_proper_round":true,"lobby_id":true},"params":[{"name":"current_turn","required":true,"transform":{"type":"scalar"},"locs":[{"a":37,"b":50}]},{"name":"current_proper_round","required":true,"transform":{"type":"scalar"},"locs":[{"a":78,"b":99}]},{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":118,"b":127}]}],"statement":"UPDATE lobbies\nSET \n  current_turn = :current_turn!,\n  current_proper_round = :current_proper_round!\nWHERE lobby_id = :lobby_id!"};
 
 /**
  * Query generated from SQL:
  * ```
  * UPDATE lobbies
- * SET current_turn = :current_turn
+ * SET 
+ *   current_turn = :current_turn!,
+ *   current_proper_round = :current_proper_round!
  * WHERE lobby_id = :lobby_id!
  * ```
  */
-export const updateLobbyCurrentTurn = new PreparedQuery<IUpdateLobbyCurrentTurnParams,IUpdateLobbyCurrentTurnResult>(updateLobbyCurrentTurnIR);
+export const updateLobbyMatchState = new PreparedQuery<IUpdateLobbyMatchStateParams,IUpdateLobbyMatchStateResult>(updateLobbyMatchStateIR);
 
 
 /** 'UpdateLobbyPlayer' parameters type */

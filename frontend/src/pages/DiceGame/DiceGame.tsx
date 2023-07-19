@@ -44,6 +44,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
   // end state of last round (latest finished round)
   const [displayedState, setDisplayedState] = useState<MatchState>({
     turn: lobbyState.current_turn,
+    properRound: lobbyState.current_proper_round,
     players: lobbyState.players,
   });
   // cache of state that was fetched, but still needs to be displayed
@@ -237,6 +238,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
   const [isFetchingRound, setIsFetchingRound] = useState(false);
   const [fetchedEndState, setFetchedEndState] = useState<MatchState>({
     turn: lobbyState.current_turn,
+    properRound: lobbyState.current_proper_round,
     players: lobbyState.players,
   });
   const [nextFetchedRound, setFetchedRound] = useState(
@@ -304,6 +306,8 @@ const DiceGame: React.FC<DiceGameProps> = ({
         variant="caption"
         sx={{ fontSize: "1.25rem", lineHeight: "1.75rem" }}
       >
+        {`Round: ${displayedState.properRound + 1}`}
+        {" | "}
         {caption ??
           (thisPlayer.turn === displayedState.turn
             ? "Your turn"

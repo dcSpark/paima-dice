@@ -103,6 +103,7 @@ export function buildCurrentMatchState(
 
   return {
     players,
+    properRound: lobby.current_proper_round,
     turn: lobby.current_turn,
   };
 }

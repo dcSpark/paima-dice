@@ -15,6 +15,7 @@ export interface IGetPaginatedOpenLobbiesResult {
   created_at: Date;
   creation_block_height: number;
   current_match: number | null;
+  current_proper_round: number | null;
   current_round: number | null;
   current_turn: number | null;
   hidden: boolean;
@@ -63,6 +64,7 @@ export interface ISearchPaginatedOpenLobbiesResult {
   created_at: Date;
   creation_block_height: number;
   current_match: number | null;
+  current_proper_round: number | null;
   current_round: number | null;
   current_turn: number | null;
   hidden: boolean;
@@ -109,6 +111,7 @@ export interface IGetOpenLobbyByIdResult {
   created_at: Date;
   creation_block_height: number;
   current_match: number | null;
+  current_proper_round: number | null;
   current_round: number | null;
   current_turn: number | null;
   hidden: boolean;
@@ -183,6 +186,7 @@ export interface IGetRandomLobbyResult {
   created_at: Date;
   creation_block_height: number;
   current_match: number | null;
+  current_proper_round: number | null;
   current_round: number | null;
   current_turn: number | null;
   hidden: boolean;
@@ -225,6 +229,7 @@ export interface IGetRandomActiveLobbyResult {
   created_at: Date;
   creation_block_height: number;
   current_match: number | null;
+  current_proper_round: number | null;
   current_round: number | null;
   current_turn: number | null;
   hidden: boolean;
@@ -268,6 +273,7 @@ export interface IGetUserLobbiesResult {
   created_at: Date;
   creation_block_height: number;
   current_match: number | null;
+  current_proper_round: number | null;
   current_round: number | null;
   current_turn: number | null;
   hidden: boolean;
@@ -316,6 +322,7 @@ export interface IGetPaginatedUserLobbiesResult {
   created_at: Date;
   creation_block_height: number;
   current_match: number | null;
+  current_proper_round: number | null;
   current_round: number | null;
   current_turn: number | null;
   hidden: boolean;
@@ -368,6 +375,7 @@ export interface IGetAllPaginatedUserLobbiesResult {
   created_at: Date;
   creation_block_height: number;
   current_match: number | null;
+  current_proper_round: number | null;
   current_round: number | null;
   current_turn: number | null;
   hidden: boolean;
@@ -418,6 +426,7 @@ export interface IGetActiveLobbiesResult {
   created_at: Date;
   creation_block_height: number;
   current_match: number | null;
+  current_proper_round: number | null;
   current_round: number | null;
   current_turn: number | null;
   hidden: boolean;
@@ -459,6 +468,7 @@ export interface IGetLobbyByIdResult {
   created_at: Date;
   creation_block_height: number;
   current_match: number | null;
+  current_proper_round: number | null;
   current_round: number | null;
   current_turn: number | null;
   hidden: boolean;

@@ -16,6 +16,7 @@ CREATE TABLE lobbies (
   current_match INTEGER,
   current_round INTEGER,
   current_turn INTEGER,
+  current_proper_round INTEGER,
   created_at TIMESTAMP NOT NULL,
   creation_block_height INTEGER NOT NULL,
   hidden BOOLEAN NOT NULL DEFAULT false,

@@ -55,6 +55,9 @@ export interface MatchEnvironment {}
 
 export interface MatchState {
   players: LobbyPlayer[];
+  // Round that is displayed to users (consists of everyone taking a turn).
+  // Not to be confused with round everywhere else (1 move + 1 random seed).
+  properRound: number;
   turn: number; // whose turn is it
 }
 
@@ -114,7 +117,11 @@ export type LobbyPlayer = {
   score: number;
 };
 
-type ActiveLobbyRequirements = 'current_match' | 'current_round' | 'current_turn';
+type ActiveLobbyRequirements =
+  | 'current_match'
+  | 'current_round'
+  | 'current_turn'
+  | 'current_proper_round';
 /* Note: does not require state: 'active', we may want to get rid of the state if it's useless */
 export type ActiveLobby = Omit<IGetLobbyByIdResult, ActiveLobbyRequirements> &
   PropertiesNonNullable<Pick<IGetLobbyByIdResult, ActiveLobbyRequirements>>;

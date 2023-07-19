@@ -33,6 +33,7 @@ export function buildMatchExecutor({
       points: 0,
       score: 0,
     })),
+    properRound: 0,
     turn: 0,
   };
 

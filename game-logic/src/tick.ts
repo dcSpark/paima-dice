@@ -126,7 +126,7 @@ export function applyEvent(matchState: MatchState, event: TickEvent): void {
   }
 
   if (event.kind === TickEventKind.roundEnd) {
-    // reset scores
+    matchState.properRound++;
     for (const i in matchState.players) {
       matchState.players[i].score = 0;
     }

@@ -15,13 +15,13 @@ import type { SQLUpdate } from 'paima-sdk/paima-db';
 import {
   updateLobbyCurrentMatch,
   updateLobbyCurrentRound,
-  updateLobbyCurrentTurn,
+  updateLobbyMatchState,
   updateLobbyState,
 } from '@dice/db/src/update.queries.js';
 import type {
   IUpdateLobbyCurrentMatchParams,
   IUpdateLobbyCurrentRoundParams,
-  IUpdateLobbyCurrentTurnParams,
+  IUpdateLobbyMatchStateParams,
   IUpdateLobbyStateParams,
 } from '@dice/db/src/update.queries.js';
 import type { INewMatchParams, INewMoveParams } from '@dice/db/src/insert.queries.js';
@@ -81,6 +81,7 @@ export function persistInitialMatchState(
 
   const newTurnOrder = genPermutation(players.length, randomnessGenerator);
   const newMatchState: MatchState = {
+    properRound: 0,
     turn: 0,
     players: players.map((player, i) => ({
       nftId: player.nftId,
@@ -222,11 +223,12 @@ export function persistUpdateMatchState(lobbyId: string, newMatchState: MatchSta
   }));
   const playerUpdates: SQLUpdate[] = playerParams.map(param => [updateLobbyPlayer, param]);
 
-  const lobbyParams: IUpdateLobbyCurrentTurnParams = {
+  const lobbyParams: IUpdateLobbyMatchStateParams = {
     lobby_id: lobbyId,
     current_turn: newMatchState.turn,
+    current_proper_round: newMatchState.properRound,
   };
-  const lobbyUpdates: SQLUpdate[] = [[updateLobbyCurrentTurn, lobbyParams]];
+  const lobbyUpdates: SQLUpdate[] = [[updateLobbyMatchState, lobbyParams]];
 
   return [...playerUpdates, ...lobbyUpdates];
 }
