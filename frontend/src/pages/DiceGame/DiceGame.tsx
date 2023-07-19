@@ -43,7 +43,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
   );
   // end state of last round (latest finished round)
   const [displayedState, setDisplayedState] = useState<MatchState>({
-    turn: lobbyState.turn,
+    turn: lobbyState.current_turn,
     players: lobbyState.players,
   });
   // cache of state that was fetched, but still needs to be displayed
@@ -73,8 +73,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
   async function submit(rollAgain: boolean) {
     const moveResult = await DiceService.submitMove(
       selectedNft,
-      lobbyState.lobby_id,
-      lobbyState.current_round,
+      lobbyState,
       rollAgain
     );
     console.log("Move result:", moveResult);
@@ -128,7 +127,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
     () =>
       lobbyState.current_round === displayedRound + 1 &&
       thisPlayer.turn === displayedState.turn &&
-      thisPlayer.turn === lobbyState.turn,
+      thisPlayer.turn === lobbyState.current_turn,
     [lobbyState, displayedRound, thisPlayer]
   );
 
@@ -237,7 +236,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
 
   const [isFetchingRound, setIsFetchingRound] = useState(false);
   const [fetchedEndState, setFetchedEndState] = useState<MatchState>({
-    turn: lobbyState.turn,
+    turn: lobbyState.current_turn,
     players: lobbyState.players,
   });
   const [nextFetchedRound, setFetchedRound] = useState(
@@ -257,7 +256,12 @@ const DiceGame: React.FC<DiceGameProps> = ({
 
     setIsFetchingRound(true);
     Paima.default
-      .getRoundExecutor(lobbyState.lobby_id, nextFetchedRound, fetchedEndState)
+      .getRoundExecutor(
+        lobbyState.lobby_id,
+        lobbyState.current_match,
+        nextFetchedRound,
+        fetchedEndState
+      )
       .then((newRoundExecutor) => {
         if (newRoundExecutor.success) {
           const newRoundExecutorResults = {

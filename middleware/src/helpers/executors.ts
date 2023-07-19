@@ -27,12 +27,18 @@ export function buildMatchExecutor({
     })),
     turn: 0,
   };
+
+  const paimaMoves = moves.map(move => ({
+    ...move,
+    round: move.round_within_match,
+  }));
+
   return matchExecutor.initialize(
     extractMatchEnvironment(lobby),
     lobby.num_of_rounds,
     initialState,
     seeds,
-    moves,
+    paimaMoves,
     processTick
   );
 }

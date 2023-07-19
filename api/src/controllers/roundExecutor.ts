@@ -1,9 +1,10 @@
 import { Controller, Get, Query, Route, ValidateError } from 'tsoa';
-import { requirePool, getLobbyById, getRoundData, getRoundMoves } from '@dice/db';
+import { requirePool, getLobbyById, getRoundMoves } from '@dice/db';
 import { isLeft } from 'fp-ts/Either';
 import { psqlInt } from '../validation.js';
 import type { RoundExecutorBackendData } from '@dice/utils';
 import { getBlockHeight } from 'paima-sdk/paima-db';
+import { getRound } from '@dice/db/src/select.queries.js';
 
 type Response = RoundExecutorBackendData | Error;
 
@@ -14,10 +15,18 @@ interface Error {
 @Route('round_executor')
 export class RoundExecutorController extends Controller {
   @Get()
-  public async get(@Query() lobbyID: string, @Query() round: number): Promise<Response> {
-    const valRound = psqlInt.decode(round);
+  public async get(
+    @Query() lobbyID: string,
+    @Query() matchWithinLobby: number,
+    @Query() roundWithinMatch: number
+  ): Promise<Response> {
+    const valMatch = psqlInt.decode(matchWithinLobby);
+    if (isLeft(valMatch)) {
+      throw new ValidateError({ matchWithinLobby: { message: 'invalid number' } }, '');
+    }
+    const valRound = psqlInt.decode(roundWithinMatch);
     if (isLeft(valRound)) {
-      throw new ValidateError({ round: { message: 'invalid number' } }, '');
+      throw new ValidateError({ roundWithinMatch: { message: 'invalid number' } }, '');
     }
 
     const pool = requirePool();
@@ -27,9 +36,16 @@ export class RoundExecutorController extends Controller {
     }
 
     const [last_round_data] =
-      round === 0
+      roundWithinMatch === 0
         ? [undefined]
-        : await getRoundData.run({ lobby_id: lobbyID, round_number: round - 1 }, pool);
+        : await getRound.run(
+            {
+              lobby_id: lobbyID,
+              match_within_lobby: matchWithinLobby,
+              round_within_match: roundWithinMatch - 1,
+            },
+            pool
+          );
 
     const [last_block_height] =
       last_round_data == null
@@ -37,7 +53,14 @@ export class RoundExecutorController extends Controller {
         : await getBlockHeight.run({ block_height: last_round_data.execution_block_height }, pool);
     const seed = last_block_height?.seed ?? lobby.initial_random_seed;
 
-    const moves = await getRoundMoves.run({ lobby_id: lobbyID, round: round }, pool);
+    const moves = await getRoundMoves.run(
+      {
+        lobby_id: lobbyID,
+        match_within_lobby: matchWithinLobby,
+        round_within_match: roundWithinMatch,
+      },
+      pool
+    );
     return {
       lobby,
       moves,

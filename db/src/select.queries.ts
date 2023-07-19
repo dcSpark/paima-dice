@@ -14,7 +14,9 @@ export interface IGetPaginatedOpenLobbiesParams {
 export interface IGetPaginatedOpenLobbiesResult {
   created_at: Date;
   creation_block_height: number;
-  current_round: number;
+  current_match: number | null;
+  current_round: number | null;
+  current_turn: number | null;
   hidden: boolean;
   initial_random_seed: string;
   lobby_creator: number;
@@ -25,7 +27,6 @@ export interface IGetPaginatedOpenLobbiesResult {
   play_time_per_player: number;
   practice: boolean;
   round_length: number;
-  turn: number;
 }
 
 /** 'GetPaginatedOpenLobbies' query type */
@@ -62,7 +63,9 @@ export interface ISearchPaginatedOpenLobbiesParams {
 export interface ISearchPaginatedOpenLobbiesResult {
   created_at: Date;
   creation_block_height: number;
-  current_round: number;
+  current_match: number | null;
+  current_round: number | null;
+  current_turn: number | null;
   hidden: boolean;
   initial_random_seed: string;
   lobby_creator: number;
@@ -73,7 +76,6 @@ export interface ISearchPaginatedOpenLobbiesResult {
   play_time_per_player: number;
   practice: boolean;
   round_length: number;
-  turn: number;
 }
 
 /** 'SearchPaginatedOpenLobbies' query type */
@@ -108,7 +110,9 @@ export interface IGetOpenLobbyByIdParams {
 export interface IGetOpenLobbyByIdResult {
   created_at: Date;
   creation_block_height: number;
-  current_round: number;
+  current_match: number | null;
+  current_round: number | null;
+  current_turn: number | null;
   hidden: boolean;
   initial_random_seed: string;
   lobby_creator: number;
@@ -119,7 +123,6 @@ export interface IGetOpenLobbyByIdResult {
   play_time_per_player: number;
   practice: boolean;
   round_length: number;
-  turn: number;
 }
 
 /** 'GetOpenLobbyById' query type */
@@ -182,7 +185,9 @@ export type IGetRandomLobbyParams = void;
 export interface IGetRandomLobbyResult {
   created_at: Date;
   creation_block_height: number;
-  current_round: number;
+  current_match: number | null;
+  current_round: number | null;
+  current_turn: number | null;
   hidden: boolean;
   initial_random_seed: string;
   lobby_creator: number;
@@ -193,7 +198,6 @@ export interface IGetRandomLobbyResult {
   play_time_per_player: number;
   practice: boolean;
   round_length: number;
-  turn: number;
 }
 
 /** 'GetRandomLobby' query type */
@@ -224,7 +228,9 @@ export type IGetRandomActiveLobbyParams = void;
 export interface IGetRandomActiveLobbyResult {
   created_at: Date;
   creation_block_height: number;
-  current_round: number;
+  current_match: number | null;
+  current_round: number | null;
+  current_turn: number | null;
   hidden: boolean;
   initial_random_seed: string;
   lobby_creator: number;
@@ -235,7 +241,6 @@ export interface IGetRandomActiveLobbyResult {
   play_time_per_player: number;
   practice: boolean;
   round_length: number;
-  turn: number;
 }
 
 /** 'GetRandomActiveLobby' query type */
@@ -267,7 +272,9 @@ export interface IGetUserLobbiesParams {
 export interface IGetUserLobbiesResult {
   created_at: Date;
   creation_block_height: number;
-  current_round: number;
+  current_match: number | null;
+  current_round: number | null;
+  current_turn: number | null;
   hidden: boolean;
   initial_random_seed: string;
   lobby_creator: number;
@@ -278,7 +285,6 @@ export interface IGetUserLobbiesResult {
   play_time_per_player: number;
   practice: boolean;
   round_length: number;
-  turn: number;
 }
 
 /** 'GetUserLobbies' query type */
@@ -315,7 +321,9 @@ export interface IGetPaginatedUserLobbiesParams {
 export interface IGetPaginatedUserLobbiesResult {
   created_at: Date;
   creation_block_height: number;
-  current_round: number;
+  current_match: number | null;
+  current_round: number | null;
+  current_turn: number | null;
   hidden: boolean;
   initial_random_seed: string;
   lobby_creator: number;
@@ -326,7 +334,6 @@ export interface IGetPaginatedUserLobbiesResult {
   play_time_per_player: number;
   practice: boolean;
   round_length: number;
-  turn: number;
 }
 
 /** 'GetPaginatedUserLobbies' query type */
@@ -367,7 +374,9 @@ export interface IGetAllPaginatedUserLobbiesParams {
 export interface IGetAllPaginatedUserLobbiesResult {
   created_at: Date;
   creation_block_height: number;
-  current_round: number;
+  current_match: number | null;
+  current_round: number | null;
+  current_turn: number | null;
   hidden: boolean;
   initial_random_seed: string;
   lobby_creator: number;
@@ -378,7 +387,6 @@ export interface IGetAllPaginatedUserLobbiesResult {
   play_time_per_player: number;
   practice: boolean;
   round_length: number;
-  turn: number;
 }
 
 /** 'GetAllPaginatedUserLobbies' query type */
@@ -417,7 +425,9 @@ export type IGetActiveLobbiesParams = void;
 export interface IGetActiveLobbiesResult {
   created_at: Date;
   creation_block_height: number;
-  current_round: number;
+  current_match: number | null;
+  current_round: number | null;
+  current_turn: number | null;
   hidden: boolean;
   initial_random_seed: string;
   lobby_creator: number;
@@ -428,7 +438,6 @@ export interface IGetActiveLobbiesResult {
   play_time_per_player: number;
   practice: boolean;
   round_length: number;
-  turn: number;
 }
 
 /** 'GetActiveLobbies' query type */
@@ -458,7 +467,9 @@ export interface IGetLobbyByIdParams {
 export interface IGetLobbyByIdResult {
   created_at: Date;
   creation_block_height: number;
-  current_round: number;
+  current_match: number | null;
+  current_round: number | null;
+  current_turn: number | null;
   hidden: boolean;
   initial_random_seed: string;
   lobby_creator: number;
@@ -469,7 +480,6 @@ export interface IGetLobbyByIdResult {
   play_time_per_player: number;
   practice: boolean;
   round_length: number;
-  turn: number;
 }
 
 /** 'GetLobbyById' query type */
@@ -558,16 +568,19 @@ export const getBothUserStats = new PreparedQuery<IGetBothUserStatsParams,IGetBo
 /** 'GetRoundMoves' parameters type */
 export interface IGetRoundMovesParams {
   lobby_id: string;
-  round: number;
+  match_within_lobby: number;
+  round_within_match: number;
 }
 
 /** 'GetRoundMoves' return type */
 export interface IGetRoundMovesResult {
   id: number;
   lobby_id: string;
+  match_within_lobby: number;
+  move_within_round: number;
   nft_id: number;
   roll_again: boolean;
-  round: number;
+  round_within_match: number;
 }
 
 /** 'GetRoundMoves' query type */
@@ -576,92 +589,62 @@ export interface IGetRoundMovesQuery {
   result: IGetRoundMovesResult;
 }
 
-const getRoundMovesIR: any = {"usedParamSet":{"lobby_id":true,"round":true},"params":[{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":43,"b":52}]},{"name":"round","required":true,"transform":{"type":"scalar"},"locs":[{"a":68,"b":74}]}],"statement":"SELECT * FROM match_moves\nWHERE lobby_id = :lobby_id!\nAND   round = :round!"};
-
-/**
- * Query generated from SQL:
- * ```
- * SELECT * FROM match_moves
- * WHERE lobby_id = :lobby_id!
- * AND   round = :round!
- * ```
- */
-export const getRoundMoves = new PreparedQuery<IGetRoundMovesParams,IGetRoundMovesResult>(getRoundMovesIR);
-
-
-/** 'GetCachedMoves' parameters type */
-export interface IGetCachedMovesParams {
-  lobby_id: string | null | void;
-}
-
-/** 'GetCachedMoves' return type */
-export interface IGetCachedMovesResult {
-  id: number;
-  lobby_id: string;
-  nft_id: number;
-  roll_again: boolean;
-  round: number;
-}
-
-/** 'GetCachedMoves' query type */
-export interface IGetCachedMovesQuery {
-  params: IGetCachedMovesParams;
-  result: IGetCachedMovesResult;
-}
-
-const getCachedMovesIR: any = {"usedParamSet":{"lobby_id":true},"params":[{"name":"lobby_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":305,"b":313}]}],"statement":"SELECT\nmatch_moves.id,\nmatch_moves.lobby_id,\nmatch_moves.nft_id,\nmatch_moves.roll_again,\nmatch_moves.round\nFROM match_moves\nINNER JOIN rounds\nON match_moves.lobby_id = rounds.lobby_id\nAND match_moves.round = rounds.round_within_match\nWHERE rounds.execution_block_height IS NULL\nAND match_moves.lobby_id = :lobby_id"};
-
-/**
- * Query generated from SQL:
- * ```
- * SELECT
- * match_moves.id,
- * match_moves.lobby_id,
- * match_moves.nft_id,
- * match_moves.roll_again,
- * match_moves.round
- * FROM match_moves
- * INNER JOIN rounds
- * ON match_moves.lobby_id = rounds.lobby_id
- * AND match_moves.round = rounds.round_within_match
- * WHERE rounds.execution_block_height IS NULL
- * AND match_moves.lobby_id = :lobby_id
- * ```
- */
-export const getCachedMoves = new PreparedQuery<IGetCachedMovesParams,IGetCachedMovesResult>(getCachedMovesIR);
-
-
-/** 'GetMovesByLobby' parameters type */
-export interface IGetMovesByLobbyParams {
-  lobby_id: string | null | void;
-}
-
-/** 'GetMovesByLobby' return type */
-export interface IGetMovesByLobbyResult {
-  id: number;
-  lobby_id: string;
-  nft_id: number;
-  roll_again: boolean;
-  round: number;
-}
-
-/** 'GetMovesByLobby' query type */
-export interface IGetMovesByLobbyQuery {
-  params: IGetMovesByLobbyParams;
-  result: IGetMovesByLobbyResult;
-}
-
-const getMovesByLobbyIR: any = {"usedParamSet":{"lobby_id":true},"params":[{"name":"lobby_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":55,"b":63}]}],"statement":"SELECT *\nFROM match_moves\nWHERE match_moves.lobby_id = :lobby_id"};
+const getRoundMovesIR: any = {"usedParamSet":{"lobby_id":true,"match_within_lobby":true,"round_within_match":true},"params":[{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":44,"b":53}]},{"name":"match_within_lobby","required":true,"transform":{"type":"scalar"},"locs":[{"a":82,"b":101}]},{"name":"round_within_match","required":true,"transform":{"type":"scalar"},"locs":[{"a":130,"b":149}]}],"statement":"SELECT *\nFROM round_move\nWHERE\n  lobby_id = :lobby_id! AND\n  match_within_lobby = :match_within_lobby! AND\n  round_within_match = :round_within_match!\nORDER BY round_move.move_within_round"};
 
 /**
  * Query generated from SQL:
  * ```
  * SELECT *
- * FROM match_moves
- * WHERE match_moves.lobby_id = :lobby_id
+ * FROM round_move
+ * WHERE
+ *   lobby_id = :lobby_id! AND
+ *   match_within_lobby = :match_within_lobby! AND
+ *   round_within_match = :round_within_match!
+ * ORDER BY round_move.move_within_round
  * ```
  */
-export const getMovesByLobby = new PreparedQuery<IGetMovesByLobbyParams,IGetMovesByLobbyResult>(getMovesByLobbyIR);
+export const getRoundMoves = new PreparedQuery<IGetRoundMovesParams,IGetRoundMovesResult>(getRoundMovesIR);
+
+
+/** 'GetMatchMoves' parameters type */
+export interface IGetMatchMovesParams {
+  lobby_id: string;
+  match_within_lobby: number;
+}
+
+/** 'GetMatchMoves' return type */
+export interface IGetMatchMovesResult {
+  id: number;
+  lobby_id: string;
+  match_within_lobby: number;
+  move_within_round: number;
+  nft_id: number;
+  roll_again: boolean;
+  round_within_match: number;
+}
+
+/** 'GetMatchMoves' query type */
+export interface IGetMatchMovesQuery {
+  params: IGetMatchMovesParams;
+  result: IGetMatchMovesResult;
+}
+
+const getMatchMovesIR: any = {"usedParamSet":{"lobby_id":true,"match_within_lobby":true},"params":[{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":45,"b":54}]},{"name":"match_within_lobby","required":true,"transform":{"type":"scalar"},"locs":[{"a":83,"b":102}]}],"statement":"SELECT *\nFROM round_move\nWHERE \n  lobby_id = :lobby_id! AND\n  match_within_lobby = :match_within_lobby!\nORDER BY\n  round_move.round_within_match,\n  round_move.move_within_round"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT *
+ * FROM round_move
+ * WHERE 
+ *   lobby_id = :lobby_id! AND
+ *   match_within_lobby = :match_within_lobby!
+ * ORDER BY
+ *   round_move.round_within_match,
+ *   round_move.move_within_round
+ * ```
+ */
+export const getMatchMoves = new PreparedQuery<IGetMatchMovesParams,IGetMatchMovesResult>(getMatchMovesIR);
 
 
 /** 'GetNewLobbiesByUserAndBlockHeight' parameters type */
@@ -694,43 +677,49 @@ const getNewLobbiesByUserAndBlockHeightIR: any = {"usedParamSet":{"nft_id":true,
 export const getNewLobbiesByUserAndBlockHeight = new PreparedQuery<IGetNewLobbiesByUserAndBlockHeightParams,IGetNewLobbiesByUserAndBlockHeightResult>(getNewLobbiesByUserAndBlockHeightIR);
 
 
-/** 'GetRoundData' parameters type */
-export interface IGetRoundDataParams {
+/** 'GetRound' parameters type */
+export interface IGetRoundParams {
   lobby_id: string;
-  round_number: number | null | void;
+  match_within_lobby: number;
+  round_within_match: number;
 }
 
-/** 'GetRoundData' return type */
-export interface IGetRoundDataResult {
+/** 'GetRound' return type */
+export interface IGetRoundResult {
   execution_block_height: number | null;
   id: number;
   lobby_id: string;
+  match_within_lobby: number;
   round_within_match: number;
   starting_block_height: number;
 }
 
-/** 'GetRoundData' query type */
-export interface IGetRoundDataQuery {
-  params: IGetRoundDataParams;
-  result: IGetRoundDataResult;
+/** 'GetRound' query type */
+export interface IGetRoundQuery {
+  params: IGetRoundParams;
+  result: IGetRoundResult;
 }
 
-const getRoundDataIR: any = {"usedParamSet":{"lobby_id":true,"round_number":true},"params":[{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":38,"b":47}]},{"name":"round_number","required":false,"transform":{"type":"scalar"},"locs":[{"a":74,"b":86}]}],"statement":"SELECT * FROM rounds\nWHERE lobby_id = :lobby_id!\nAND round_within_match = :round_number"};
+const getRoundIR: any = {"usedParamSet":{"lobby_id":true,"match_within_lobby":true,"round_within_match":true},"params":[{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":46,"b":55}]},{"name":"match_within_lobby","required":true,"transform":{"type":"scalar"},"locs":[{"a":84,"b":103}]},{"name":"round_within_match","required":true,"transform":{"type":"scalar"},"locs":[{"a":132,"b":151}]}],"statement":"SELECT *\nFROM match_round\nWHERE \n  lobby_id = :lobby_id! AND\n  match_within_lobby = :match_within_lobby! AND\n  round_within_match = :round_within_match!"};
 
 /**
  * Query generated from SQL:
  * ```
- * SELECT * FROM rounds
- * WHERE lobby_id = :lobby_id!
- * AND round_within_match = :round_number
+ * SELECT *
+ * FROM match_round
+ * WHERE 
+ *   lobby_id = :lobby_id! AND
+ *   match_within_lobby = :match_within_lobby! AND
+ *   round_within_match = :round_within_match!
  * ```
  */
-export const getRoundData = new PreparedQuery<IGetRoundDataParams,IGetRoundDataResult>(getRoundDataIR);
+export const getRound = new PreparedQuery<IGetRoundParams,IGetRoundResult>(getRoundIR);
 
 
 /** 'GetMatchSeeds' parameters type */
 export interface IGetMatchSeedsParams {
-  lobby_id: string | null | void;
+  lobby_id: string;
+  match_within_lobby: number;
 }
 
 /** 'GetMatchSeeds' return type */
@@ -740,6 +729,7 @@ export interface IGetMatchSeedsResult {
   execution_block_height: number | null;
   id: number;
   lobby_id: string;
+  match_within_lobby: number;
   round_within_match: number;
   seed: string;
   starting_block_height: number;
@@ -751,16 +741,18 @@ export interface IGetMatchSeedsQuery {
   result: IGetMatchSeedsResult;
 }
 
-const getMatchSeedsIR: any = {"usedParamSet":{"lobby_id":true},"params":[{"name":"lobby_id","required":false,"transform":{"type":"scalar"},"locs":[{"a":132,"b":140}]}],"statement":"SELECT * FROM rounds\nINNER JOIN block_heights\nON block_heights.block_height = rounds.execution_block_height\nWHERE rounds.lobby_id = :lobby_id\nORDER BY rounds.round_within_match ASC"};
+const getMatchSeedsIR: any = {"usedParamSet":{"lobby_id":true,"match_within_lobby":true},"params":[{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":133,"b":142}]},{"name":"match_within_lobby","required":true,"transform":{"type":"scalar"},"locs":[{"a":171,"b":190}]}],"statement":"SELECT *\nFROM match_round JOIN block_heights\n  ON block_heights.block_height = match_round.execution_block_height\nWHERE\n  lobby_id = :lobby_id! AND\n  match_within_lobby = :match_within_lobby!\nORDER BY match_round.round_within_match ASC"};
 
 /**
  * Query generated from SQL:
  * ```
- * SELECT * FROM rounds
- * INNER JOIN block_heights
- * ON block_heights.block_height = rounds.execution_block_height
- * WHERE rounds.lobby_id = :lobby_id
- * ORDER BY rounds.round_within_match ASC
+ * SELECT *
+ * FROM match_round JOIN block_heights
+ *   ON block_heights.block_height = match_round.execution_block_height
+ * WHERE
+ *   lobby_id = :lobby_id! AND
+ *   match_within_lobby = :match_within_lobby!
+ * ORDER BY match_round.round_within_match ASC
  * ```
  */
 export const getMatchSeeds = new PreparedQuery<IGetMatchSeedsParams,IGetMatchSeedsResult>(getMatchSeedsIR);

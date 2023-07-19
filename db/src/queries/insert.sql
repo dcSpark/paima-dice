@@ -7,7 +7,6 @@ INSERT INTO lobbies(
   num_of_rounds,
   round_length,
   play_time_per_player,
-  current_round,
   initial_random_seed,
   creation_block_height,
   created_at,
@@ -22,7 +21,6 @@ VALUES(
   :num_of_rounds!,
   :round_length!,
   :play_time_per_player!,
-  :current_round,
   :initial_random_seed!,
   :creation_block_height!,
   :created_at!,
@@ -45,17 +43,30 @@ VALUES(
   :turn!
 );
 
+/* @name newMatch */
+INSERT INTO lobby_match(
+  lobby_id,
+  match_within_lobby
+)
+VALUES (
+  :lobby_id!,
+  :match_within_lobby!
+)
+RETURNING *;
+
 /* 
   @name newRound
 */
-INSERT INTO rounds(
+INSERT INTO match_round(
   lobby_id,
+  match_within_lobby,
   round_within_match,
   starting_block_height,
   execution_block_height
 )
 VALUES (
   :lobby_id!,
+  :match_within_lobby!,
   :round_within_match!,
   :starting_block_height!,
   :execution_block_height
@@ -63,11 +74,24 @@ VALUES (
 RETURNING *;
 
 /* 
-  @name newMatchMove
-  @param new_move -> (lobby_id!, nft_id!, round!, roll_again!)
+  @name newMove
 */
-INSERT INTO match_moves(lobby_id, nft_id, round, roll_again)
-VALUES :new_move;
+INSERT INTO round_move(
+  lobby_id,
+  match_within_lobby,
+  round_within_match,
+  move_within_round,
+  nft_id,
+  roll_again
+)
+VALUES (
+  :lobby_id!,
+  :match_within_lobby!,
+  :round_within_match!,
+  :move_within_round!,
+  :nft_id!,
+  :roll_again!
+);
 
 /* @name newStats
   @param stats -> (nft_id!, wins!, losses!, ties!)

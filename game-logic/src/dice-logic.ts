@@ -1,6 +1,6 @@
-import type { IGetLobbyByIdResult, IGetLobbyPlayersResult } from '@dice/db';
+import type { IGetLobbyPlayersResult } from '@dice/db';
 import { RoundKind } from '@dice/utils';
-import type { MatchState, DiceRolls, LobbyPlayer } from '@dice/utils';
+import type { MatchState, DiceRolls, LobbyPlayer, ActiveLobby } from '@dice/utils';
 import type { ConciseResult, MatchResult } from '@dice/utils';
 import type { IGetBlockHeightResult } from 'paima-sdk/paima-db';
 import Prando from 'paima-sdk/paima-prando';
@@ -87,7 +87,7 @@ export function matchResults(matchState: MatchState): MatchResult {
 }
 
 export function buildCurrentMatchState(
-  lobby: IGetLobbyByIdResult,
+  lobby: ActiveLobby,
   rawPlayers: IGetLobbyPlayersResult[]
 ): MatchState {
   const players: LobbyPlayer[] = rawPlayers.map(player => {
@@ -103,7 +103,7 @@ export function buildCurrentMatchState(
 
   return {
     players,
-    turn: lobby.turn,
+    turn: lobby.current_turn,
   };
 }
 

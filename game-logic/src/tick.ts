@@ -6,8 +6,8 @@ import type {
   TurnEndTickEvent,
 } from '@dice/utils';
 import { type MatchState, type MatchEnvironment, type TickEvent, TickEventKind } from '@dice/utils';
-import type { IGetCachedMovesResult } from '@dice/db';
 import { genDiceRolls, getPlayerScore } from '.';
+import type { IGetRoundMovesResult } from '@dice/db';
 
 // TODO: variable number of players
 const numPlayers = 2;
@@ -16,7 +16,8 @@ const numPlayers = 2;
 export function processTick(
   matchEnvironment: MatchEnvironment,
   matchState: MatchState,
-  moves: IGetCachedMovesResult[],
+  // TODO: type for round and match moves is the same, not sure which is provided here
+  moves: IGetRoundMovesResult[],
   currentTick: number,
   randomnessGenerator: Prando
 ): TickEvent[] | null {

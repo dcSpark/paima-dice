@@ -47,14 +47,16 @@ export interface SubmittedMovesInput {
   input: 'submittedMoves';
   nftId: number;
   lobbyID: string;
-  roundNumber: number;
+  matchWithinLobby: number;
+  roundWithinMatch: number;
   rollAgain: boolean;
 }
 
 export interface PracticeMovesInput {
   input: 'practiceMoves';
   lobbyID: string;
-  roundNumber: number;
+  matchWithinLobby: number;
+  roundWithinMatch: number;
 }
 
 export interface ScheduledDataInput {

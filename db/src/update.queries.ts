@@ -31,34 +31,32 @@ const updateLobbyStateIR: any = {"usedParamSet":{"lobby_state":true,"lobby_id":t
 export const updateLobbyState = new PreparedQuery<IUpdateLobbyStateParams,IUpdateLobbyStateResult>(updateLobbyStateIR);
 
 
-/** 'UpdateLobbyTurn' parameters type */
-export interface IUpdateLobbyTurnParams {
+/** 'UpdateLobbyCurrentMatch' parameters type */
+export interface IUpdateLobbyCurrentMatchParams {
+  current_match: number | null | void;
   lobby_id: string;
-  turn: number | null | void;
 }
 
-/** 'UpdateLobbyTurn' return type */
-export type IUpdateLobbyTurnResult = void;
+/** 'UpdateLobbyCurrentMatch' return type */
+export type IUpdateLobbyCurrentMatchResult = void;
 
-/** 'UpdateLobbyTurn' query type */
-export interface IUpdateLobbyTurnQuery {
-  params: IUpdateLobbyTurnParams;
-  result: IUpdateLobbyTurnResult;
+/** 'UpdateLobbyCurrentMatch' query type */
+export interface IUpdateLobbyCurrentMatchQuery {
+  params: IUpdateLobbyCurrentMatchParams;
+  result: IUpdateLobbyCurrentMatchResult;
 }
 
-const updateLobbyTurnIR: any = {"usedParamSet":{"turn":true,"lobby_id":true},"params":[{"name":"turn","required":false,"transform":{"type":"scalar"},"locs":[{"a":29,"b":33}]},{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":55,"b":64}]}],"statement":"UPDATE lobbies\nSET \n  turn = :turn\nWHERE \n  lobby_id = :lobby_id!"};
+const updateLobbyCurrentMatchIR: any = {"usedParamSet":{"current_match":true,"lobby_id":true},"params":[{"name":"current_match","required":false,"transform":{"type":"scalar"},"locs":[{"a":35,"b":48}]},{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":67,"b":76}]}],"statement":"UPDATE lobbies\nSET current_match = :current_match\nWHERE lobby_id = :lobby_id!"};
 
 /**
  * Query generated from SQL:
  * ```
  * UPDATE lobbies
- * SET 
- *   turn = :turn
- * WHERE 
- *   lobby_id = :lobby_id!
+ * SET current_match = :current_match
+ * WHERE lobby_id = :lobby_id!
  * ```
  */
-export const updateLobbyTurn = new PreparedQuery<IUpdateLobbyTurnParams,IUpdateLobbyTurnResult>(updateLobbyTurnIR);
+export const updateLobbyCurrentMatch = new PreparedQuery<IUpdateLobbyCurrentMatchParams,IUpdateLobbyCurrentMatchResult>(updateLobbyCurrentMatchIR);
 
 
 /** 'UpdateLobbyCurrentRound' parameters type */
@@ -76,19 +74,45 @@ export interface IUpdateLobbyCurrentRoundQuery {
   result: IUpdateLobbyCurrentRoundResult;
 }
 
-const updateLobbyCurrentRoundIR: any = {"usedParamSet":{"current_round":true,"lobby_id":true},"params":[{"name":"current_round","required":false,"transform":{"type":"scalar"},"locs":[{"a":38,"b":51}]},{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":73,"b":82}]}],"statement":"UPDATE lobbies\nSET \n  current_round = :current_round\nWHERE \n  lobby_id = :lobby_id!"};
+const updateLobbyCurrentRoundIR: any = {"usedParamSet":{"current_round":true,"lobby_id":true},"params":[{"name":"current_round","required":false,"transform":{"type":"scalar"},"locs":[{"a":35,"b":48}]},{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":67,"b":76}]}],"statement":"UPDATE lobbies\nSET current_round = :current_round\nWHERE lobby_id = :lobby_id!"};
 
 /**
  * Query generated from SQL:
  * ```
  * UPDATE lobbies
- * SET 
- *   current_round = :current_round
- * WHERE 
- *   lobby_id = :lobby_id!
+ * SET current_round = :current_round
+ * WHERE lobby_id = :lobby_id!
  * ```
  */
 export const updateLobbyCurrentRound = new PreparedQuery<IUpdateLobbyCurrentRoundParams,IUpdateLobbyCurrentRoundResult>(updateLobbyCurrentRoundIR);
+
+
+/** 'UpdateLobbyCurrentTurn' parameters type */
+export interface IUpdateLobbyCurrentTurnParams {
+  current_turn: number | null | void;
+  lobby_id: string;
+}
+
+/** 'UpdateLobbyCurrentTurn' return type */
+export type IUpdateLobbyCurrentTurnResult = void;
+
+/** 'UpdateLobbyCurrentTurn' query type */
+export interface IUpdateLobbyCurrentTurnQuery {
+  params: IUpdateLobbyCurrentTurnParams;
+  result: IUpdateLobbyCurrentTurnResult;
+}
+
+const updateLobbyCurrentTurnIR: any = {"usedParamSet":{"current_turn":true,"lobby_id":true},"params":[{"name":"current_turn","required":false,"transform":{"type":"scalar"},"locs":[{"a":34,"b":46}]},{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":65,"b":74}]}],"statement":"UPDATE lobbies\nSET current_turn = :current_turn\nWHERE lobby_id = :lobby_id!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * UPDATE lobbies
+ * SET current_turn = :current_turn
+ * WHERE lobby_id = :lobby_id!
+ * ```
+ */
+export const updateLobbyCurrentTurn = new PreparedQuery<IUpdateLobbyCurrentTurnParams,IUpdateLobbyCurrentTurnResult>(updateLobbyCurrentTurnIR);
 
 
 /** 'UpdateLobbyPlayer' parameters type */
@@ -130,7 +154,8 @@ export const updateLobbyPlayer = new PreparedQuery<IUpdateLobbyPlayerParams,IUpd
 export interface IExecutedRoundParams {
   execution_block_height: number;
   lobby_id: string;
-  round: number;
+  match_within_lobby: number;
+  round_within_match: number;
 }
 
 /** 'ExecutedRound' return type */
@@ -142,15 +167,17 @@ export interface IExecutedRoundQuery {
   result: IExecutedRoundResult;
 }
 
-const executedRoundIR: any = {"usedParamSet":{"execution_block_height":true,"lobby_id":true,"round":true},"params":[{"name":"execution_block_height","required":true,"transform":{"type":"scalar"},"locs":[{"a":43,"b":66}]},{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":92,"b":101}]},{"name":"round","required":true,"transform":{"type":"scalar"},"locs":[{"a":135,"b":141}]}],"statement":"UPDATE rounds\nSET execution_block_height = :execution_block_height!\nWHERE rounds.lobby_id = :lobby_id!\nAND rounds.round_within_match = :round!"};
+const executedRoundIR: any = {"usedParamSet":{"execution_block_height":true,"lobby_id":true,"match_within_lobby":true,"round_within_match":true},"params":[{"name":"execution_block_height","required":true,"transform":{"type":"scalar"},"locs":[{"a":48,"b":71}]},{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":93,"b":102}]},{"name":"match_within_lobby","required":true,"transform":{"type":"scalar"},"locs":[{"a":131,"b":150}]},{"name":"round_within_match","required":true,"transform":{"type":"scalar"},"locs":[{"a":179,"b":198}]}],"statement":"UPDATE match_round\nSET execution_block_height = :execution_block_height!\nWHERE \n  lobby_id = :lobby_id! AND\n  match_within_lobby = :match_within_lobby! AND\n  round_within_match = :round_within_match!"};
 
 /**
  * Query generated from SQL:
  * ```
- * UPDATE rounds
+ * UPDATE match_round
  * SET execution_block_height = :execution_block_height!
- * WHERE rounds.lobby_id = :lobby_id!
- * AND rounds.round_within_match = :round!
+ * WHERE 
+ *   lobby_id = :lobby_id! AND
+ *   match_within_lobby = :match_within_lobby! AND
+ *   round_within_match = :round_within_match!
  * ```
  */
 export const executedRound = new PreparedQuery<IExecutedRoundParams,IExecutedRoundResult>(executedRoundIR);

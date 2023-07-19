@@ -19,55 +19,17 @@ export class DiceService {
   // Submit Moves
   static async submitMove(
     nftId: number,
-    lobbyId: string,
-    roundNumber: number,
+    lobbyState: LobbyState,
     move: boolean
   ): Promise<OldResult> {
     const result = await Paima.default.submitMoves(
       nftId,
-      lobbyId,
-      roundNumber,
+      lobbyState.lobby_id,
+      lobbyState.current_match,
+      lobbyState.current_round,
       move
     );
     console.log("Submit move result: ", result);
     return result;
-  }
-}
-
-export class DiceLogic {
-  nftId: number;
-
-  constructor(nftId: number) {
-    this.nftId = nftId;
-  }
-
-  async handleMove(lobbyState: LobbyState, move: boolean): Promise<void> {
-    if (lobbyState == null) {
-      throw new Error("Lobby state is null");
-    }
-
-    if (!this.isThisPlayersTurn(lobbyState, lobbyState.current_round)) {
-      console.log("It's the other player's turn");
-      return;
-    }
-
-    const moveResult = await DiceService.submitMove(
-      this.nftId,
-      lobbyState.lobby_id,
-      lobbyState.current_round,
-      move
-    );
-    console.log("Move result: ", moveResult);
-    if (moveResult.success === false) {
-      console.log("Move failed");
-      return;
-    }
-  }
-
-  isThisPlayersTurn(lobbyState: LobbyState, turn?: number): boolean {
-    const thisPlayer = lobbyState.players.find(
-      (player) => player.nftId === this.nftId
-    );
-    return thisPlayer?.turn === turn;
   }
 }

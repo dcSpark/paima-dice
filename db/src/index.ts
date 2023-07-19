@@ -2,12 +2,8 @@ export {
   IGetRoundMovesResult,
   IGetLobbyByIdResult,
   IGetOpenLobbyByIdResult,
-  IGetCachedMovesResult,
-  IGetRoundDataResult,
   IGetUserStatsResult,
-  getCachedMoves,
   getLobbyById,
-  getRoundData,
   getUserStats,
   IGetPaginatedOpenLobbiesResult,
   getPaginatedOpenLobbies,
@@ -15,8 +11,6 @@ export {
   searchPaginatedOpenLobbies,
   getOpenLobbyById,
   getMatchSeeds,
-  getMovesByLobby,
-  IGetMovesByLobbyResult,
   getRandomLobby,
   IGetRandomLobbyResult,
   getRoundMoves,
@@ -34,7 +28,6 @@ export {
 } from './select.queries.js';
 export {
   createLobby,
-  newMatchMove,
   newRound,
   newStats,
   updateStats,
@@ -42,7 +35,6 @@ export {
   INewStatsParams,
   INewRoundParams,
   IUpdateStatsParams,
-  INewMatchMoveParams,
 } from './insert.queries.js';
 export {
   updateLobbyPlayer,

@@ -93,43 +93,42 @@ WHERE global_user_state.nft_id = :nft_id_1
 OR global_user_state.nft_id = :nft_id_2;
 
 /* @name getRoundMoves */
-SELECT * FROM match_moves
-WHERE lobby_id = :lobby_id!
-AND   round = :round!;
-
-/* @name getCachedMoves */
-SELECT
-match_moves.id,
-match_moves.lobby_id,
-match_moves.nft_id,
-match_moves.roll_again,
-match_moves.round
-FROM match_moves
-INNER JOIN rounds
-ON match_moves.lobby_id = rounds.lobby_id
-AND match_moves.round = rounds.round_within_match
-WHERE rounds.execution_block_height IS NULL
-AND match_moves.lobby_id = :lobby_id;
-
-/* @name getMovesByLobby */
 SELECT *
-FROM match_moves
-WHERE match_moves.lobby_id = :lobby_id;
+FROM round_move
+WHERE
+  lobby_id = :lobby_id! AND
+  match_within_lobby = :match_within_lobby! AND
+  round_within_match = :round_within_match!
+ORDER BY round_move.move_within_round;
 
+/* @name getMatchMoves */
+SELECT *
+FROM round_move
+WHERE 
+  lobby_id = :lobby_id! AND
+  match_within_lobby = :match_within_lobby!
+ORDER BY
+  round_move.round_within_match,
+  round_move.move_within_round;
 
 /* @name getNewLobbiesByUserAndBlockHeight */
 SELECT lobby_id FROM lobbies
 WHERE lobby_creator = :nft_id
 AND creation_block_height = :block_height;
 
-/* @name getRoundData */
-SELECT * FROM rounds
-WHERE lobby_id = :lobby_id!
-AND round_within_match = :round_number;
+/* @name getRound */
+SELECT *
+FROM match_round
+WHERE 
+  lobby_id = :lobby_id! AND
+  match_within_lobby = :match_within_lobby! AND
+  round_within_match = :round_within_match!;
 
 /* @name getMatchSeeds */
-SELECT * FROM rounds
-INNER JOIN block_heights
-ON block_heights.block_height = rounds.execution_block_height
-WHERE rounds.lobby_id = :lobby_id
-ORDER BY rounds.round_within_match ASC;
+SELECT *
+FROM match_round JOIN block_heights
+  ON block_heights.block_height = match_round.execution_block_height
+WHERE
+  lobby_id = :lobby_id! AND
+  match_within_lobby = :match_within_lobby!
+ORDER BY match_round.round_within_match ASC;

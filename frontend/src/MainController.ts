@@ -216,11 +216,15 @@ class MainController {
   }
 
   async getMatchExecutor(
-    lobbyId: string
+    lobbyId: string,
+    matchWithinLobby: number
   ): Promise<MatchExecutor<MatchState, TickEvent>> {
     await this.enforceWalletConnected();
     this.callback(null, true, null);
-    const response = await Paima.default.getMatchExecutor(lobbyId);
+    const response = await Paima.default.getMatchExecutor(
+      lobbyId,
+      matchWithinLobby
+    );
     console.log("get match executor: ", response);
     this.callback(null, false, null);
     if (!response.success) {

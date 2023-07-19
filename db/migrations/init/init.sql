@@ -13,9 +13,10 @@ CREATE TABLE lobbies (
   num_of_rounds INTEGER NOT NULL,
   round_length INTEGER NOT NULL,
   play_time_per_player INTEGER NOT NULL,
-  current_round INTEGER NOT NULL DEFAULT 0,
+  current_match INTEGER,
+  current_round INTEGER,
+  current_turn INTEGER,
   initial_random_seed TEXT NOT NULL,
-  turn INTEGER NOT NULL DEFAULT 0,
   created_at TIMESTAMP NOT NULL,
   creation_block_height INTEGER NOT NULL,
   hidden BOOLEAN NOT NULL DEFAULT false,
@@ -24,22 +25,29 @@ CREATE TABLE lobbies (
   lobby_state lobby_status NOT NULL
 );
 
-CREATE TABLE rounds(
+CREATE TABLE lobby_match(
   id SERIAL PRIMARY KEY,
   lobby_id TEXT NOT NULL references lobbies(lobby_id),
+  match_within_lobby INTEGER NOT NULL
+);
+
+CREATE TABLE match_round(
+  id SERIAL PRIMARY KEY,
+  lobby_id TEXT NOT NULL references lobbies(lobby_id),
+  match_within_lobby INTEGER NOT NULL,
   round_within_match INTEGER NOT NULL,
   starting_block_height INTEGER NOT NULL references block_heights(block_height),
   execution_block_Height INTEGER references block_heights(block_height)
 );
 
-CREATE TYPE match_result AS ENUM ('win', 'tie', 'loss');
-
-CREATE TABLE match_moves (
-   id SERIAL PRIMARY KEY,
-   lobby_id TEXT NOT NULL references lobbies(lobby_id),
-   nft_id INTEGER NOT NULL,
-   round INTEGER NOT NULL,
-   roll_again BOOLEAN NOT NULL
+CREATE TABLE round_move (
+  id SERIAL PRIMARY KEY,
+  lobby_id TEXT NOT NULL references lobbies(lobby_id),
+  match_within_lobby INTEGER NOT NULL,
+  round_within_match INTEGER NOT NULL,
+  move_within_round INTEGER NOT NULL,
+  nft_id INTEGER NOT NULL,
+  roll_again BOOLEAN NOT NULL
 );
 
 CREATE TABLE global_user_state (

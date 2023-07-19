@@ -3,19 +3,20 @@ UPDATE lobbies
 SET lobby_state = :lobby_state!
 WHERE lobby_id = :lobby_id!;
 
-/* @name updateLobbyTurn */
+/* @name updateLobbyCurrentMatch */
 UPDATE lobbies
-SET 
-  turn = :turn
-WHERE 
-  lobby_id = :lobby_id!;
+SET current_match = :current_match
+WHERE lobby_id = :lobby_id!;
 
 /* @name updateLobbyCurrentRound */
 UPDATE lobbies
-SET 
-  current_round = :current_round
-WHERE 
-  lobby_id = :lobby_id!;
+SET current_round = :current_round
+WHERE lobby_id = :lobby_id!;
+
+/* @name updateLobbyCurrentTurn */
+UPDATE lobbies
+SET current_turn = :current_turn
+WHERE lobby_id = :lobby_id!;
 
 /* @name updateLobbyPlayer */
 UPDATE lobby_player
@@ -27,10 +28,12 @@ WHERE
   lobby_id = :lobby_id! AND nft_id = :nft_id!;
 
 /* @name executedRound */
-UPDATE rounds
+UPDATE match_round
 SET execution_block_height = :execution_block_height!
-WHERE rounds.lobby_id = :lobby_id!
-AND rounds.round_within_match = :round!;
+WHERE 
+  lobby_id = :lobby_id! AND
+  match_within_lobby = :match_within_lobby! AND
+  round_within_match = :round_within_match!;
 
 /* @name addWin */
 UPDATE global_user_state

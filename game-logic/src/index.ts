@@ -3,7 +3,7 @@ import { roundExecutor } from 'paima-sdk/paima-executors';
 import type Prando from 'paima-sdk/paima-prando';
 import type { MatchState, MatchEnvironment, TickEvent } from '@dice/utils';
 import { processTick } from './tick';
-import type { IGetLobbyByIdResult, IGetCachedMovesResult } from '@dice/db';
+import type { IGetLobbyByIdResult, IGetRoundMovesResult } from '@dice/db';
 import { cloneMatchState } from './dice-logic';
 
 export * from './tick';
@@ -15,13 +15,18 @@ export * from './dice-logic';
 export function initRoundExecutor(
   lobby: IGetLobbyByIdResult,
   matchState: MatchState,
-  moves: IGetCachedMovesResult[],
+  moves: IGetRoundMovesResult[],
   randomnessGenerator: Prando
 ): RoundExecutor<MatchState, TickEvent> {
+  const paimaMoves = moves.map(move => ({
+    ...move,
+    round: move.round_within_match,
+  }));
+
   return roundExecutor.initialize(
     extractMatchEnvironment(lobby),
     buildMatchState(matchState),
-    moves,
+    paimaMoves,
     randomnessGenerator,
     processTick
   );

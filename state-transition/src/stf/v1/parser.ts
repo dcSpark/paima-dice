@@ -18,8 +18,8 @@ nftMint             = nftmint|address|tokenId
 createdLobby        = c|creatorNftId|numOfRounds|roundLength|playTimePerPlayer|isHidden?|isPractice?
 joinedLobby         = j|nftId|*lobbyID
 closedLobby         = cs|*lobbyID
-submittedMoves      = s|nftId|*lobbyID|roundNumber|rollAgain
-practiceMoves       = p|*lobbyID|roundNumber
+submittedMoves      = s|nftId|*lobbyID|matchWithinLobby|roundWithinMatch|rollAgain
+practiceMoves       = p|*lobbyID|matchWithinLobby|roundWithinMatch
 zombieScheduledData = z|*lobbyID
 userScheduledData   = u|*user|result
 `;
@@ -46,12 +46,14 @@ const closedLobby: ParserRecord<ClosedLobbyInput> = {
 const submittedMoves: ParserRecord<SubmittedMovesInput> = {
   nftId: PaimaParser.NumberParser(),
   lobbyID: PaimaParser.NCharsParser(12, 12),
-  roundNumber: PaimaParser.NumberParser(0, SAFE_NUMBER),
+  matchWithinLobby: PaimaParser.NumberParser(0, SAFE_NUMBER),
+  roundWithinMatch: PaimaParser.NumberParser(0, SAFE_NUMBER),
   rollAgain: PaimaParser.TrueFalseParser(),
 };
 const practiceMoves: ParserRecord<PracticeMovesInput> = {
   lobbyID: PaimaParser.NCharsParser(12, 12),
-  roundNumber: PaimaParser.NumberParser(0, SAFE_NUMBER),
+  matchWithinLobby: PaimaParser.NumberParser(0, SAFE_NUMBER),
+  roundWithinMatch: PaimaParser.NumberParser(0, SAFE_NUMBER),
 };
 const zombieScheduledData: ParserRecord<ZombieRound> = {
   renameCommand: 'scheduledData',

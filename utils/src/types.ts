@@ -1,9 +1,12 @@
 import type {
   IGetLobbyByIdResult,
-  IGetMovesByLobbyResult,
   IGetUserStatsResult,
   IGetNewLobbiesByUserAndBlockHeightResult,
 } from '@dice/db';
+import type { IGetMatchMovesResult } from '@dice/db/build/select.queries';
+
+// TODO: find this in lib.es5
+export type PropertiesNonNullable<T> = { [P in keyof T]-?: NonNullable<T[P]> };
 
 export enum RoundKind {
   initial,
@@ -55,8 +58,6 @@ export interface MatchState {
   turn: number; // whose turn is it
 }
 
-export type MatchMove = boolean;
-
 export type LobbyStatus = 'open' | 'active' | 'finished' | 'closed';
 
 // TODO: allow for more than 2 players
@@ -72,7 +73,7 @@ export interface MatchWinnerResponse {
 
 export interface RoundExecutorBackendData {
   lobby: IGetLobbyByIdResult;
-  moves: IGetMovesByLobbyResult[];
+  moves: IGetMatchMovesResult[];
   seed: string;
 }
 
@@ -88,7 +89,7 @@ interface ExecutorDataSeed {
 
 export interface MatchExecutorData {
   lobby: LobbyState;
-  moves: IGetMovesByLobbyResult[];
+  moves: IGetMatchMovesResult[];
   seeds: ExecutorDataSeed[];
 }
 
@@ -113,7 +114,12 @@ export type LobbyPlayer = {
   score: number;
 };
 
-export interface LobbyState extends IGetLobbyByIdResult {
+type ActiveLobbyRequirements = 'current_match' | 'current_round' | 'current_turn';
+/* Note: does not require state: 'active', we may want to get rid of the state if it's useless */
+export type ActiveLobby = Omit<IGetLobbyByIdResult, ActiveLobbyRequirements> &
+  PropertiesNonNullable<Pick<IGetLobbyByIdResult, ActiveLobbyRequirements>>;
+
+export interface LobbyState extends ActiveLobby {
   round_seed: string;
   players: LobbyPlayer[];
 }

@@ -93,7 +93,8 @@ async function getLobbySearch(
 
 async function getRoundExecutionState(
   lobbyID: string,
-  round: number
+  matchWithinLobby: number,
+  roundWithinMatch: number
 ): Promise<PackedRoundExecutionState | FailedResult> {
   const errorFxn = buildEndpointErrorFxn('getRoundExecutionState');
 
@@ -101,7 +102,7 @@ async function getRoundExecutionState(
   let latestBlockHeight: number;
 
   try {
-    const query = backendQueryRoundStatus(lobbyID, round);
+    const query = backendQueryRoundStatus(lobbyID, matchWithinLobby, roundWithinMatch);
     [res, latestBlockHeight] = await Promise.all([fetch(query), getBlockNumber()]);
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.ERROR_QUERYING_BACKEND_ENDPOINT, err);
@@ -214,7 +215,8 @@ async function getOpenLobbies(
 
 async function getRoundExecutor(
   lobbyId: string,
-  roundNumber: number,
+  matchWithinLobby: number,
+  roundWithinMatch: number,
   matchState: MatchState
 ): Promise<Result<RoundExecutor<MatchState, TickEvent>>> {
   const errorFxn = buildEndpointErrorFxn('getRoundExecutor');
@@ -222,7 +224,7 @@ async function getRoundExecutor(
   // Retrieve data:
   let res: Response;
   try {
-    const query = backendQueryRoundExecutor(lobbyId, roundNumber);
+    const query = backendQueryRoundExecutor(lobbyId, matchWithinLobby, roundWithinMatch);
     res = await fetch(query);
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.ERROR_QUERYING_BACKEND_ENDPOINT, err);
@@ -251,14 +253,15 @@ async function getRoundExecutor(
 }
 
 async function getMatchExecutor(
-  lobbyId: string
+  lobbyId: string,
+  matchWithinLobby: number
 ): Promise<Result<MatchExecutor<MatchState, TickEvent>>> {
   const errorFxn = buildEndpointErrorFxn('getMatchExecutor');
 
   // Retrieve data:
   let res: Response;
   try {
-    const query = backendQueryMatchExecutor(lobbyId);
+    const query = backendQueryMatchExecutor(lobbyId, matchWithinLobby);
     res = await fetch(query);
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.ERROR_QUERYING_BACKEND_ENDPOINT, err);

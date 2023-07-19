@@ -14,3 +14,4 @@ export const NFT_NAME = 'Dice NFT contract';
 export const SAFE_NUMBER = 2 ** 31 - 1;
 
 export * from './types.js';
+export * from './typecheck.js';

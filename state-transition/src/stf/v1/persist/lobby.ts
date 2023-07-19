@@ -27,7 +27,6 @@ export function persistLobbyCreation(
     num_of_rounds: inputData.numOfRounds,
     round_length: inputData.roundLength,
     play_time_per_player: inputData.playTimePerPlayer,
-    current_round: 0,
     initial_random_seed: seed,
     created_at: new Date(),
     creation_block_height: blockHeight,
@@ -72,7 +71,7 @@ export function persistLobbyCreation(
   const activateLobbyUpdates: SQLUpdate[] =
     playersInLobby < lobbyParams.max_players
       ? []
-      : persistStartMatch(lobby_id, lobbyParams.round_length, blockHeight);
+      : persistStartMatch(lobby_id, null, lobbyParams.round_length, blockHeight);
 
   console.log(`Created lobby ${lobby_id}`);
   return [

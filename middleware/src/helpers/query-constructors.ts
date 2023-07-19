@@ -34,11 +34,16 @@ export function backendQueryUserLobbiesBlockheight(nftId: number, blockHeight: n
   return buildBackendQuery(endpoint, options);
 }
 
-export function backendQueryRoundStatus(lobbyID: string, round: number): string {
+export function backendQueryRoundStatus(
+  lobbyID: string,
+  matchWithinLobby: number,
+  roundWithinMatch: number
+): string {
   const endpoint = 'round_status';
   const options = {
     lobbyID,
-    round,
+    matchWithinLobby,
+    roundWithinMatch,
   };
   return buildBackendQuery(endpoint, options);
 }
@@ -79,19 +84,25 @@ export function backendQueryOpenLobbies(nftId: number, count?: number, page?: nu
   return buildBackendQuery(endpoint, options);
 }
 
-export function backendQueryRoundExecutor(lobbyID: string, round: number): string {
+export function backendQueryRoundExecutor(
+  lobbyID: string,
+  matchWithinLobby: number,
+  roundWithinMatch: number
+): string {
   const endpoint = 'round_executor';
   const options = {
     lobbyID,
-    round,
+    matchWithinLobby,
+    roundWithinMatch,
   };
   return buildBackendQuery(endpoint, options);
 }
 
-export function backendQueryMatchExecutor(lobbyID: string): string {
+export function backendQueryMatchExecutor(lobbyID: string, matchWithinLobby: number): string {
   const endpoint = 'match_executor';
   const options = {
     lobbyID,
+    matchWithinLobby,
   };
   return buildBackendQuery(endpoint, options);
 }
