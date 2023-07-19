@@ -109,8 +109,7 @@ class MainController {
     roundLength: number,
     timePerPlayer: number,
     isHidden = false,
-    isPractice = false,
-    isWhite = true
+    isPractice = false
   ): Promise<void> {
     await this.enforceWalletConnected();
     this.callback(null, true, null);
@@ -120,8 +119,7 @@ class MainController {
       roundLength,
       timePerPlayer,
       isHidden,
-      isPractice,
-      isWhite
+      isPractice
     );
     const response = await Paima.default.createLobby(
       creatorNftId,
@@ -129,8 +127,7 @@ class MainController {
       roundLength,
       timePerPlayer,
       isHidden,
-      isPractice,
-      isWhite
+      isPractice
     );
     console.log("create lobby response: ", response);
     if (!response.success) {

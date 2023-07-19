@@ -30,7 +30,6 @@ export interface CreatedLobbyInput {
   playTimePerPlayer: number;
   isHidden: boolean;
   isPractice: boolean;
-  playerOneIsWhite: boolean;
 }
 
 export interface JoinedLobbyInput {

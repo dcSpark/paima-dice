@@ -35,8 +35,7 @@ async function createLobby(
   roundLength: number,
   playTimePerPlayer: number,
   isHidden = false,
-  isPractice = false,
-  playerOneIsWhite = true
+  isPractice = false
 ): Promise<CreateLobbySuccessfulResponse | FailedResult> {
   const errorFxn = buildEndpointErrorFxn('createLobby');
 
@@ -49,8 +48,6 @@ async function createLobby(
     { value: playTimePerPlayer.toString(10) },
     { value: isHidden ? 'T' : '' },
     { value: isPractice ? 'T' : '' },
-    // TODO: change to support multiple players
-    { value: playerOneIsWhite ? 'T' : '' },
   ]);
 
   let currentBlockVar: number;

@@ -14,7 +14,7 @@ import type {
 
 const myGrammar = `
 nftMint             = nftmint|address|tokenId
-createdLobby        = c|creatorNftId|numOfRounds|roundLength|playTimePerPlayer|isHidden?|isPractice?|playerOneIsWhite?
+createdLobby        = c|creatorNftId|numOfRounds|roundLength|playTimePerPlayer|isHidden?|isPractice?
 joinedLobby         = j|nftId|*lobbyID
 closedLobby         = cs|*lobbyID
 submittedMoves      = s|nftId|*lobbyID|roundNumber|rollAgain
@@ -34,7 +34,6 @@ const createdLobby: ParserRecord<CreatedLobbyInput> = {
   playTimePerPlayer: PaimaParser.NumberParser(1, 10000),
   isHidden: PaimaParser.TrueFalseParser(false),
   isPractice: PaimaParser.TrueFalseParser(false),
-  playerOneIsWhite: PaimaParser.TrueFalseParser(true),
 };
 const joinedLobby: ParserRecord<JoinedLobbyInput> = {
   nftId: PaimaParser.NumberParser(),
