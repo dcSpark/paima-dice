@@ -126,6 +126,7 @@ export type NewLobby = IGetNewLobbiesByUserAndBlockHeightResult;
 
 export type LobbyPlayer = {
   nftId: number;
+  startingDeck: Deck;
   turn: undefined | number;
   points: number;
   score: number;
@@ -139,3 +140,8 @@ export interface LobbyState extends LobbyWithStateProps {
   roundSeed: string;
   players: LobbyPlayer[];
 }
+
+export type CardId = number;
+export type Deck = CardId[];
+export type SerializedCard = string;
+export type SerializedDeck = string;

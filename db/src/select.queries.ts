@@ -156,6 +156,7 @@ export interface IGetLobbyPlayersResult {
   nft_id: number;
   points: number;
   score: number;
+  starting_deck: string;
   turn: number | null;
 }
 

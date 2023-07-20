@@ -15,8 +15,8 @@ import { SAFE_NUMBER } from '@dice/utils';
 
 const myGrammar = `
 nftMint             = nftmint|address|tokenId
-createdLobby        = c|creatorNftId|numOfRounds|roundLength|playTimePerPlayer|isHidden?|isPractice?
-joinedLobby         = j|nftId|*lobbyID
+createdLobby        = c|creatorNftId|creatorDeck|numOfRounds|roundLength|playTimePerPlayer|isHidden?|isPractice?
+joinedLobby         = j|nftId|*lobbyID|deck
 closedLobby         = cs|*lobbyID
 submittedMoves      = s|nftId|*lobbyID|matchWithinLobby|roundWithinMatch|rollAgain
 practiceMoves       = p|*lobbyID|matchWithinLobby|roundWithinMatch
@@ -30,6 +30,7 @@ const nftMint: ParserRecord<NftMintInput> = {
 };
 const createdLobby: ParserRecord<CreatedLobbyInput> = {
   creatorNftId: PaimaParser.NumberParser(),
+  creatorDeck: PaimaParser.NCharsParser(0, 1000),
   numOfRounds: PaimaParser.NumberParser(0, 1000),
   roundLength: PaimaParser.DefaultRoundLength(),
   playTimePerPlayer: PaimaParser.NumberParser(1, 10000),
@@ -39,6 +40,7 @@ const createdLobby: ParserRecord<CreatedLobbyInput> = {
 const joinedLobby: ParserRecord<JoinedLobbyInput> = {
   nftId: PaimaParser.NumberParser(),
   lobbyID: PaimaParser.NCharsParser(12, 12),
+  deck: PaimaParser.NCharsParser(0, 1000),
 };
 const closedLobby: ParserRecord<ClosedLobbyInput> = {
   lobbyID: PaimaParser.NCharsParser(12, 12),

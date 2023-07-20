@@ -3,7 +3,7 @@ import type { IUpdateLobbyStateParams, ICreateLobbyParams } from '@dice/db';
 import { createLobby, updateLobbyState } from '@dice/db';
 import Prando from 'paima-sdk/paima-prando';
 import type { LobbyPlayer, LobbyStatus, MatchEnvironment } from '@dice/utils';
-import { PRACTICE_BOT_NFT_ID } from '@dice/utils';
+import { PRACTICE_BOT_NFT_ID, deserializeDeck, genBotDeck, serializeDeck } from '@dice/utils';
 import { persistStartMatch } from './match.js';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
 import type { IJoinPlayerToLobbyParams } from '@dice/db/src/insert.queries.js';
@@ -11,7 +11,6 @@ import { joinPlayerToLobby } from '@dice/db/src/insert.queries.js';
 
 // Persist creation of a lobby
 export function persistLobbyCreation(
-  nftId: number,
   blockHeight: number,
   inputData: CreatedLobbyInput,
   seed: string,
@@ -32,7 +31,7 @@ export function persistLobbyCreation(
     creation_block_height: blockHeight,
     hidden: inputData.isHidden,
     practice: inputData.isPractice,
-    lobby_creator: nftId,
+    lobby_creator: inputData.creatorNftId,
     lobby_state: 'open' as LobbyStatus,
   };
   const createLobbyTuple: SQLUpdate = [createLobby, lobbyParams];
@@ -40,10 +39,12 @@ export function persistLobbyCreation(
   // join creator to lobby
   const joinParams: IJoinPlayerToLobbyParams = {
     lobby_id,
-    nft_id: nftId,
+    nft_id: inputData.creatorNftId,
+    starting_deck: inputData.creatorDeck,
   };
   lobbyPlayers.push({
-    nftId,
+    nftId: inputData.creatorNftId,
+    startingDeck: deserializeDeck(inputData.creatorDeck),
     points: 0,
     score: 0,
     turn: undefined,
@@ -55,8 +56,10 @@ export function persistLobbyCreation(
   const joinBots: SQLUpdate[] = Array(numBots)
     .fill(null)
     .flatMap(() => {
+      const botDeck = genBotDeck();
       lobbyPlayers.push({
         nftId: PRACTICE_BOT_NFT_ID,
+        startingDeck: botDeck,
         points: 0,
         score: 0,
         turn: undefined,
@@ -64,6 +67,7 @@ export function persistLobbyCreation(
       return persistLobbyJoin({
         lobby_id,
         nft_id: PRACTICE_BOT_NFT_ID,
+        starting_deck: serializeDeck(botDeck),
       });
     });
 

@@ -1,6 +1,11 @@
 import { Controller, Get, Query, Route, ValidateError } from 'tsoa';
 import { requirePool, getLobbyById, getMatchSeeds, getLobbyPlayers } from '@dice/db';
-import { isLobbyWithStateProps, type LobbyPlayer, type MatchExecutorData } from '@dice/utils';
+import {
+  deserializeDeck,
+  isLobbyWithStateProps,
+  type LobbyPlayer,
+  type MatchExecutorData,
+} from '@dice/utils';
 import { psqlInt } from '../validation';
 import { isLeft } from 'fp-ts/lib/Either';
 import { getMatch, getMatchMoves } from '@dice/db/src/select.queries';
@@ -29,6 +34,7 @@ export class MatchExecutorController extends Controller {
     }
     const players: LobbyPlayer[] = rawPlayers.map(raw => ({
       nftId: raw.nft_id,
+      startingDeck: deserializeDeck(raw.starting_deck),
       points: raw.points,
       score: raw.score,
       turn: raw.turn ?? undefined,

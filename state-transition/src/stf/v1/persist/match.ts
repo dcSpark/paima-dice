@@ -87,6 +87,7 @@ export function persistInitialMatchState(
     turn: 0,
     players: players.map((player, i) => ({
       nftId: player.nftId,
+      startingDeck: player.startingDeck,
       turn: newTurnOrder[i],
       points: 0,
       score: 0,

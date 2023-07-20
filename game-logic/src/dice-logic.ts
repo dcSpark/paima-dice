@@ -1,5 +1,5 @@
 import type { IGetLobbyPlayersResult } from '@dice/db';
-import { RoundKind } from '@dice/utils';
+import { RoundKind, deserializeDeck } from '@dice/utils';
 import type { MatchState, DiceRolls, LobbyPlayer, LobbyWithStateProps } from '@dice/utils';
 import type { ConciseResult, MatchResult } from '@dice/utils';
 import type { IGetBlockHeightResult } from 'paima-sdk/paima-db';
@@ -95,6 +95,7 @@ export function buildCurrentMatchState(
 
     return {
       nftId: player.nft_id,
+      startingDeck: deserializeDeck(player.starting_deck),
       turn: player.turn,
       points: player.points,
       score: player.score,
@@ -114,6 +115,7 @@ export function cloneMatchState(template: MatchState): MatchState {
     ...template,
     players: template.players.map(template => ({
       ...template,
+      startingDeck: [...template.startingDeck],
     })),
   };
 }
