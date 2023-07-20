@@ -11,7 +11,6 @@ import {
 import { buildEndpointErrorFxn, MiddlewareErrorCode } from '../errors';
 import { getLobbyStateWithUser, getNonemptyNewLobbies } from '../helpers/auxiliary-queries';
 import { lobbyWasClosed, userCreatedLobby, userJoinedLobby } from '../helpers/utility-functions';
-import type { MatchMove } from '@dice/utils';
 import type { CreateLobbySuccessfulResponse } from '../types';
 
 const RETRY_PERIOD = 1000;
@@ -35,8 +34,7 @@ async function createLobby(
   roundLength: number,
   playTimePerPlayer: number,
   isHidden = false,
-  isPractice = false,
-  playerOneIsWhite = true
+  isPractice = false
 ): Promise<CreateLobbySuccessfulResponse | FailedResult> {
   const errorFxn = buildEndpointErrorFxn('createLobby');
 
@@ -49,8 +47,6 @@ async function createLobby(
     { value: playTimePerPlayer.toString(10) },
     { value: isHidden ? 'T' : '' },
     { value: isPractice ? 'T' : '' },
-    // TODO: change to support multiple players
-    { value: playerOneIsWhite ? 'T' : '' },
   ]);
 
   let currentBlockVar: number;
@@ -197,8 +193,9 @@ async function closeLobby(nftId: number, lobbyID: string): Promise<OldResult> {
 async function submitMoves(
   nftId: number,
   lobbyID: string,
-  roundNumber: number,
-  rollAgain: MatchMove
+  matchWithinLobby: number,
+  roundWithinMatch: number,
+  rollAgain: boolean
 ): Promise<OldResult> {
   const errorFxn = buildEndpointErrorFxn('submitMoves');
 
@@ -206,7 +203,8 @@ async function submitMoves(
   conciseBuilder.setPrefix('s');
   conciseBuilder.addValue({ value: nftId.toString(10) });
   conciseBuilder.addValue({ value: lobbyID, isStateIdentifier: true });
-  conciseBuilder.addValue({ value: roundNumber.toString(10) });
+  conciseBuilder.addValue({ value: matchWithinLobby.toString(10) });
+  conciseBuilder.addValue({ value: roundWithinMatch.toString(10) });
   conciseBuilder.addValue({ value: rollAgain ? 'T' : 'F' });
 
   try {

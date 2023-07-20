@@ -35,6 +35,7 @@ export function persistStatsUpdate(
 }
 
 // Schedule a stats update to be executed in the future
+// Stats are updated with scheduled data to support parallelism safely.
 export function scheduleStatsUpdate(
   nftId: number,
   result: ConciseResult,

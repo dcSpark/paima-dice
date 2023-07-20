@@ -1,9 +1,11 @@
 import { Controller, Get, Query, Route } from 'tsoa';
-import { getLobbyById, getLobbyPlayers, getRoundData, requirePool } from '@dice/db';
-import type { LobbyPlayer, LobbyState } from '@dice/utils';
+import { getLobbyById, getLobbyPlayers, requirePool } from '@dice/db';
+import { isLobbyWithStateProps, type LobbyPlayer, type LobbyState } from '@dice/utils';
+import { getMatch, getRound } from '@dice/db/src/select.queries';
 import { getBlockHeight } from 'paima-sdk/paima-db';
 
 interface Response {
+  // returns null if missing state properties, use lobbyRaw for any lobby
   lobby: LobbyState | null;
 }
 
@@ -17,36 +19,53 @@ export class LobbyStatecontroller extends Controller {
       getLobbyPlayers.run({ lobby_id: lobbyID }, pool),
     ]);
     if (!lobby) return { lobby: null };
-    else {
-      // null if this is first round
-      const [last_round_data] = await getRoundData.run(
-        { lobby_id: lobbyID, round_number: lobby.current_round - 1 },
-        pool
-      );
 
-      const [last_block_height] =
-        last_round_data == null
-          ? [undefined]
-          : await getBlockHeight.run(
-              { block_height: last_round_data.execution_block_height },
-              pool
-            );
-      const round_seed = last_block_height?.seed ?? lobby.initial_random_seed;
+    if (!isLobbyWithStateProps(lobby)) return { lobby: null };
 
-      const players: LobbyPlayer[] = rawPlayers.map(raw => ({
-        nftId: raw.nft_id,
-        points: raw.points,
-        score: raw.score,
-        turn: raw.turn ?? undefined,
-      }));
+    const [match] = await getMatch.run(
+      {
+        lobby_id: lobbyID,
+        match_within_lobby: lobby.current_match,
+      },
+      pool
+    );
 
-      return {
-        lobby: {
-          ...lobby,
-          round_seed,
-          players,
-        },
-      };
+    const [last_round_data] =
+      lobby.current_round === 0
+        ? [undefined]
+        : await getRound.run(
+            {
+              lobby_id: lobbyID,
+              match_within_lobby: lobby.current_match,
+              round_within_match: lobby.current_round - 1,
+            },
+            pool
+          );
+
+    const seedBlockHeight =
+      lobby.current_round === 0
+        ? match.starting_block_height
+        : last_round_data?.execution_block_height;
+
+    if (seedBlockHeight == null) {
+      return { lobby: null };
     }
+    const [seedBlockRow] = await getBlockHeight.run({ block_height: seedBlockHeight }, pool);
+    const roundSeed = seedBlockRow.seed;
+
+    const players: LobbyPlayer[] = rawPlayers.map(raw => ({
+      nftId: raw.nft_id,
+      points: raw.points,
+      score: raw.score,
+      turn: raw.turn ?? undefined,
+    }));
+
+    return {
+      lobby: {
+        ...lobby,
+        roundSeed,
+        players,
+      },
+    };
   }
 }

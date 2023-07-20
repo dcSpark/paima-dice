@@ -1,7 +1,7 @@
 import { MatchState, TickEvent, LobbyState } from "@dice/utils";
 import * as Paima from "@dice/middleware";
 import { MatchExecutor } from "paima-sdk/paima-executors";
-import { IGetPaginatedUserLobbiesResult } from "@dice/db";
+import { IGetLobbyByIdResult, IGetPaginatedUserLobbiesResult } from "@dice/db";
 
 // The MainController is a React component that will be used to control the state of the application
 // It will be used to check if the user has metamask installed and if they are connected to the correct network
@@ -25,7 +25,7 @@ class MainController {
   callback: (
     page: Page | null,
     isLoading: boolean,
-    extraData: LobbyState
+    extraData: IGetLobbyByIdResult
   ) => void;
 
   private checkCallback() {
@@ -87,6 +87,18 @@ class MainController {
     return response.lobby;
   }
 
+  async loadLobbyRaw(lobbyId: string): Promise<IGetLobbyByIdResult> {
+    await this.enforceWalletConnected();
+    this.callback(null, true, null);
+    const response = await Paima.default.getLobbyRaw(lobbyId);
+    console.log("get lobby state response: ", response);
+    this.callback(null, false, null);
+    if (!response.success) {
+      throw new Error("Could not get lobby state");
+    }
+    return response.lobby;
+  }
+
   async searchLobby(
     nftId: number,
     query: string,
@@ -109,8 +121,7 @@ class MainController {
     roundLength: number,
     timePerPlayer: number,
     isHidden = false,
-    isPractice = false,
-    isWhite = true
+    isPractice = false
   ): Promise<void> {
     await this.enforceWalletConnected();
     this.callback(null, true, null);
@@ -120,8 +131,7 @@ class MainController {
       roundLength,
       timePerPlayer,
       isHidden,
-      isPractice,
-      isWhite
+      isPractice
     );
     const response = await Paima.default.createLobby(
       creatorNftId,
@@ -129,16 +139,15 @@ class MainController {
       roundLength,
       timePerPlayer,
       isHidden,
-      isPractice,
-      isWhite
+      isPractice
     );
     console.log("create lobby response: ", response);
     if (!response.success) {
       this.callback(null, false, null);
       throw new Error("Could not create lobby");
     }
-    const lobbyState = await this.loadLobbyState(response.lobbyID);
-    this.callback(Page.Game, false, lobbyState);
+    const lobbyRaw = await this.loadLobbyRaw(response.lobbyID);
+    this.callback(Page.Game, false, lobbyRaw);
   }
 
   async joinLobby(nftId: number, lobbyId: string): Promise<void> {
@@ -149,7 +158,7 @@ class MainController {
       this.callback(null, false, null);
       throw new Error("Could not join lobby");
     }
-    const resp = await Paima.default.getLobbyState(lobbyId);
+    const resp = await Paima.default.getLobbyRaw(lobbyId);
     console.log("move to joined lobby response: ", response);
     if (!resp.success) {
       this.callback(null, false, null);
@@ -195,7 +204,7 @@ class MainController {
     if (!response.success) {
       throw new Error("Could not get open lobbies");
     }
-    return response.lobbies.filter((lobby) => lobby.lobby_state === "open");
+    return response.lobbies;
   }
 
   async getMyGames(
@@ -219,11 +228,15 @@ class MainController {
   }
 
   async getMatchExecutor(
-    lobbyId: string
+    lobbyId: string,
+    matchWithinLobby: number
   ): Promise<MatchExecutor<MatchState, TickEvent>> {
     await this.enforceWalletConnected();
     this.callback(null, true, null);
-    const response = await Paima.default.getMatchExecutor(lobbyId);
+    const response = await Paima.default.getMatchExecutor(
+      lobbyId,
+      matchWithinLobby
+    );
     console.log("get match executor: ", response);
     this.callback(null, false, null);
     if (!response.success) {

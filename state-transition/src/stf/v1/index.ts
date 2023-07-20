@@ -30,9 +30,9 @@ export default async function (
     case 'nftMint':
       return mintNft(parsed);
     case 'createdLobby':
-      return createdLobby(user, blockHeight, parsed, dbConn);
+      return createdLobby(user, blockHeight, parsed, dbConn, randomnessGenerator);
     case 'joinedLobby':
-      return joinedLobby(user, blockHeight, parsed, dbConn);
+      return joinedLobby(user, blockHeight, parsed, dbConn, randomnessGenerator);
     case 'closedLobby':
       return closedLobby(user, parsed, dbConn);
     case 'submittedMoves':

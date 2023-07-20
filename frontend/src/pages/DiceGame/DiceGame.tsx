@@ -33,6 +33,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
   selectedNft,
 }) => {
   const diceRefs = useRef<Record<number, undefined | DiceRef>>({});
+  const [matchOver, setMatchOver] = useState(false);
   const [caption, setCaption] = useState<undefined | string>();
 
   // round being currently shown
@@ -43,8 +44,10 @@ const DiceGame: React.FC<DiceGameProps> = ({
   );
   // end state of last round (latest finished round)
   const [displayedState, setDisplayedState] = useState<MatchState>({
-    turn: lobbyState.turn,
+    turn: lobbyState.current_turn,
+    properRound: lobbyState.current_proper_round,
     players: lobbyState.players,
+    result: undefined,
   });
   // cache of state that was fetched, but still needs to be displayed
   // the actual round executor is stateful so we store all it's end results instead
@@ -73,8 +76,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
   async function submit(rollAgain: boolean) {
     const moveResult = await DiceService.submitMove(
       selectedNft,
-      lobbyState.lobby_id,
-      lobbyState.current_round,
+      lobbyState,
       rollAgain
     );
     console.log("Move result:", moveResult);
@@ -105,7 +107,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
     // create initial roll queue and roll first
     if (startingScore === 0 && initialRollQueue.length === 0) {
       const newInitialRolls = genInitialDiceRolls(
-        new Prando(lobbyState.round_seed)
+        new Prando(lobbyState.roundSeed)
       ).dice;
       playInitialRollFromQueue(newInitialRolls);
       return;
@@ -128,7 +130,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
     () =>
       lobbyState.current_round === displayedRound + 1 &&
       thisPlayer.turn === displayedState.turn &&
-      thisPlayer.turn === lobbyState.turn,
+      thisPlayer.turn === lobbyState.current_turn,
     [lobbyState, displayedRound, thisPlayer]
   );
 
@@ -140,7 +142,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
     void (async () => {
       setIsTickDisplaying(true);
       const diceRef = diceRefs.current[displayedState.turn];
-      const dieRoll = genDieRoll(new Prando(lobbyState.round_seed));
+      const dieRoll = genDieRoll(new Prando(lobbyState.roundSeed));
       await diceRef.roll([dieRoll]);
       setDisplayedState((oldDisplayedState) => {
         const newDisplayedState = cloneMatchState(oldDisplayedState);
@@ -190,8 +192,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
           continue;
 
         if (tickEvent.kind === TickEventKind.roll) {
-          const playerRolling = displayedState.turn === 1 ? 1 : 2;
-          await diceRefs.current[playerRolling].roll(tickEvent.diceRolls);
+          await diceRefs.current[displayedState.turn].roll(tickEvent.diceRolls);
         }
         setDisplayedState((oldDisplayedState) => {
           const newDisplayedState = cloneMatchState(oldDisplayedState);
@@ -226,6 +227,25 @@ const DiceGame: React.FC<DiceGameProps> = ({
           await new Promise((resolve) => setTimeout(resolve, 3000));
           setCaption(undefined);
         }
+
+        if (tickEvent.kind === TickEventKind.matchEnd) {
+          setCaption(() => {
+            const thisPlayerIndex = displayedState.players.findIndex(
+              (player) => player.nftId === selectedNft
+            );
+            const thisPlayerResult = tickEvent.result[thisPlayerIndex];
+
+            if (thisPlayerResult === "w") return "You win!";
+            if (thisPlayerResult === "l") return "You lose!";
+            return "It's a tie!";
+          });
+          setDisplayedState((oldDisplayedState) => {
+            const newDisplayedState = cloneMatchState(oldDisplayedState);
+            applyEvent(newDisplayedState, tickEvent);
+            return newDisplayedState;
+          });
+          setMatchOver(true);
+        }
       }
 
       setDisplayedRound(displayedRound + 1);
@@ -238,8 +258,10 @@ const DiceGame: React.FC<DiceGameProps> = ({
 
   const [isFetchingRound, setIsFetchingRound] = useState(false);
   const [fetchedEndState, setFetchedEndState] = useState<MatchState>({
-    turn: lobbyState.turn,
+    turn: lobbyState.current_turn,
+    properRound: lobbyState.current_proper_round,
     players: lobbyState.players,
+    result: undefined,
   });
   const [nextFetchedRound, setFetchedRound] = useState(
     lobbyState.current_round
@@ -258,7 +280,12 @@ const DiceGame: React.FC<DiceGameProps> = ({
 
     setIsFetchingRound(true);
     Paima.default
-      .getRoundExecutor(lobbyState.lobby_id, nextFetchedRound, fetchedEndState)
+      .getRoundExecutor(
+        lobbyState.lobby_id,
+        lobbyState.current_match,
+        nextFetchedRound,
+        fetchedEndState
+      )
       .then((newRoundExecutor) => {
         if (newRoundExecutor.success) {
           const newRoundExecutorResults = {
@@ -286,6 +313,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
   }, [isFetchingRound, displayedRound, lobbyState.current_round]);
 
   const disableInteraction =
+    matchOver ||
     displayedRound !== lobbyState.current_round ||
     thisPlayer.turn !== displayedState.turn ||
     isTickDisplaying;
@@ -301,6 +329,8 @@ const DiceGame: React.FC<DiceGameProps> = ({
         variant="caption"
         sx={{ fontSize: "1.25rem", lineHeight: "1.75rem" }}
       >
+        {matchOver ? "Match over" : `Round: ${displayedState.properRound + 1}`}
+        {" | "}
         {caption ??
           (thisPlayer.turn === displayedState.turn
             ? "Your turn"

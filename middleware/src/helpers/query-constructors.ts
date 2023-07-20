@@ -2,6 +2,14 @@ import type { WalletAddress } from 'paima-sdk/paima-utils';
 import type { QueryOptions } from 'paima-sdk/paima-mw-core';
 import { buildBackendQuery } from 'paima-sdk/paima-mw-core';
 
+export function backendQueryLobbyRaw(lobbyID: string): string {
+  const endpoint = 'lobby_raw';
+  const options = {
+    lobbyID,
+  };
+  return buildBackendQuery(endpoint, options);
+}
+
 export function backendQueryLobbyState(lobbyID: string): string {
   const endpoint = 'lobby_state';
   const options = {
@@ -34,11 +42,16 @@ export function backendQueryUserLobbiesBlockheight(nftId: number, blockHeight: n
   return buildBackendQuery(endpoint, options);
 }
 
-export function backendQueryRoundStatus(lobbyID: string, round: number): string {
+export function backendQueryRoundStatus(
+  lobbyID: string,
+  matchWithinLobby: number,
+  roundWithinMatch: number
+): string {
   const endpoint = 'round_status';
   const options = {
     lobbyID,
-    round,
+    matchWithinLobby,
+    roundWithinMatch,
   };
   return buildBackendQuery(endpoint, options);
 }
@@ -79,27 +92,25 @@ export function backendQueryOpenLobbies(nftId: number, count?: number, page?: nu
   return buildBackendQuery(endpoint, options);
 }
 
-export function backendQueryRoundExecutor(lobbyID: string, round: number): string {
+export function backendQueryRoundExecutor(
+  lobbyID: string,
+  matchWithinLobby: number,
+  roundWithinMatch: number
+): string {
   const endpoint = 'round_executor';
   const options = {
     lobbyID,
-    round,
+    matchWithinLobby,
+    roundWithinMatch,
   };
   return buildBackendQuery(endpoint, options);
 }
 
-export function backendQueryMatchExecutor(lobbyID: string): string {
+export function backendQueryMatchExecutor(lobbyID: string, matchWithinLobby: number): string {
   const endpoint = 'match_executor';
   const options = {
     lobbyID,
-  };
-  return buildBackendQuery(endpoint, options);
-}
-
-export function backendQueryMatchWinner(lobbyID: string): string {
-  const endpoint = 'match_winner';
-  const options = {
-    lobbyID,
+    matchWithinLobby,
   };
   return buildBackendQuery(endpoint, options);
 }

@@ -3,7 +3,6 @@ import { PaimaMiddlewareErrorCode, getBlockNumber } from 'paima-sdk/paima-mw-cor
 import type { MatchExecutor, RoundExecutor } from 'paima-sdk/paima-executors';
 
 import type {
-  MatchWinnerResponse,
   MatchExecutorData,
   RoundStatusData,
   UserStats,
@@ -14,12 +13,11 @@ import type {
 } from '@dice/utils';
 
 import { buildEndpointErrorFxn, MiddlewareErrorCode } from '../errors';
-import { getRawLobbyState, getRawNewLobbies } from '../helpers/auxiliary-queries';
+import { auxGetLobbyRaw, auxGetLobbyState, getRawNewLobbies } from '../helpers/auxiliary-queries';
 import { calculateRoundEnd } from '../helpers/utility-functions';
 import { buildMatchExecutor, buildRoundExecutor } from '../helpers/executors';
 import {
   backendQueryMatchExecutor,
-  backendQueryMatchWinner,
   backendQueryNftsForWallet,
   backendQueryOpenLobbies,
   backendQueryRoundExecutor,
@@ -31,6 +29,7 @@ import {
 import type {
   LobbyStates,
   NewLobbies,
+  PackedLobbyRaw,
   PackedLobbyState,
   PackedRoundExecutionState,
   PackedUserLobbies,
@@ -39,13 +38,40 @@ import type {
 import type { WalletAddress } from 'paima-sdk/paima-utils';
 import type { IGetPaginatedUserLobbiesResult } from '@dice/db';
 
+async function getLobbyRaw(lobbyID: string): Promise<PackedLobbyRaw | FailedResult> {
+  const errorFxn = buildEndpointErrorFxn('getLobbyRaw');
+
+  let packedLobbyRaw: PackedLobbyRaw | FailedResult;
+
+  try {
+    packedLobbyRaw = await auxGetLobbyRaw(lobbyID);
+
+    if (!packedLobbyRaw.success) {
+      return errorFxn(packedLobbyRaw.errorMessage);
+    }
+  } catch (err) {
+    return errorFxn(PaimaMiddlewareErrorCode.ERROR_QUERYING_BACKEND_ENDPOINT, err);
+  }
+
+  try {
+    const { lobby } = packedLobbyRaw;
+
+    return {
+      success: true,
+      lobby,
+    };
+  } catch (err) {
+    return errorFxn(PaimaMiddlewareErrorCode.INVALID_RESPONSE_FROM_BACKEND, err);
+  }
+}
+
 async function getLobbyState(lobbyID: string): Promise<PackedLobbyState | FailedResult> {
   const errorFxn = buildEndpointErrorFxn('getLobbyState');
 
   let packedLobbyState: PackedLobbyState | FailedResult;
 
   try {
-    packedLobbyState = await getRawLobbyState(lobbyID);
+    packedLobbyState = await auxGetLobbyState(lobbyID);
 
     if (!packedLobbyState.success) {
       return errorFxn(packedLobbyState.errorMessage);
@@ -95,7 +121,8 @@ async function getLobbySearch(
 
 async function getRoundExecutionState(
   lobbyID: string,
-  round: number
+  matchWithinLobby: number,
+  roundWithinMatch: number
 ): Promise<PackedRoundExecutionState | FailedResult> {
   const errorFxn = buildEndpointErrorFxn('getRoundExecutionState');
 
@@ -103,7 +130,7 @@ async function getRoundExecutionState(
   let latestBlockHeight: number;
 
   try {
-    const query = backendQueryRoundStatus(lobbyID, round);
+    const query = backendQueryRoundStatus(lobbyID, matchWithinLobby, roundWithinMatch);
     [res, latestBlockHeight] = await Promise.all([fetch(query), getBlockNumber()]);
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.ERROR_QUERYING_BACKEND_ENDPOINT, err);
@@ -214,31 +241,10 @@ async function getOpenLobbies(
   }
 }
 
-async function getMatchWinner(lobbyId: string): Promise<Result<MatchWinnerResponse>> {
-  const errorFxn = buildEndpointErrorFxn('getMatchWinner');
-
-  let res: Response;
-  try {
-    const query = backendQueryMatchWinner(lobbyId);
-    res = await fetch(query);
-  } catch (err) {
-    return errorFxn(PaimaMiddlewareErrorCode.ERROR_QUERYING_BACKEND_ENDPOINT, err);
-  }
-
-  try {
-    const j = (await res.json()) as MatchWinnerResponse;
-    return {
-      success: true,
-      result: j,
-    };
-  } catch (err) {
-    return errorFxn(PaimaMiddlewareErrorCode.INVALID_RESPONSE_FROM_BACKEND, err);
-  }
-}
-
 async function getRoundExecutor(
   lobbyId: string,
-  roundNumber: number,
+  matchWithinLobby: number,
+  roundWithinMatch: number,
   matchState: MatchState
 ): Promise<Result<RoundExecutor<MatchState, TickEvent>>> {
   const errorFxn = buildEndpointErrorFxn('getRoundExecutor');
@@ -246,7 +252,7 @@ async function getRoundExecutor(
   // Retrieve data:
   let res: Response;
   try {
-    const query = backendQueryRoundExecutor(lobbyId, roundNumber);
+    const query = backendQueryRoundExecutor(lobbyId, matchWithinLobby, roundWithinMatch);
     res = await fetch(query);
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.ERROR_QUERYING_BACKEND_ENDPOINT, err);
@@ -275,14 +281,15 @@ async function getRoundExecutor(
 }
 
 async function getMatchExecutor(
-  lobbyId: string
+  lobbyId: string,
+  matchWithinLobby: number
 ): Promise<Result<MatchExecutor<MatchState, TickEvent>>> {
   const errorFxn = buildEndpointErrorFxn('getMatchExecutor');
 
   // Retrieve data:
   let res: Response;
   try {
-    const query = backendQueryMatchExecutor(lobbyId);
+    const query = backendQueryMatchExecutor(lobbyId, matchWithinLobby);
     res = await fetch(query);
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.ERROR_QUERYING_BACKEND_ENDPOINT, err);
@@ -331,13 +338,13 @@ async function getNftsForWallet(wallet: WalletAddress): Promise<Result<number[]>
 
 export const queryEndpoints = {
   getUserStats,
+  getLobbyRaw,
   getLobbyState,
   getLobbySearch,
   getRoundExecutionState,
   getOpenLobbies,
   getUserLobbiesMatches,
   getNewLobbies,
-  getMatchWinner,
   getRoundExecutor,
   getMatchExecutor,
   getNftsForWallet,

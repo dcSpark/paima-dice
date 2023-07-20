@@ -1,9 +1,12 @@
 import type {
   IGetLobbyByIdResult,
-  IGetMovesByLobbyResult,
   IGetUserStatsResult,
   IGetNewLobbiesByUserAndBlockHeightResult,
 } from '@dice/db';
+import type { IGetMatchMovesResult } from '@dice/db/build/select.queries';
+
+// TODO: find this in lib.es5
+export type PropertiesNonNullable<T> = { [P in keyof T]-?: NonNullable<T[P]> };
 
 export enum RoundKind {
   initial,
@@ -27,6 +30,7 @@ export enum TickEventKind {
   applyPoints,
   turnEnd,
   roundEnd,
+  matchEnd,
 }
 
 export type RollTickEvent = {
@@ -44,18 +48,32 @@ export type TurnEndTickEvent = {
 export type RoundEndTickEvent = {
   kind: TickEventKind.roundEnd;
 };
+export type MatchEndTickEvent = {
+  kind: TickEventKind.matchEnd;
+  result: MatchResult;
+};
 
-export type TickEvent = RollTickEvent | ApplyPointsTickEvent | TurnEndTickEvent | RoundEndTickEvent;
+export type TickEvent =
+  | RollTickEvent
+  | ApplyPointsTickEvent
+  | TurnEndTickEvent
+  | RoundEndTickEvent
+  | MatchEndTickEvent;
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface MatchEnvironment {}
+export interface MatchEnvironment {
+  practice: boolean;
+  numberOfRounds: number;
+}
 
 export interface MatchState {
   players: LobbyPlayer[];
+  // Round that is displayed to users (consists of everyone taking a turn).
+  // Not to be confused with round everywhere else (1 move + 1 random seed).
+  properRound: number;
   turn: number; // whose turn is it
+  result: undefined | MatchResult;
 }
-
-export type MatchMove = boolean;
 
 export type LobbyStatus = 'open' | 'active' | 'finished' | 'closed';
 
@@ -72,7 +90,7 @@ export interface MatchWinnerResponse {
 
 export interface RoundExecutorBackendData {
   lobby: IGetLobbyByIdResult;
-  moves: IGetMovesByLobbyResult[];
+  moves: IGetMatchMovesResult[];
   seed: string;
 }
 
@@ -88,7 +106,7 @@ interface ExecutorDataSeed {
 
 export interface MatchExecutorData {
   lobby: LobbyState;
-  moves: IGetMovesByLobbyResult[];
+  moves: IGetMatchMovesResult[];
   seeds: ExecutorDataSeed[];
 }
 
@@ -113,7 +131,11 @@ export type LobbyPlayer = {
   score: number;
 };
 
-export interface LobbyState extends IGetLobbyByIdResult {
-  round_seed: string;
+type LobbyStateProps = 'current_match' | 'current_round' | 'current_turn' | 'current_proper_round';
+export type LobbyWithStateProps = Omit<IGetLobbyByIdResult, LobbyStateProps> &
+  PropertiesNonNullable<Pick<IGetLobbyByIdResult, LobbyStateProps>>;
+
+export interface LobbyState extends LobbyWithStateProps {
+  roundSeed: string;
   players: LobbyPlayer[];
 }

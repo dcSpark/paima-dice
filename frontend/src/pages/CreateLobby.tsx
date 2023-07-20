@@ -15,7 +15,7 @@ const CreateLobby: React.FC = () => {
     selectedNftState: [selectedNft],
   } = useGlobalStateContext();
 
-  const [numberOfRounds, setNumberOfRounds] = useState("10");
+  const [numberOfRounds, setNumberOfRounds] = useState("5");
   const [roundLength, setRoundLength] = useState("100");
   const [playersTime, setPlayersTime] = useState("100");
   const [isHidden, setIsHidden] = useState(false);
@@ -42,24 +42,26 @@ const CreateLobby: React.FC = () => {
       <Wrapper small>
         <Box>
           {
-            // TODO: disabled - need to be properly implemented, on the backend:
-            //  <Box sx={{ display: "flex", flexFlow: "column", gap: "2rem" }}>
-            // <NumericField
-            //   label="Number of Rounds"
-            //   value={numberOfRounds}
-            //   onChange={setNumberOfRounds}
-            // />
-            // <NumericField
-            //   label="Player's Time"
-            //   value={playersTime}
-            //   onChange={setPlayersTime}
-            // />
-            // <NumericField
-            //   label="Round Length"
-            //   value={roundLength}
-            //   onChange={setRoundLength}
-            // />
-            // </Box>
+            <Box sx={{ display: "flex", flexFlow: "column", gap: "2rem" }}>
+              <NumericField
+                label="Number of Rounds"
+                value={numberOfRounds}
+                onChange={setNumberOfRounds}
+              />
+              {
+                // TODO: disabled - need to be properly implemented on the backend:
+                /* <NumericField
+                label="Player's Time"
+                value={playersTime}
+                onChange={setPlayersTime}
+              />
+              <NumericField
+                label="Round Length"
+                value={roundLength}
+                onChange={setRoundLength}
+              /> */
+              }
+            </Box>
           }
           <Box sx={{ display: "flex", paddingTop: "24px" }}>
             {

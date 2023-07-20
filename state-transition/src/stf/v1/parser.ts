@@ -11,14 +11,15 @@ import type {
   UserStats,
   ZombieRound,
 } from './types';
+import { SAFE_NUMBER } from '@dice/utils';
 
 const myGrammar = `
 nftMint             = nftmint|address|tokenId
-createdLobby        = c|creatorNftId|numOfRounds|roundLength|playTimePerPlayer|isHidden?|isPractice?|playerOneIsWhite?
+createdLobby        = c|creatorNftId|numOfRounds|roundLength|playTimePerPlayer|isHidden?|isPractice?
 joinedLobby         = j|nftId|*lobbyID
 closedLobby         = cs|*lobbyID
-submittedMoves      = s|nftId|*lobbyID|roundNumber|rollAgain
-practiceMoves       = p|*lobbyID|roundNumber
+submittedMoves      = s|nftId|*lobbyID|matchWithinLobby|roundWithinMatch|rollAgain
+practiceMoves       = p|*lobbyID|matchWithinLobby|roundWithinMatch
 zombieScheduledData = z|*lobbyID
 userScheduledData   = u|*user|result
 `;
@@ -29,12 +30,11 @@ const nftMint: ParserRecord<NftMintInput> = {
 };
 const createdLobby: ParserRecord<CreatedLobbyInput> = {
   creatorNftId: PaimaParser.NumberParser(),
-  numOfRounds: PaimaParser.NumberParser(3, 1000),
+  numOfRounds: PaimaParser.NumberParser(0, 1000),
   roundLength: PaimaParser.DefaultRoundLength(),
   playTimePerPlayer: PaimaParser.NumberParser(1, 10000),
   isHidden: PaimaParser.TrueFalseParser(false),
   isPractice: PaimaParser.TrueFalseParser(false),
-  playerOneIsWhite: PaimaParser.TrueFalseParser(true),
 };
 const joinedLobby: ParserRecord<JoinedLobbyInput> = {
   nftId: PaimaParser.NumberParser(),
@@ -46,12 +46,14 @@ const closedLobby: ParserRecord<ClosedLobbyInput> = {
 const submittedMoves: ParserRecord<SubmittedMovesInput> = {
   nftId: PaimaParser.NumberParser(),
   lobbyID: PaimaParser.NCharsParser(12, 12),
-  roundNumber: PaimaParser.NumberParser(1, 10000),
+  matchWithinLobby: PaimaParser.NumberParser(0, SAFE_NUMBER),
+  roundWithinMatch: PaimaParser.NumberParser(0, SAFE_NUMBER),
   rollAgain: PaimaParser.TrueFalseParser(),
 };
 const practiceMoves: ParserRecord<PracticeMovesInput> = {
   lobbyID: PaimaParser.NCharsParser(12, 12),
-  roundNumber: PaimaParser.NumberParser(1, 10000),
+  matchWithinLobby: PaimaParser.NumberParser(0, SAFE_NUMBER),
+  roundWithinMatch: PaimaParser.NumberParser(0, SAFE_NUMBER),
 };
 const zombieScheduledData: ParserRecord<ZombieRound> = {
   renameCommand: 'scheduledData',

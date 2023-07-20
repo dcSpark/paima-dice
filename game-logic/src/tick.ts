@@ -1,13 +1,14 @@
 import type Prando from 'paima-sdk/paima-prando';
 import type {
   ApplyPointsTickEvent,
+  MatchEndTickEvent,
   RollTickEvent,
   RoundEndTickEvent,
   TurnEndTickEvent,
 } from '@dice/utils';
 import { type MatchState, type MatchEnvironment, type TickEvent, TickEventKind } from '@dice/utils';
-import type { IGetCachedMovesResult } from '@dice/db';
-import { genDiceRolls, getPlayerScore } from '.';
+import { genDiceRolls, getPlayerScore, matchResults } from '.';
+import type { IGetRoundMovesResult } from '@dice/db';
 
 // TODO: variable number of players
 const numPlayers = 2;
@@ -16,11 +17,12 @@ const numPlayers = 2;
 export function processTick(
   matchEnvironment: MatchEnvironment,
   matchState: MatchState,
-  moves: IGetCachedMovesResult[],
+  // TODO: type for round and match moves is the same, not sure which is provided here
+  moves: IGetRoundMovesResult[],
   currentTick: number,
   randomnessGenerator: Prando
 ): TickEvent[] | null {
-  const events = [];
+  const events: TickEvent[] = [];
   // Every tick we intend to process a single move.
   const move = moves[currentTick - 1];
 
@@ -49,8 +51,8 @@ export function processTick(
   }
 
   const turnEnds = !rollEvents[rollEvents.length - 1].rollAgain;
-  // recall: we index turns from 1
-  const roundEnds = turnEnds && matchState.turn === numPlayers;
+  const roundEnds = turnEnds && matchState.turn === numPlayers - 1;
+  const matchEnds = roundEnds && matchState.properRound === matchEnvironment.numberOfRounds - 1;
 
   const applyPointsEvents: ApplyPointsTickEvent[] = (() => {
     if (!roundEnds) return [];
@@ -100,6 +102,14 @@ export function processTick(
     events.push(event);
   }
 
+  const matchEndEvents: MatchEndTickEvent[] = matchEnds
+    ? [{ kind: TickEventKind.matchEnd, result: matchResults(matchState) }]
+    : [];
+  for (const event of matchEndEvents) {
+    applyEvent(matchState, event);
+    events.push(event);
+  }
+
   // We return the tick event which gets emitted by the round executor. This is explicitly
   // for the frontend to know what happened during the current tick.
   return events;
@@ -109,10 +119,8 @@ export function processTick(
 export function applyEvent(matchState: MatchState, event: TickEvent): void {
   if (event.kind === TickEventKind.roll) {
     const addedScore = event.diceRolls.reduce((acc, next) => acc + next, 0);
-    matchState.players[
-      // recall: we index turns from 1
-      matchState.turn - 1
-    ].score += addedScore;
+    const turnPlayerIndex = matchState.players.findIndex(player => player.turn === matchState.turn);
+    matchState.players[turnPlayerIndex].score += addedScore;
     return;
   }
 
@@ -123,16 +131,18 @@ export function applyEvent(matchState: MatchState, event: TickEvent): void {
   }
 
   if (event.kind === TickEventKind.turnEnd) {
-    // recall: we index turns from 1
-    const numPlayers = 2;
-    matchState.turn = (matchState.turn % numPlayers) + 1;
+    matchState.turn = (matchState.turn + 1) % numPlayers;
     return;
   }
 
   if (event.kind === TickEventKind.roundEnd) {
-    // reset scores
+    matchState.properRound++;
     for (const i in matchState.players) {
       matchState.players[i].score = 0;
     }
+  }
+
+  if (event.kind === TickEventKind.matchEnd) {
+    matchState.result = event.result;
   }
 }

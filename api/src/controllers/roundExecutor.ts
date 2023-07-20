@@ -1,44 +1,82 @@
 import { Controller, Get, Query, Route, ValidateError } from 'tsoa';
-import { requirePool, getLobbyById, getRoundData, getRoundMoves } from '@dice/db';
+import { requirePool, getLobbyById, getRoundMoves } from '@dice/db';
 import { isLeft } from 'fp-ts/Either';
-import { psqlNum } from '../validation.js';
+import { psqlInt } from '../validation.js';
 import type { RoundExecutorBackendData } from '@dice/utils';
 import { getBlockHeight } from 'paima-sdk/paima-db';
+import { getMatch, getRound } from '@dice/db/src/select.queries.js';
 
 type Response = RoundExecutorBackendData | Error;
 
 interface Error {
-  error: 'lobby not found' | 'bad round number' | 'round not found';
+  error:
+    | 'lobby not found'
+    | 'bad round number'
+    | 'round not found'
+    | 'match not found'
+    | 'internal error';
 }
 
 @Route('round_executor')
 export class RoundExecutorController extends Controller {
   @Get()
-  public async get(@Query() lobbyID: string, @Query() round: number): Promise<Response> {
-    const valRound = psqlNum.decode(round);
-    if (isLeft(valRound) || !(round > 0)) {
-      throw new ValidateError({ round: { message: 'invalid number' } }, '');
+  public async get(
+    @Query() lobbyID: string,
+    @Query() matchWithinLobby: number,
+    @Query() roundWithinMatch: number
+  ): Promise<Response> {
+    const valMatch = psqlInt.decode(matchWithinLobby);
+    if (isLeft(valMatch)) {
+      throw new ValidateError({ matchWithinLobby: { message: 'invalid number' } }, '');
+    }
+    const valRound = psqlInt.decode(roundWithinMatch);
+    if (isLeft(valRound)) {
+      throw new ValidateError({ roundWithinMatch: { message: 'invalid number' } }, '');
     }
 
     const pool = requirePool();
     const [lobby] = await getLobbyById.run({ lobby_id: lobbyID }, pool);
+    const [match] = await getMatch.run(
+      { lobby_id: lobbyID, match_within_lobby: matchWithinLobby },
+      pool
+    );
     if (!lobby) {
       return { error: 'lobby not found' };
     }
+    if (match == null) {
+      return { error: 'match not found' };
+    }
 
-    // null if this is first round
-    const [last_round_data] = await getRoundData.run(
-      { lobby_id: lobbyID, round_number: round - 1 },
+    const [last_round_data] =
+      roundWithinMatch === 0
+        ? [undefined]
+        : await getRound.run(
+            {
+              lobby_id: lobbyID,
+              match_within_lobby: matchWithinLobby,
+              round_within_match: roundWithinMatch - 1,
+            },
+            pool
+          );
+
+    const seedBlockHeight =
+      roundWithinMatch === 0
+        ? match.starting_block_height
+        : last_round_data?.execution_block_height;
+    if (seedBlockHeight == null) {
+      return { error: 'internal error' };
+    }
+
+    const [seedBlockRow] = await getBlockHeight.run({ block_height: seedBlockHeight }, pool);
+    const seed = seedBlockRow.seed;
+    const moves = await getRoundMoves.run(
+      {
+        lobby_id: lobbyID,
+        match_within_lobby: matchWithinLobby,
+        round_within_match: roundWithinMatch,
+      },
       pool
     );
-
-    const [last_block_height] =
-      last_round_data == null
-        ? [undefined]
-        : await getBlockHeight.run({ block_height: last_round_data.execution_block_height }, pool);
-    const seed = last_block_height?.seed ?? lobby.initial_random_seed;
-
-    const moves = await getRoundMoves.run({ lobby_id: lobbyID, round: round }, pool);
     return {
       lobby,
       moves,

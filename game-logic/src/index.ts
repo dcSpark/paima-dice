@@ -3,7 +3,7 @@ import { roundExecutor } from 'paima-sdk/paima-executors';
 import type Prando from 'paima-sdk/paima-prando';
 import type { MatchState, MatchEnvironment, TickEvent } from '@dice/utils';
 import { processTick } from './tick';
-import type { IGetLobbyByIdResult, IGetCachedMovesResult } from '@dice/db';
+import type { IGetLobbyByIdResult, IGetRoundMovesResult } from '@dice/db';
 import { cloneMatchState } from './dice-logic';
 
 export * from './tick';
@@ -15,13 +15,18 @@ export * from './dice-logic';
 export function initRoundExecutor(
   lobby: IGetLobbyByIdResult,
   matchState: MatchState,
-  moves: IGetCachedMovesResult[],
+  moves: IGetRoundMovesResult[],
   randomnessGenerator: Prando
 ): RoundExecutor<MatchState, TickEvent> {
+  const paimaMoves = moves.map(move => ({
+    ...move,
+    round: move.round_within_match,
+  }));
+
   return roundExecutor.initialize(
     extractMatchEnvironment(lobby),
     buildMatchState(matchState),
-    moves,
+    paimaMoves,
     randomnessGenerator,
     processTick
   );
@@ -30,8 +35,8 @@ export function initRoundExecutor(
 // From a lobby, extract a match environment which will be used by the round executor.
 // A match environment is a piece of immutable data about the match which is
 // relevant to the round executor, but which can not be updated.
-export function extractMatchEnvironment(_lobby: IGetLobbyByIdResult): MatchEnvironment {
-  return {};
+export function extractMatchEnvironment(lobby: IGetLobbyByIdResult): MatchEnvironment {
+  return { practice: lobby.practice, numberOfRounds: lobby.num_of_rounds };
 }
 
 // From a given round, construct the match state which will be used by the round executor.
