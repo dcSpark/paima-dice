@@ -31,11 +31,15 @@ VALUES(
 /* @name joinPlayerToLobby */
 INSERT INTO lobby_player(
   lobby_id,
-  nft_id
+  nft_id,
+  starting_deck,
+  current_deck
 )
 VALUES(
   :lobby_id!,
-  :nft_id!
+  :nft_id!,
+  :starting_deck!,
+  :current_deck!
 );
 
 /* @name newMatch */

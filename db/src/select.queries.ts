@@ -151,11 +151,15 @@ export interface IGetLobbyPlayersParams {
 
 /** 'GetLobbyPlayers' return type */
 export interface IGetLobbyPlayersResult {
+  current_deck: string;
+  current_draw: number;
+  current_hand: string;
   id: number;
   lobby_id: string;
   nft_id: number;
   points: number;
   score: number;
+  starting_deck: string;
   turn: number | null;
 }
 

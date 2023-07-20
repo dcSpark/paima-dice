@@ -1,6 +1,12 @@
 import { Controller, Get, Query, Route } from 'tsoa';
 import { getLobbyById, getLobbyPlayers, requirePool } from '@dice/db';
-import { isLobbyWithStateProps, type LobbyPlayer, type LobbyState } from '@dice/utils';
+import {
+  deserializeDeck,
+  deserializeHand,
+  isLobbyWithStateProps,
+  type LobbyPlayer,
+  type LobbyState,
+} from '@dice/utils';
 import { getMatch, getRound } from '@dice/db/src/select.queries';
 import { getBlockHeight } from 'paima-sdk/paima-db';
 
@@ -55,6 +61,10 @@ export class LobbyStatecontroller extends Controller {
 
     const players: LobbyPlayer[] = rawPlayers.map(raw => ({
       nftId: raw.nft_id,
+      startingDeck: deserializeDeck(raw.starting_deck),
+      currentDeck: deserializeDeck(raw.current_deck),
+      currentHand: deserializeHand(raw.current_hand),
+      currentDraw: raw.current_draw,
       points: raw.points,
       score: raw.score,
       turn: raw.turn ?? undefined,

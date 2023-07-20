@@ -7,6 +7,9 @@ import {
   type LobbyState,
   TickEventKind,
   LobbyPlayer,
+  Deck,
+  CardId,
+  CardDraw,
 } from "@dice/utils";
 import {
   applyEvent,
@@ -14,6 +17,7 @@ import {
   genInitialDiceRolls,
   getPlayerScore,
   cloneMatchState,
+  getTurnPlayer,
 } from "@dice/game-logic";
 import * as Paima from "@dice/middleware";
 import { DiceService } from "./GameLogic";
@@ -70,7 +74,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
 
   // "forced moves", user has to roll until he gets score 16
   const [initialRollQueue, setInitialRollQueue] = React.useState<
-    [number, number][]
+    [CardDraw, CardDraw][]
   >([]);
 
   async function submit(rollAgain: boolean) {
@@ -84,17 +88,18 @@ const DiceGame: React.FC<DiceGameProps> = ({
   }
   async function handleRoll(): Promise<void> {
     const startingScore = getPlayerScore(displayedState);
+    const player = getTurnPlayer(displayedState);
     const diceRef = diceRefs.current[displayedState.turn];
 
-    async function playInitialRollFromQueue(queue: [number, number][]) {
+    async function playInitialRollFromQueue(queue: [CardDraw, CardDraw][]) {
       setIsTickDisplaying(true);
       const [playedInitialRoll, ...restInitialRolls] = queue;
       setInitialRollQueue(restInitialRolls);
-      await diceRef?.roll(playedInitialRoll);
+      await diceRef?.roll([playedInitialRoll[0].die, playedInitialRoll[1].die]);
       setDisplayedState((oldDisplayedState) => {
         const newDisplayedState = cloneMatchState(oldDisplayedState);
         applyEvent(newDisplayedState, {
-          kind: TickEventKind.roll,
+          kind: TickEventKind.draw,
           diceRolls: playedInitialRoll,
           // won't be used, just mock value
           rollAgain: true,
@@ -107,6 +112,8 @@ const DiceGame: React.FC<DiceGameProps> = ({
     // create initial roll queue and roll first
     if (startingScore === 0 && initialRollQueue.length === 0) {
       const newInitialRolls = genInitialDiceRolls(
+        player.currentDraw,
+        player.currentDeck,
         new Prando(lobbyState.roundSeed)
       ).dice;
       playInitialRollFromQueue(newInitialRolls);
@@ -141,13 +148,18 @@ const DiceGame: React.FC<DiceGameProps> = ({
 
     void (async () => {
       setIsTickDisplaying(true);
+      const player = getTurnPlayer(displayedState);
       const diceRef = diceRefs.current[displayedState.turn];
-      const dieRoll = genDieRoll(new Prando(lobbyState.roundSeed));
-      await diceRef.roll([dieRoll]);
+      const dieRoll = genDieRoll(
+        player.currentDraw,
+        player.currentDeck,
+        new Prando(lobbyState.roundSeed)
+      );
+      await diceRef.roll([dieRoll.die]);
       setDisplayedState((oldDisplayedState) => {
         const newDisplayedState = cloneMatchState(oldDisplayedState);
         applyEvent(newDisplayedState, {
-          kind: TickEventKind.roll,
+          kind: TickEventKind.draw,
           diceRolls: [dieRoll],
           // won't be used, just mock value
           rollAgain: true,
@@ -187,12 +199,15 @@ const DiceGame: React.FC<DiceGameProps> = ({
         // skip replay of this player's actions that already happened interactively
         if (
           thisPlayer.turn === displayedState.turn &&
-          tickEvent.kind === TickEventKind.roll
+          tickEvent.kind === TickEventKind.draw
         )
           continue;
 
-        if (tickEvent.kind === TickEventKind.roll) {
-          await diceRefs.current[displayedState.turn].roll(tickEvent.diceRolls);
+        if (tickEvent.kind === TickEventKind.draw) {
+          const diceRolls = tickEvent.diceRolls.map((draw) => draw.die) as
+            | [number]
+            | [number, number];
+          await diceRefs.current[displayedState.turn].roll(diceRolls);
         }
         setDisplayedState((oldDisplayedState) => {
           const newDisplayedState = cloneMatchState(oldDisplayedState);
@@ -200,7 +215,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
           return newDisplayedState;
         });
 
-        if (tickEvent.kind === TickEventKind.roll)
+        if (tickEvent.kind === TickEventKind.draw)
           await new Promise((resolve) => setTimeout(resolve, 2000));
 
         if (tickEvent.kind === TickEventKind.applyPoints) {

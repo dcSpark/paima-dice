@@ -12,6 +12,7 @@ import { buildEndpointErrorFxn, MiddlewareErrorCode } from '../errors';
 import { getLobbyStateWithUser, getNonemptyNewLobbies } from '../helpers/auxiliary-queries';
 import { lobbyWasClosed, userCreatedLobby, userJoinedLobby } from '../helpers/utility-functions';
 import type { CreateLobbySuccessfulResponse } from '../types';
+import { serializeDeck, type Deck } from '@dice/utils';
 
 const RETRY_PERIOD = 1000;
 const RETRIES_COUNT = 8;
@@ -30,6 +31,7 @@ const getUserWallet = (errorFxn: EndpointErrorFxn): Result<string> => {
 
 async function createLobby(
   creatorNftId: number,
+  deck: Deck,
   numberOfRounds: number,
   roundLength: number,
   playTimePerPlayer: number,
@@ -42,6 +44,7 @@ async function createLobby(
   conciseBuilder.setPrefix('c');
   conciseBuilder.addValues([
     { value: creatorNftId.toString(10) },
+    { value: serializeDeck(deck) },
     { value: numberOfRounds.toString(10) },
     { value: roundLength.toString(10) },
     { value: playTimePerPlayer.toString(10) },
@@ -94,7 +97,7 @@ async function createLobby(
   }
 }
 
-async function joinLobby(nftId: number, lobbyID: string): Promise<OldResult> {
+async function joinLobby(nftId: number, lobbyID: string, deck: Deck): Promise<OldResult> {
   const errorFxn = buildEndpointErrorFxn('joinLobby');
 
   const conciseBuilder = builder.initialize();
@@ -102,6 +105,7 @@ async function joinLobby(nftId: number, lobbyID: string): Promise<OldResult> {
   conciseBuilder.addValues([
     { value: nftId.toString(10) },
     { value: lobbyID, isStateIdentifier: true },
+    { value: serializeDeck(deck) },
   ]);
 
   let currentBlockVar: number;

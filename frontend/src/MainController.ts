@@ -1,4 +1,4 @@
-import { MatchState, TickEvent, LobbyState } from "@dice/utils";
+import { MatchState, TickEvent, LobbyState, genBotDeck } from "@dice/utils";
 import * as Paima from "@dice/middleware";
 import { MatchExecutor } from "paima-sdk/paima-executors";
 import { IGetLobbyByIdResult, IGetPaginatedUserLobbiesResult } from "@dice/db";
@@ -135,6 +135,7 @@ class MainController {
     );
     const response = await Paima.default.createLobby(
       creatorNftId,
+      genBotDeck(), // TODO: user's deck
       numOfRounds,
       roundLength,
       timePerPlayer,
@@ -153,7 +154,11 @@ class MainController {
   async joinLobby(nftId: number, lobbyId: string): Promise<void> {
     await this.enforceWalletConnected();
     this.callback(null, true, null);
-    const response = await Paima.default.joinLobby(nftId, lobbyId);
+    const response = await Paima.default.joinLobby(
+      nftId,
+      lobbyId,
+      genBotDeck() // TODO: user's deck
+    );
     if (!response.success) {
       this.callback(null, false, null);
       throw new Error("Could not join lobby");

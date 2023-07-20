@@ -17,25 +17,32 @@ export type DiceRolls = {
 } & (
   | {
       roundKind: RoundKind.initial;
-      dice: [number, number][];
+      dice: [CardDraw, CardDraw][];
     }
   | {
       roundKind: RoundKind.extra;
-      dice: [[number]];
+      dice: [[CardDraw]];
     }
 );
 
 export enum TickEventKind {
-  roll,
+  draw,
   applyPoints,
   turnEnd,
   roundEnd,
   matchEnd,
 }
 
-export type RollTickEvent = {
-  kind: TickEventKind.roll;
-  diceRolls: [number] | [number, number];
+export type CardDraw = {
+  cardNumber: number;
+  card: HandCard; // deck can be empty
+  newDeck: Deck;
+  die: number;
+};
+
+export type DrawTickEvent = {
+  kind: TickEventKind.draw;
+  diceRolls: [CardDraw] | [CardDraw, CardDraw];
   rollAgain: boolean;
 };
 export type ApplyPointsTickEvent = {
@@ -54,7 +61,7 @@ export type MatchEndTickEvent = {
 };
 
 export type TickEvent =
-  | RollTickEvent
+  | DrawTickEvent
   | ApplyPointsTickEvent
   | TurnEndTickEvent
   | RoundEndTickEvent
@@ -126,6 +133,10 @@ export type NewLobby = IGetNewLobbiesByUserAndBlockHeightResult;
 
 export type LobbyPlayer = {
   nftId: number;
+  startingDeck: Deck;
+  currentDeck: Deck;
+  currentHand: Hand;
+  currentDraw: number;
   turn: undefined | number;
   points: number;
   score: number;
@@ -139,3 +150,17 @@ export interface LobbyState extends LobbyWithStateProps {
   roundSeed: string;
   players: LobbyPlayer[];
 }
+
+export type CardId = number;
+export type Deck = CardId[];
+export type SerializedCard = string;
+export type SerializedDeck = string;
+
+export type HandCard = {
+  cardId: undefined | CardId;
+  // the position in all cards drawn this match by this player
+  draw: number;
+};
+export type Hand = HandCard[];
+export type SerializedHandCard = string;
+export type SerializedHand = string;

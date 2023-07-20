@@ -1,4 +1,4 @@
-import type { ConciseResult } from '@dice/utils';
+import type { ConciseResult, SerializedDeck } from '@dice/utils';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
 
 export type ParsedSubmittedInput =
@@ -25,6 +25,7 @@ export interface NftMintInput {
 export interface CreatedLobbyInput {
   input: 'createdLobby';
   creatorNftId: number;
+  creatorDeck: SerializedDeck;
   numOfRounds: number;
   roundLength: number;
   playTimePerPlayer: number;
@@ -35,6 +36,7 @@ export interface CreatedLobbyInput {
 export interface JoinedLobbyInput {
   input: 'joinedLobby';
   nftId: number;
+  deck: SerializedDeck;
   lobbyID: string;
 }
 

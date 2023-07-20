@@ -9,6 +9,7 @@ import type {
   LobbyPlayer,
   MatchEnvironment,
   MatchState,
+  SerializedDeck,
 } from '@dice/utils';
 import {
   initRoundExecutor,
@@ -39,7 +40,14 @@ import type {
   SubmittedMovesInput,
 } from './types.js';
 import { isUserStats, isZombieRound } from './types.js';
-import { NFT_NAME, PRACTICE_BOT_NFT_ID, isLobbyWithStateProps } from '@dice/utils';
+import {
+  DECK_SIZE,
+  NFT_NAME,
+  PRACTICE_BOT_NFT_ID,
+  deserializeDeck,
+  deserializeHand,
+  isLobbyWithStateProps,
+} from '@dice/utils';
 import { getBlockHeight, type SQLUpdate } from 'paima-sdk/paima-db';
 import { PracticeAI } from './persist/practice-ai';
 import { getOwnedNfts } from 'paima-sdk/paima-utils-backend';
@@ -69,13 +77,13 @@ export const createdLobby = async (
     console.log('DISCARD: user does not own specified nft');
     return [];
   }
-  return persistLobbyCreation(
-    input.creatorNftId,
-    blockHeight,
-    input,
-    block.seed,
-    randomnessGenerator
-  );
+
+  if (!(await validateStartingDeck(input.creatorNftId, input.creatorDeck, dbConn))) {
+    console.log('DISCARD: invalid deck');
+    return [];
+  }
+
+  return persistLobbyCreation(blockHeight, input, block.seed, randomnessGenerator);
 };
 
 // State transition when a join lobby input is processed
@@ -100,6 +108,10 @@ export const joinedLobby = async (
   }
   const lobbyPlayers: LobbyPlayer[] = rawPlayers.map(player => ({
     nftId: player.nft_id,
+    startingDeck: deserializeDeck(player.starting_deck),
+    currentDeck: deserializeDeck(player.current_deck),
+    currentHand: deserializeHand(player.current_hand),
+    currentDraw: player.current_draw,
     points: player.points,
     score: player.score,
     turn: player.turn ?? undefined,
@@ -110,12 +122,23 @@ export const joinedLobby = async (
     return [];
   }
 
+  if (!(await validateStartingDeck(input.nftId, input.deck, dbConn))) {
+    console.log('DISCARD: invalid deck');
+    return [];
+  }
+
   const joinUpdates = persistLobbyJoin({
     lobby_id: input.lobbyID,
     nft_id: input.nftId,
+    starting_deck: input.deck,
+    current_deck: input.deck,
   });
   lobbyPlayers.push({
     nftId: input.nftId,
+    startingDeck: deserializeDeck(input.deck),
+    currentDeck: deserializeDeck(input.deck),
+    currentHand: [],
+    currentDraw: 0,
     points: 0,
     score: 0,
     turn: undefined,
@@ -507,4 +530,22 @@ async function fetchPrandoSeed(
 async function checkUserOwns(user: WalletAddress, nftId: number, dbConn: Pool): Promise<boolean> {
   const walletNfts = await getOwnedNfts(dbConn, NFT_NAME, user);
   return walletNfts.some(ownedNftId => Number(ownedNftId) === nftId);
+}
+
+async function validateStartingDeck(
+  _nftId: number,
+  deck: SerializedDeck,
+  _dbConn: Pool
+): Promise<boolean> {
+  try {
+    const deserialized = deserializeDeck(deck);
+    if (deserialized.length !== DECK_SIZE) return false;
+
+    // TODO: every card exists
+    // TODO: user owns all cards
+
+    return true;
+  } catch (_) {
+    return false;
+  }
 }

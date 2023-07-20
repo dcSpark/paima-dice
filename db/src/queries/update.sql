@@ -23,9 +23,12 @@ WHERE lobby_id = :lobby_id!;
 /* @name updateLobbyPlayer */
 UPDATE lobby_player
 SET
-  points = :points,
-  score = :score,
-  turn = :turn
+  points = :points!,
+  score = :score!,
+  turn = :turn,
+  current_deck = :current_deck!,
+  current_draw = :current_draw!,
+  current_hand = :current_hand!
 WHERE 
   lobby_id = :lobby_id! AND nft_id = :nft_id!;
 
