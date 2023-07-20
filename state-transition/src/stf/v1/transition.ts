@@ -45,6 +45,7 @@ import {
   NFT_NAME,
   PRACTICE_BOT_NFT_ID,
   deserializeDeck,
+  deserializeHand,
   isLobbyWithStateProps,
 } from '@dice/utils';
 import { getBlockHeight, type SQLUpdate } from 'paima-sdk/paima-db';
@@ -109,6 +110,7 @@ export const joinedLobby = async (
     nftId: player.nft_id,
     startingDeck: deserializeDeck(player.starting_deck),
     currentDeck: deserializeDeck(player.current_deck),
+    currentHand: deserializeHand(player.current_hand),
     currentDraw: player.current_draw,
     points: player.points,
     score: player.score,
@@ -135,6 +137,7 @@ export const joinedLobby = async (
     nftId: input.nftId,
     startingDeck: deserializeDeck(input.deck),
     currentDeck: deserializeDeck(input.deck),
+    currentHand: [],
     currentDraw: 0,
     points: 0,
     score: 0,

@@ -126,9 +126,12 @@ export function applyEvent(matchState: MatchState, event: TickEvent): void {
     const addedScore = event.diceRolls.reduce((acc, next) => acc + next.die, 0);
     const turnPlayerIndex = matchState.players.findIndex(player => player.turn === matchState.turn);
     matchState.players[turnPlayerIndex].score += addedScore;
-    matchState.players[turnPlayerIndex].currentDraw += event.diceRolls.length;
-    matchState.players[turnPlayerIndex].currentDeck =
-      event.diceRolls[event.diceRolls.length - 1].newDeck;
+
+    for (const draw of event.diceRolls) {
+      matchState.players[turnPlayerIndex].currentDraw++;
+      matchState.players[turnPlayerIndex].currentDeck = draw.newDeck;
+      matchState.players[turnPlayerIndex].currentHand.push(draw.card);
+    }
     return;
   }
 

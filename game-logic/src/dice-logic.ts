@@ -1,5 +1,5 @@
 import type { IGetLobbyPlayersResult } from '@dice/db';
-import { RoundKind, deserializeDeck } from '@dice/utils';
+import { RoundKind, deserializeDeck, deserializeHand } from '@dice/utils';
 import type {
   MatchState,
   DiceRolls,
@@ -133,6 +133,7 @@ export function buildCurrentMatchState(
       nftId: player.nft_id,
       startingDeck: deserializeDeck(player.starting_deck),
       currentDeck: deserializeDeck(player.current_deck),
+      currentHand: deserializeHand(player.current_hand),
       currentDraw: player.current_draw,
       turn: player.turn,
       points: player.points,

@@ -2,6 +2,7 @@ import { Controller, Get, Query, Route, ValidateError } from 'tsoa';
 import { requirePool, getLobbyById, getMatchSeeds, getLobbyPlayers } from '@dice/db';
 import {
   deserializeDeck,
+  deserializeHand,
   isLobbyWithStateProps,
   type LobbyPlayer,
   type MatchExecutorData,
@@ -36,6 +37,7 @@ export class MatchExecutorController extends Controller {
       nftId: raw.nft_id,
       startingDeck: deserializeDeck(raw.starting_deck),
       currentDeck: deserializeDeck(raw.current_deck),
+      currentHand: deserializeHand(raw.current_hand),
       currentDraw: raw.current_draw,
       points: raw.points,
       score: raw.score,

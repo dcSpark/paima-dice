@@ -1,5 +1,14 @@
 import type Prando from 'paima-sdk/paima-prando';
-import type { CardId, Deck, SerializedCard, SerializedDeck } from './types';
+import type {
+  CardId,
+  Deck,
+  Hand,
+  HandCard,
+  SerializedCard,
+  SerializedDeck,
+  SerializedHand,
+  SerializedHandCard,
+} from './types';
 import { DECK_SIZE } from '.';
 
 /**
@@ -17,7 +26,6 @@ export function genPermutation(size: number, randomnessGenerator: Prando): numbe
   return result;
 }
 
-/* TODO: can't find the restricted characters at the moment. I'm sure '+' is ok, but it looks stupid. */
 const deckCardDelimiter = '+';
 
 export function serializeCard(card: CardId): SerializedCard {
@@ -33,6 +41,7 @@ export function deserializeCard(card: SerializedCard): CardId {
 }
 
 export function deserializeDeck(deck: SerializedDeck): Deck {
+  if (deck === '') return [];
   return deck.split(deckCardDelimiter).map(deserializeCard);
 }
 
@@ -41,4 +50,28 @@ export function genBotDeck(): Deck {
     // TODO: select from existing cards
     return Math.floor(Math.random() * 3);
   });
+}
+
+const handCardDelimiter = deckCardDelimiter;
+const handCardPropDelimiter = '-';
+
+export function serializeHandCard(card: HandCard): SerializedHandCard {
+  return [card.cardId?.toString() ?? '', card.draw.toString()].join(handCardPropDelimiter);
+}
+
+export function serializeHand(hand: Hand): SerializedHand {
+  return hand.map(serializeHandCard).join(handCardDelimiter);
+}
+
+export function deserializeHandCard(card: SerializedHandCard): HandCard {
+  const [rawCardId, rawDraw] = card.split(handCardPropDelimiter);
+  return {
+    cardId: rawCardId === '' ? undefined : Number.parseInt(rawCardId),
+    draw: Number.parseInt(rawDraw),
+  };
+}
+
+export function deserializeHand(hand: SerializedHand): Hand {
+  if (hand === '') return [];
+  return hand.split(handCardDelimiter).map(deserializeHandCard);
 }

@@ -35,7 +35,7 @@ export enum TickEventKind {
 
 export type CardDraw = {
   cardNumber: number;
-  card: undefined | CardId; // deck can be empty
+  card: HandCard; // deck can be empty
   newDeck: Deck;
   die: number;
 };
@@ -135,6 +135,7 @@ export type LobbyPlayer = {
   nftId: number;
   startingDeck: Deck;
   currentDeck: Deck;
+  currentHand: Hand;
   currentDraw: number;
   turn: undefined | number;
   points: number;
@@ -154,3 +155,12 @@ export type CardId = number;
 export type Deck = CardId[];
 export type SerializedCard = string;
 export type SerializedDeck = string;
+
+export type HandCard = {
+  cardId: undefined | CardId;
+  // the position in all cards drawn this match by this player
+  draw: number;
+};
+export type Hand = HandCard[];
+export type SerializedHandCard = string;
+export type SerializedHand = string;

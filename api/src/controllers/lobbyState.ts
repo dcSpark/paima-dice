@@ -2,6 +2,7 @@ import { Controller, Get, Query, Route } from 'tsoa';
 import { getLobbyById, getLobbyPlayers, requirePool } from '@dice/db';
 import {
   deserializeDeck,
+  deserializeHand,
   isLobbyWithStateProps,
   type LobbyPlayer,
   type LobbyState,
@@ -62,6 +63,7 @@ export class LobbyStatecontroller extends Controller {
       nftId: raw.nft_id,
       startingDeck: deserializeDeck(raw.starting_deck),
       currentDeck: deserializeDeck(raw.current_deck),
+      currentHand: deserializeHand(raw.current_hand),
       currentDraw: raw.current_draw,
       points: raw.points,
       score: raw.score,

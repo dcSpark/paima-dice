@@ -65,6 +65,7 @@ CREATE TABLE lobby_player (
   nft_id INTEGER NOT NULL,
   starting_deck TEXT NOT NULL,
   current_deck TEXT NOT NULL,
+  current_hand TEXT NOT NULL DEFAULT '',
   current_draw INTEGER NOT NULL DEFAULT 0,
   points INTEGER NOT NULL DEFAULT 0,
   score INTEGER NOT NULL DEFAULT 0,

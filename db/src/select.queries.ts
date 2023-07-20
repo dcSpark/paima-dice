@@ -153,6 +153,7 @@ export interface IGetLobbyPlayersParams {
 export interface IGetLobbyPlayersResult {
   current_deck: string;
   current_draw: number;
+  current_hand: string;
   id: number;
   lobby_id: string;
   nft_id: number;
