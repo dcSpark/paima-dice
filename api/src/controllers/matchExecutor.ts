@@ -1,6 +1,6 @@
 import { Controller, Get, Query, Route, ValidateError } from 'tsoa';
 import { requirePool, getLobbyById, getMatchSeeds, getLobbyPlayers } from '@dice/db';
-import { isLobbyActive, type LobbyPlayer, type MatchExecutorData } from '@dice/utils';
+import { isLobbyWithStateProps, type LobbyPlayer, type MatchExecutorData } from '@dice/utils';
 import { psqlInt } from '../validation';
 import { isLeft } from 'fp-ts/lib/Either';
 import { getMatch, getMatchMoves } from '@dice/db/src/select.queries';
@@ -24,7 +24,7 @@ export class MatchExecutorController extends Controller {
       pool
     );
     const rawPlayers = await getLobbyPlayers.run({ lobby_id: lobbyID }, pool);
-    if (lobby == null || !isLobbyActive(lobby) || match == null) {
+    if (lobby == null || !isLobbyWithStateProps(lobby) || match == null) {
       return null;
     }
     const players: LobbyPlayer[] = rawPlayers.map(raw => ({

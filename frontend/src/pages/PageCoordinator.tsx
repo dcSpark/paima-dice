@@ -11,6 +11,7 @@ import "./PageCoordinator.scss";
 import { AppContext } from "@src/main";
 import { Lobby } from "./DiceGame/Lobby";
 import { useGlobalStateContext } from "@src/GlobalStateContext";
+import { IGetLobbyByIdResult } from "@dice/db";
 
 const PageCoordinator: React.FC = () => {
   const mainController: MainController = useContext(AppContext);
@@ -19,14 +20,14 @@ const PageCoordinator: React.FC = () => {
   } = useGlobalStateContext();
   const navigate = useNavigate();
 
-  const [lobby, setLobby] = useState<LobbyState>(null);
+  const [lobby, setLobby] = useState<IGetLobbyByIdResult>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     mainController.callback = (
       newPage: Page | null,
       isLoading: boolean,
-      extraData: LobbyState | null
+      extraData: IGetLobbyByIdResult | null
     ) => {
       // Update the local state and show a message to the user
       setLoading(isLoading);
@@ -47,9 +48,7 @@ const PageCoordinator: React.FC = () => {
         <Route path={Page.MyGames} element={<MyGames />} />
         <Route
           path={Page.Game}
-          element={
-            <Lobby initialLobbyState={lobby} selectedNft={selectedNft} />
-          }
+          element={<Lobby initialLobbyRaw={lobby} selectedNft={selectedNft} />}
         />
         <Route path={Page.CreateLobby} element={<CreateLobby />} />
         <Route path={Page.Landing} element={<LandingPage />} />

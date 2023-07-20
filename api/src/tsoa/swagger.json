@@ -6,32 +6,6 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
-			"LobbyPlayer": {
-				"properties": {
-					"score": {
-						"type": "number",
-						"format": "double"
-					},
-					"points": {
-						"type": "number",
-						"format": "double"
-					},
-					"turn": {
-						"type": "number",
-						"format": "double"
-					},
-					"nftId": {
-						"type": "number",
-						"format": "double"
-					}
-				},
-				"required": [
-					"score",
-					"points",
-					"nftId"
-				],
-				"type": "object"
-			},
 			"lobby_status": {
 				"type": "string",
 				"enum": [
@@ -41,7 +15,8 @@
 					"open"
 				]
 			},
-			"Pick_IGetLobbyByIdResult.Exclude_keyofIGetLobbyByIdResult.ActiveLobbyRequirements__": {
+			"IGetLobbyByIdResult": {
+				"description": "'GetLobbyById' return type",
 				"properties": {
 					"created_at": {
 						"type": "string",
@@ -50,6 +25,26 @@
 					"creation_block_height": {
 						"type": "number",
 						"format": "double"
+					},
+					"current_match": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"current_proper_round": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"current_round": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
+					"current_turn": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
 					},
 					"hidden": {
 						"type": "boolean"
@@ -87,6 +82,10 @@
 				"required": [
 					"created_at",
 					"creation_block_height",
+					"current_match",
+					"current_proper_round",
+					"current_round",
+					"current_turn",
 					"hidden",
 					"lobby_creator",
 					"lobby_id",
@@ -98,54 +97,6 @@
 					"round_length"
 				],
 				"type": "object",
-				"description": "From T, pick a set of properties whose keys are in the union K"
-			},
-			"Omit_IGetLobbyByIdResult.ActiveLobbyRequirements_": {
-				"$ref": "#/components/schemas/Pick_IGetLobbyByIdResult.Exclude_keyofIGetLobbyByIdResult.ActiveLobbyRequirements__",
-				"description": "Construct a type with the properties of T except for those in type K."
-			},
-			"PropertiesNonNullable_Pick_IGetLobbyByIdResult.ActiveLobbyRequirements__": {
-				"properties": {
-					"current_match": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
-					"current_round": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					},
-					"current_turn": {
-						"type": "number",
-						"format": "double",
-						"nullable": true
-					}
-				},
-				"required": [
-					"current_match",
-					"current_round",
-					"current_turn"
-				],
-				"type": "object"
-			},
-			"LobbyState": {
-				"properties": {
-					"roundSeed": {
-						"type": "string"
-					},
-					"players": {
-						"items": {
-							"$ref": "#/components/schemas/LobbyPlayer"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"roundSeed",
-					"players"
-				],
-				"type": "object",
 				"additionalProperties": false
 			},
 			"Response": {
@@ -153,7 +104,7 @@
 					"lobby": {
 						"allOf": [
 							{
-								"$ref": "#/components/schemas/LobbyState"
+								"$ref": "#/components/schemas/IGetLobbyByIdResult"
 							}
 						],
 						"nullable": true
@@ -181,6 +132,11 @@
 						"format": "double",
 						"nullable": true
 					},
+					"current_proper_round": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
 					"current_round": {
 						"type": "number",
 						"format": "double",
@@ -228,6 +184,7 @@
 					"created_at",
 					"creation_block_height",
 					"current_match",
+					"current_proper_round",
 					"current_round",
 					"current_turn",
 					"hidden",
@@ -274,6 +231,11 @@
 						"format": "double",
 						"nullable": true
 					},
+					"current_proper_round": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
 					"current_round": {
 						"type": "number",
 						"format": "double",
@@ -321,6 +283,7 @@
 					"created_at",
 					"creation_block_height",
 					"current_match",
+					"current_proper_round",
 					"current_round",
 					"current_turn",
 					"hidden",
@@ -369,6 +332,11 @@
 						"format": "double",
 						"nullable": true
 					},
+					"current_proper_round": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
 					"current_round": {
 						"type": "number",
 						"format": "double",
@@ -416,6 +384,7 @@
 					"created_at",
 					"creation_block_height",
 					"current_match",
+					"current_proper_round",
 					"current_round",
 					"current_turn",
 					"hidden",
@@ -447,6 +416,11 @@
 						"format": "double",
 						"nullable": true
 					},
+					"current_proper_round": {
+						"type": "number",
+						"format": "double",
+						"nullable": true
+					},
 					"current_round": {
 						"type": "number",
 						"format": "double",
@@ -494,6 +468,7 @@
 					"created_at",
 					"creation_block_height",
 					"current_match",
+					"current_proper_round",
 					"current_round",
 					"current_turn",
 					"hidden",
@@ -548,6 +523,34 @@
 	},
 	"openapi": "3.0.0",
 	"paths": {
+		"/lobby_raw": {
+			"get": {
+				"operationId": "Get",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Response"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "lobbyID",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
 		"/lobby_state": {
 			"get": {
 				"operationId": "Get",

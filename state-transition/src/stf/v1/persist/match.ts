@@ -1,12 +1,10 @@
 import type { SubmittedMovesInput } from '../types.js';
 import type { INewRoundParams, IExecutedRoundParams, IUpdateLobbyPlayerParams } from '@dice/db';
 import { newRound, executedRound, updateLobbyPlayer } from '@dice/db';
-import type { LobbyPlayer } from '@dice/utils';
+import type { LobbyPlayer, MatchEnvironment } from '@dice/utils';
 import {
   genPermutation,
-  type ActiveLobby,
-  type ConciseResult,
-  type ExpandedResult,
+  type LobbyWithStateProps,
   type MatchState,
   PRACTICE_BOT_NFT_ID,
 } from '@dice/utils';
@@ -29,9 +27,11 @@ import { newMatch, newMove } from '@dice/db/src/insert.queries.js';
 import type { IGetRoundResult } from '@dice/db/src/select.queries.js';
 import type Prando from 'paima-sdk/paima-prando';
 import { schedulePracticeMove } from './practice.js';
+import { scheduleStatsUpdate } from './stats.js';
 
 export function persistStartMatch(
   lobbyId: string,
+  matchEnvironment: MatchEnvironment,
   players: LobbyPlayer[],
   current_match: null | number,
   roundLength: number,
@@ -48,6 +48,7 @@ export function persistStartMatch(
 
   const initialMatchStateUpdates = persistInitialMatchState(
     lobbyId,
+    matchEnvironment,
     players,
     matchWithinLobby,
     roundLength,
@@ -59,6 +60,7 @@ export function persistStartMatch(
 
 export function persistInitialMatchState(
   lobbyId: string,
+  matchEnvironment: MatchEnvironment,
   players: LobbyPlayer[],
   matchWithinLobby: number,
   roundLength: number,
@@ -89,8 +91,14 @@ export function persistInitialMatchState(
       points: 0,
       score: 0,
     })),
+    result: undefined,
   };
-  const matchStateUpdates = persistUpdateMatchState(lobbyId, newMatchState);
+  const matchStateUpdates = persistUpdateMatchState(
+    lobbyId,
+    matchEnvironment,
+    newMatchState,
+    blockHeight
+  );
 
   const newRoundUpdates = persistNewRound(lobbyId, matchWithinLobby, 0, roundLength, blockHeight);
 
@@ -155,7 +163,7 @@ export function persistNewRound(
 // Persist moves sent by player to an active match
 export function persistMoveSubmission(
   inputData: SubmittedMovesInput,
-  lobby: ActiveLobby
+  lobby: LobbyWithStateProps
 ): { sqlUpdates: SQLUpdate[]; newMove: INewMoveParams } {
   const newMoveParams: INewMoveParams = {
     lobby_id: inputData.lobbyID,
@@ -176,7 +184,7 @@ export function persistMoveSubmission(
 // Persist an executed round (and delete scheduled zombie round input)
 export function persistExecutedRound(
   round: IGetRoundResult,
-  lobby: ActiveLobby,
+  lobby: LobbyWithStateProps,
   blockHeight: number
 ): SQLUpdate[] {
   // We close the round by updating it with the execution blockHeight
@@ -197,20 +205,20 @@ export function persistExecutedRound(
   return [executedRoundTuple];
 }
 
-const expandResult = (result: ConciseResult): ExpandedResult => {
-  if (result === 'w') return 'win';
-  if (result === 'l') return 'loss';
-  return 'tie';
-};
-
 // Persist match results in the final states table
-export function persistMatchResults(): SQLUpdate[] {
+export function persistMatchResults(finalMatchState: MatchState): SQLUpdate[] {
+  const results = finalMatchState.result;
   // TODO
   return [];
 }
 
 // Update Lobby state with the updated state
-export function persistUpdateMatchState(lobbyId: string, newMatchState: MatchState): SQLUpdate[] {
+export function persistUpdateMatchState(
+  lobbyId: string,
+  matchEnvironment: MatchEnvironment,
+  newMatchState: MatchState,
+  blockHeight: number
+): SQLUpdate[] {
   if (newMatchState.players.length !== 2)
     throw new Error(`persistUpdateMatchState: missing players`);
 
@@ -230,5 +238,41 @@ export function persistUpdateMatchState(lobbyId: string, newMatchState: MatchSta
   };
   const lobbyUpdates: SQLUpdate[] = [[updateLobbyMatchState, lobbyParams]];
 
-  return [...playerUpdates, ...lobbyUpdates];
+  const finalizeMatchUpdates = finalizeMatch(lobbyId, matchEnvironment, newMatchState, blockHeight);
+
+  return [...playerUpdates, ...lobbyUpdates, ...finalizeMatchUpdates];
+}
+
+// Finalizes the match and updates user statistics according to final score of the match
+function finalizeMatch(
+  lobbyId: string,
+  matchEnvironment: MatchEnvironment,
+  newMatchState: MatchState,
+  blockHeight: number
+): SQLUpdate[] {
+  if (newMatchState.result == null) return [];
+  const result = newMatchState.result;
+
+  // TODO: support more than 1 match
+  const updateStateParams: IUpdateLobbyStateParams = {
+    lobby_id: lobbyId,
+    lobby_state: 'finished',
+  };
+  const lobbyStateUpdates: SQLUpdate[] = [[updateLobbyState, updateStateParams]];
+
+  // If practice lobby, then no extra results/stats need to be updated
+  if (matchEnvironment.practice) {
+    console.log(`Practice match ended, ignoring results`);
+    return [...lobbyStateUpdates];
+  }
+
+  // Save the final results in the final states table
+  const resultsUpdates = persistMatchResults(newMatchState);
+
+  // Create the new scheduled data for updating user stats.
+  // Stats are updated with scheduled data to support parallelism safely.
+  const statsUpdates = newMatchState.players.map((player, i) =>
+    scheduleStatsUpdate(player.nftId, result[i], blockHeight + 1)
+  );
+  return [...lobbyStateUpdates, ...resultsUpdates, ...statsUpdates];
 }

@@ -33,6 +33,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
   selectedNft,
 }) => {
   const diceRefs = useRef<Record<number, undefined | DiceRef>>({});
+  const [matchOver, setMatchOver] = useState(false);
   const [caption, setCaption] = useState<undefined | string>();
 
   // round being currently shown
@@ -46,6 +47,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
     turn: lobbyState.current_turn,
     properRound: lobbyState.current_proper_round,
     players: lobbyState.players,
+    result: undefined,
   });
   // cache of state that was fetched, but still needs to be displayed
   // the actual round executor is stateful so we store all it's end results instead
@@ -225,6 +227,25 @@ const DiceGame: React.FC<DiceGameProps> = ({
           await new Promise((resolve) => setTimeout(resolve, 3000));
           setCaption(undefined);
         }
+
+        if (tickEvent.kind === TickEventKind.matchEnd) {
+          setCaption(() => {
+            const thisPlayerIndex = displayedState.players.findIndex(
+              (player) => player.nftId === selectedNft
+            );
+            const thisPlayerResult = tickEvent.result[thisPlayerIndex];
+
+            if (thisPlayerResult === "w") return "You win!";
+            if (thisPlayerResult === "l") return "You lose!";
+            return "It's a tie!";
+          });
+          setDisplayedState((oldDisplayedState) => {
+            const newDisplayedState = cloneMatchState(oldDisplayedState);
+            applyEvent(newDisplayedState, tickEvent);
+            return newDisplayedState;
+          });
+          setMatchOver(true);
+        }
       }
 
       setDisplayedRound(displayedRound + 1);
@@ -240,6 +261,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
     turn: lobbyState.current_turn,
     properRound: lobbyState.current_proper_round,
     players: lobbyState.players,
+    result: undefined,
   });
   const [nextFetchedRound, setFetchedRound] = useState(
     lobbyState.current_round
@@ -291,6 +313,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
   }, [isFetchingRound, displayedRound, lobbyState.current_round]);
 
   const disableInteraction =
+    matchOver ||
     displayedRound !== lobbyState.current_round ||
     thisPlayer.turn !== displayedState.turn ||
     isTickDisplaying;
@@ -306,7 +329,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
         variant="caption"
         sx={{ fontSize: "1.25rem", lineHeight: "1.75rem" }}
       >
-        {`Round: ${displayedState.properRound + 1}`}
+        {matchOver ? "Match over" : `Round: ${displayedState.properRound + 1}`}
         {" | "}
         {caption ??
           (thisPlayer.turn === displayedState.turn

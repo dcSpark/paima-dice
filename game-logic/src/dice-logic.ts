@@ -1,6 +1,6 @@
 import type { IGetLobbyPlayersResult } from '@dice/db';
 import { RoundKind } from '@dice/utils';
-import type { MatchState, DiceRolls, LobbyPlayer, ActiveLobby } from '@dice/utils';
+import type { MatchState, DiceRolls, LobbyPlayer, LobbyWithStateProps } from '@dice/utils';
 import type { ConciseResult, MatchResult } from '@dice/utils';
 import type { IGetBlockHeightResult } from 'paima-sdk/paima-db';
 import Prando from 'paima-sdk/paima-prando';
@@ -79,7 +79,7 @@ export function matchResults(matchState: MatchState): MatchResult {
   const maxPlayers = matchState.players.filter(player => player.points === maxPoints);
   const results: ConciseResult[] = matchState.players.map(player => {
     if (player.points < maxPoints) return 'l';
-    if (maxPlayers.length > 0) return 't';
+    if (maxPlayers.length > 1) return 't';
     return 'w';
   });
 
@@ -87,7 +87,7 @@ export function matchResults(matchState: MatchState): MatchResult {
 }
 
 export function buildCurrentMatchState(
-  lobby: ActiveLobby,
+  lobby: LobbyWithStateProps,
   rawPlayers: IGetLobbyPlayersResult[]
 ): MatchState {
   const players: LobbyPlayer[] = rawPlayers.map(player => {
@@ -105,6 +105,7 @@ export function buildCurrentMatchState(
     players,
     properRound: lobby.current_proper_round,
     turn: lobby.current_turn,
+    result: undefined,
   };
 }
 

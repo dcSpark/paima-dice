@@ -30,7 +30,7 @@ const nftMint: ParserRecord<NftMintInput> = {
 };
 const createdLobby: ParserRecord<CreatedLobbyInput> = {
   creatorNftId: PaimaParser.NumberParser(),
-  numOfRounds: PaimaParser.NumberParser(3, 1000),
+  numOfRounds: PaimaParser.NumberParser(0, 1000),
   roundLength: PaimaParser.DefaultRoundLength(),
   playTimePerPlayer: PaimaParser.NumberParser(1, 10000),
   isHidden: PaimaParser.TrueFalseParser(false),

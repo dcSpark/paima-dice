@@ -30,6 +30,7 @@ export enum TickEventKind {
   applyPoints,
   turnEnd,
   roundEnd,
+  matchEnd,
 }
 
 export type RollTickEvent = {
@@ -47,11 +48,23 @@ export type TurnEndTickEvent = {
 export type RoundEndTickEvent = {
   kind: TickEventKind.roundEnd;
 };
+export type MatchEndTickEvent = {
+  kind: TickEventKind.matchEnd;
+  result: MatchResult;
+};
 
-export type TickEvent = RollTickEvent | ApplyPointsTickEvent | TurnEndTickEvent | RoundEndTickEvent;
+export type TickEvent =
+  | RollTickEvent
+  | ApplyPointsTickEvent
+  | TurnEndTickEvent
+  | RoundEndTickEvent
+  | MatchEndTickEvent;
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface MatchEnvironment {}
+export interface MatchEnvironment {
+  practice: boolean;
+  numberOfRounds: number;
+}
 
 export interface MatchState {
   players: LobbyPlayer[];
@@ -59,6 +72,7 @@ export interface MatchState {
   // Not to be confused with round everywhere else (1 move + 1 random seed).
   properRound: number;
   turn: number; // whose turn is it
+  result: undefined | MatchResult;
 }
 
 export type LobbyStatus = 'open' | 'active' | 'finished' | 'closed';
@@ -117,16 +131,11 @@ export type LobbyPlayer = {
   score: number;
 };
 
-type ActiveLobbyRequirements =
-  | 'current_match'
-  | 'current_round'
-  | 'current_turn'
-  | 'current_proper_round';
-/* Note: does not require state: 'active', we may want to get rid of the state if it's useless */
-export type ActiveLobby = Omit<IGetLobbyByIdResult, ActiveLobbyRequirements> &
-  PropertiesNonNullable<Pick<IGetLobbyByIdResult, ActiveLobbyRequirements>>;
+type LobbyStateProps = 'current_match' | 'current_round' | 'current_turn' | 'current_proper_round';
+export type LobbyWithStateProps = Omit<IGetLobbyByIdResult, LobbyStateProps> &
+  PropertiesNonNullable<Pick<IGetLobbyByIdResult, LobbyStateProps>>;
 
-export interface LobbyState extends ActiveLobby {
+export interface LobbyState extends LobbyWithStateProps {
   roundSeed: string;
   players: LobbyPlayer[];
 }

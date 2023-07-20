@@ -13,7 +13,7 @@ import type {
 } from '@dice/utils';
 
 import { buildEndpointErrorFxn, MiddlewareErrorCode } from '../errors';
-import { getRawLobbyState, getRawNewLobbies } from '../helpers/auxiliary-queries';
+import { auxGetLobbyRaw, auxGetLobbyState, getRawNewLobbies } from '../helpers/auxiliary-queries';
 import { calculateRoundEnd } from '../helpers/utility-functions';
 import { buildMatchExecutor, buildRoundExecutor } from '../helpers/executors';
 import {
@@ -29,6 +29,7 @@ import {
 import type {
   LobbyStates,
   NewLobbies,
+  PackedLobbyRaw,
   PackedLobbyState,
   PackedRoundExecutionState,
   PackedUserLobbies,
@@ -37,13 +38,40 @@ import type {
 import type { WalletAddress } from 'paima-sdk/paima-utils';
 import type { IGetPaginatedUserLobbiesResult } from '@dice/db';
 
+async function getLobbyRaw(lobbyID: string): Promise<PackedLobbyRaw | FailedResult> {
+  const errorFxn = buildEndpointErrorFxn('getLobbyRaw');
+
+  let packedLobbyRaw: PackedLobbyRaw | FailedResult;
+
+  try {
+    packedLobbyRaw = await auxGetLobbyRaw(lobbyID);
+
+    if (!packedLobbyRaw.success) {
+      return errorFxn(packedLobbyRaw.errorMessage);
+    }
+  } catch (err) {
+    return errorFxn(PaimaMiddlewareErrorCode.ERROR_QUERYING_BACKEND_ENDPOINT, err);
+  }
+
+  try {
+    const { lobby } = packedLobbyRaw;
+
+    return {
+      success: true,
+      lobby,
+    };
+  } catch (err) {
+    return errorFxn(PaimaMiddlewareErrorCode.INVALID_RESPONSE_FROM_BACKEND, err);
+  }
+}
+
 async function getLobbyState(lobbyID: string): Promise<PackedLobbyState | FailedResult> {
   const errorFxn = buildEndpointErrorFxn('getLobbyState');
 
   let packedLobbyState: PackedLobbyState | FailedResult;
 
   try {
-    packedLobbyState = await getRawLobbyState(lobbyID);
+    packedLobbyState = await auxGetLobbyState(lobbyID);
 
     if (!packedLobbyState.success) {
       return errorFxn(packedLobbyState.errorMessage);
@@ -310,6 +338,7 @@ async function getNftsForWallet(wallet: WalletAddress): Promise<Result<number[]>
 
 export const queryEndpoints = {
   getUserStats,
+  getLobbyRaw,
   getLobbyState,
   getLobbySearch,
   getRoundExecutionState,

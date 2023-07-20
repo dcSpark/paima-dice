@@ -6,20 +6,23 @@ import Navbar from "@src/components/Navbar";
 import Wrapper from "@src/components/Wrapper";
 import { DiceService } from "./GameLogic";
 import DiceGame from "./DiceGame";
+import { IGetLobbyByIdResult } from "@dice/db";
 
 export function Lobby({
-  initialLobbyState,
+  initialLobbyRaw,
   selectedNft,
 }: {
-  initialLobbyState: LobbyState;
+  initialLobbyRaw: undefined | IGetLobbyByIdResult;
   selectedNft: number;
 }): React.ReactElement {
-  const [lobbyState, setLobbyState] = useState<LobbyState>(initialLobbyState);
+  const [lobbyState, setLobbyState] = useState<LobbyState>();
 
   useEffect(() => {
     const fetchLobbyData = async () => {
+      if (initialLobbyRaw == null) return;
+
       const newLobbyState = await DiceService.getLobbyState(
-        initialLobbyState.lobby_id
+        initialLobbyRaw.lobby_id
       );
       if (newLobbyState == null) return;
       setLobbyState(newLobbyState);
@@ -34,14 +37,14 @@ export function Lobby({
     };
   }, [lobbyState]);
 
-  if (lobbyState == null) return <></>;
+  if (initialLobbyRaw == null) return <></>;
 
   return (
     <>
       <Navbar />
       <Wrapper small blurred={false}>
-        <Typography variant="h1">Lobby {lobbyState.lobby_id}</Typography>
-        {lobbyState.lobby_state === "open" && (
+        <Typography variant="h1">Lobby {initialLobbyRaw.lobby_id}</Typography>
+        {lobbyState == null && (
           <>
             <div>
               Waiting for another player
@@ -49,13 +52,13 @@ export function Lobby({
             </div>
           </>
         )}
-        {lobbyState.lobby_state === "active" && (
+        {lobbyState != null && (
           <DiceGame
             lobbyState={lobbyState}
             selectedNft={selectedNft}
             refetchLobbyState={async () => {
               const response = await DiceService.getLobbyState(
-                initialLobbyState.lobby_id
+                initialLobbyRaw.lobby_id
               );
               if (response == null) return;
               setLobbyState(response);

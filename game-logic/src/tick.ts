@@ -1,12 +1,13 @@
 import type Prando from 'paima-sdk/paima-prando';
 import type {
   ApplyPointsTickEvent,
+  MatchEndTickEvent,
   RollTickEvent,
   RoundEndTickEvent,
   TurnEndTickEvent,
 } from '@dice/utils';
 import { type MatchState, type MatchEnvironment, type TickEvent, TickEventKind } from '@dice/utils';
-import { genDiceRolls, getPlayerScore } from '.';
+import { genDiceRolls, getPlayerScore, matchResults } from '.';
 import type { IGetRoundMovesResult } from '@dice/db';
 
 // TODO: variable number of players
@@ -21,7 +22,7 @@ export function processTick(
   currentTick: number,
   randomnessGenerator: Prando
 ): TickEvent[] | null {
-  const events = [];
+  const events: TickEvent[] = [];
   // Every tick we intend to process a single move.
   const move = moves[currentTick - 1];
 
@@ -51,6 +52,7 @@ export function processTick(
 
   const turnEnds = !rollEvents[rollEvents.length - 1].rollAgain;
   const roundEnds = turnEnds && matchState.turn === numPlayers - 1;
+  const matchEnds = roundEnds && matchState.properRound === matchEnvironment.numberOfRounds - 1;
 
   const applyPointsEvents: ApplyPointsTickEvent[] = (() => {
     if (!roundEnds) return [];
@@ -100,6 +102,14 @@ export function processTick(
     events.push(event);
   }
 
+  const matchEndEvents: MatchEndTickEvent[] = matchEnds
+    ? [{ kind: TickEventKind.matchEnd, result: matchResults(matchState) }]
+    : [];
+  for (const event of matchEndEvents) {
+    applyEvent(matchState, event);
+    events.push(event);
+  }
+
   // We return the tick event which gets emitted by the round executor. This is explicitly
   // for the frontend to know what happened during the current tick.
   return events;
@@ -130,5 +140,9 @@ export function applyEvent(matchState: MatchState, event: TickEvent): void {
     for (const i in matchState.players) {
       matchState.players[i].score = 0;
     }
+  }
+
+  if (event.kind === TickEventKind.matchEnd) {
+    matchState.result = event.result;
   }
 }

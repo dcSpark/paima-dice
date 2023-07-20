@@ -35,8 +35,8 @@ export function initRoundExecutor(
 // From a lobby, extract a match environment which will be used by the round executor.
 // A match environment is a piece of immutable data about the match which is
 // relevant to the round executor, but which can not be updated.
-export function extractMatchEnvironment(_lobby: IGetLobbyByIdResult): MatchEnvironment {
-  return {};
+export function extractMatchEnvironment(lobby: IGetLobbyByIdResult): MatchEnvironment {
+  return { practice: lobby.practice, numberOfRounds: lobby.num_of_rounds };
 }
 
 // From a given round, construct the match state which will be used by the round executor.

@@ -2,6 +2,14 @@ import type { WalletAddress } from 'paima-sdk/paima-utils';
 import type { QueryOptions } from 'paima-sdk/paima-mw-core';
 import { buildBackendQuery } from 'paima-sdk/paima-mw-core';
 
+export function backendQueryLobbyRaw(lobbyID: string): string {
+  const endpoint = 'lobby_raw';
+  const options = {
+    lobbyID,
+  };
+  return buildBackendQuery(endpoint, options);
+}
+
 export function backendQueryLobbyState(lobbyID: string): string {
   const endpoint = 'lobby_state';
   const options = {

@@ -1,6 +1,6 @@
 import { ENV } from 'paima-sdk/paima-utils';
 import { buildEndpointErrorFxn, MiddlewareErrorCode } from '../errors';
-import type { PackedLobbyState, RoundEnd } from '../types';
+import type { PackedLobbyRaw, PackedLobbyState, RoundEnd } from '../types';
 import { PaimaMiddlewareErrorCode } from 'paima-sdk/paima-mw-core';
 
 export function userJoinedLobby(nftId: number, lobby: PackedLobbyState): boolean {
@@ -27,7 +27,7 @@ export function userCreatedLobby(nftId: number, lobby: PackedLobbyState): boolea
   return lobbyState.lobby_creator === nftId;
 }
 
-export function lobbyWasClosed(lobby: PackedLobbyState): boolean {
+export function lobbyWasClosed(lobby: PackedLobbyRaw): boolean {
   const { lobby: lobbyState } = lobby;
   if (!lobbyState) {
     return false;

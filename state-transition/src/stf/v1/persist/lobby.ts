@@ -2,7 +2,7 @@ import type { CreatedLobbyInput } from '../types.js';
 import type { IUpdateLobbyStateParams, ICreateLobbyParams } from '@dice/db';
 import { createLobby, updateLobbyState } from '@dice/db';
 import Prando from 'paima-sdk/paima-prando';
-import type { LobbyPlayer, LobbyStatus } from '@dice/utils';
+import type { LobbyPlayer, LobbyStatus, MatchEnvironment } from '@dice/utils';
 import { PRACTICE_BOT_NFT_ID } from '@dice/utils';
 import { persistStartMatch } from './match.js';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
@@ -72,6 +72,10 @@ export function persistLobbyCreation(
       ? []
       : persistLobbyState({ lobby_id, lobby_state: 'closed' });
 
+  const matchEnvironment: MatchEnvironment = {
+    practice: lobbyParams.practice,
+    numberOfRounds: lobbyParams.num_of_rounds,
+  };
   // Automatically activate a lobby when it fills up.
   // Note: This could be replaced by some input from creator.
   const activateLobbyUpdates: SQLUpdate[] =
@@ -79,6 +83,7 @@ export function persistLobbyCreation(
       ? []
       : persistStartMatch(
           lobby_id,
+          matchEnvironment,
           lobbyPlayers,
           null,
           lobbyParams.round_length,

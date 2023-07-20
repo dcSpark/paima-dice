@@ -1,11 +1,11 @@
 import { Controller, Get, Query, Route } from 'tsoa';
 import { getLobbyById, getLobbyPlayers, requirePool } from '@dice/db';
-import { isLobbyActive, type LobbyPlayer, type LobbyState } from '@dice/utils';
+import { isLobbyWithStateProps, type LobbyPlayer, type LobbyState } from '@dice/utils';
 import { getMatch, getRound } from '@dice/db/src/select.queries';
 import { getBlockHeight } from 'paima-sdk/paima-db';
 
 interface Response {
-  // TODO: returns null if inactive, inactive lobby can be useful too
+  // returns null if missing state properties, use lobbyRaw for any lobby
   lobby: LobbyState | null;
 }
 
@@ -20,8 +20,7 @@ export class LobbyStatecontroller extends Controller {
     ]);
     if (!lobby) return { lobby: null };
 
-    // TODO: returns null if inactive, inactive lobby can be useful too
-    if (!isLobbyActive(lobby)) return { lobby: null };
+    if (!isLobbyWithStateProps(lobby)) return { lobby: null };
 
     const [match] = await getMatch.run(
       {

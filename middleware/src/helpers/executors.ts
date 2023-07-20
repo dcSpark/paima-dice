@@ -35,6 +35,7 @@ export function buildMatchExecutor({
     })),
     properRound: 0,
     turn: 0,
+    result: undefined,
   };
 
   const paimaMoves = moves.map(move => ({
