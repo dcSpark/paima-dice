@@ -61,6 +61,8 @@ export class LobbyStatecontroller extends Controller {
     const players: LobbyPlayer[] = rawPlayers.map(raw => ({
       nftId: raw.nft_id,
       startingDeck: deserializeDeck(raw.starting_deck),
+      currentDeck: deserializeDeck(raw.current_deck),
+      currentDraw: raw.current_draw,
       points: raw.points,
       score: raw.score,
       turn: raw.turn ?? undefined,

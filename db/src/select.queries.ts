@@ -151,6 +151,8 @@ export interface IGetLobbyPlayersParams {
 
 /** 'GetLobbyPlayers' return type */
 export interface IGetLobbyPlayersResult {
+  current_deck: string;
+  current_draw: number;
   id: number;
   lobby_id: string;
   nft_id: number;

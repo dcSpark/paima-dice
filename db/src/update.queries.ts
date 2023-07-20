@@ -120,10 +120,12 @@ export const updateLobbyMatchState = new PreparedQuery<IUpdateLobbyMatchStatePar
 
 /** 'UpdateLobbyPlayer' parameters type */
 export interface IUpdateLobbyPlayerParams {
+  current_deck: string;
+  current_draw: number;
   lobby_id: string;
   nft_id: number;
-  points: number | null | void;
-  score: number | null | void;
+  points: number;
+  score: number;
   turn: number | null | void;
 }
 
@@ -136,16 +138,18 @@ export interface IUpdateLobbyPlayerQuery {
   result: IUpdateLobbyPlayerResult;
 }
 
-const updateLobbyPlayerIR: any = {"usedParamSet":{"points":true,"score":true,"turn":true,"lobby_id":true,"nft_id":true},"params":[{"name":"points","required":false,"transform":{"type":"scalar"},"locs":[{"a":35,"b":41}]},{"name":"score","required":false,"transform":{"type":"scalar"},"locs":[{"a":54,"b":59}]},{"name":"turn","required":false,"transform":{"type":"scalar"},"locs":[{"a":71,"b":75}]},{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":97,"b":106}]},{"name":"nft_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":121,"b":128}]}],"statement":"UPDATE lobby_player\nSET\n  points = :points,\n  score = :score,\n  turn = :turn\nWHERE \n  lobby_id = :lobby_id! AND nft_id = :nft_id!"};
+const updateLobbyPlayerIR: any = {"usedParamSet":{"points":true,"score":true,"turn":true,"current_deck":true,"current_draw":true,"lobby_id":true,"nft_id":true},"params":[{"name":"points","required":true,"transform":{"type":"scalar"},"locs":[{"a":35,"b":42}]},{"name":"score","required":true,"transform":{"type":"scalar"},"locs":[{"a":55,"b":61}]},{"name":"turn","required":false,"transform":{"type":"scalar"},"locs":[{"a":73,"b":77}]},{"name":"current_deck","required":true,"transform":{"type":"scalar"},"locs":[{"a":97,"b":110}]},{"name":"current_draw","required":true,"transform":{"type":"scalar"},"locs":[{"a":130,"b":143}]},{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":165,"b":174}]},{"name":"nft_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":189,"b":196}]}],"statement":"UPDATE lobby_player\nSET\n  points = :points!,\n  score = :score!,\n  turn = :turn,\n  current_deck = :current_deck!,\n  current_draw = :current_draw!\nWHERE \n  lobby_id = :lobby_id! AND nft_id = :nft_id!"};
 
 /**
  * Query generated from SQL:
  * ```
  * UPDATE lobby_player
  * SET
- *   points = :points,
- *   score = :score,
- *   turn = :turn
+ *   points = :points!,
+ *   score = :score!,
+ *   turn = :turn,
+ *   current_deck = :current_deck!,
+ *   current_draw = :current_draw!
  * WHERE 
  *   lobby_id = :lobby_id! AND nft_id = :nft_id!
  * ```

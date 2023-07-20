@@ -22,7 +22,12 @@ export class PracticeAI {
     const me = getTurnPlayer(this.matchState);
     if (me.nftId !== PRACTICE_BOT_NFT_ID)
       throw new Error(`getNextMove: bot move for non-bot player`);
-    const diceRolls = genDiceRolls(me.score, this.randomnessGenerator);
+    const diceRolls = genDiceRolls(
+      me.score,
+      me.currentDraw,
+      me.currentDeck,
+      this.randomnessGenerator
+    );
     return diceRolls.finalScore < 19;
   }
 }

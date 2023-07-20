@@ -30,6 +30,8 @@ export function buildMatchExecutor({
     players: lobby.players.map((player, i) => ({
       nftId: player.nftId,
       startingDeck: player.startingDeck,
+      currentDeck: player.startingDeck,
+      currentDraw: 0,
       turn: matchTurnOrder[i],
       points: 0,
       score: 0,

@@ -108,6 +108,8 @@ export const joinedLobby = async (
   const lobbyPlayers: LobbyPlayer[] = rawPlayers.map(player => ({
     nftId: player.nft_id,
     startingDeck: deserializeDeck(player.starting_deck),
+    currentDeck: deserializeDeck(player.current_deck),
+    currentDraw: player.current_draw,
     points: player.points,
     score: player.score,
     turn: player.turn ?? undefined,
@@ -127,10 +129,13 @@ export const joinedLobby = async (
     lobby_id: input.lobbyID,
     nft_id: input.nftId,
     starting_deck: input.deck,
+    current_deck: input.deck,
   });
   lobbyPlayers.push({
     nftId: input.nftId,
     startingDeck: deserializeDeck(input.deck),
+    currentDeck: deserializeDeck(input.deck),
+    currentDraw: 0,
     points: 0,
     score: 0,
     turn: undefined,

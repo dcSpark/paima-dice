@@ -41,10 +41,13 @@ export function persistLobbyCreation(
     lobby_id,
     nft_id: inputData.creatorNftId,
     starting_deck: inputData.creatorDeck,
+    current_deck: inputData.creatorDeck,
   };
   lobbyPlayers.push({
     nftId: inputData.creatorNftId,
     startingDeck: deserializeDeck(inputData.creatorDeck),
+    currentDeck: deserializeDeck(inputData.creatorDeck),
+    currentDraw: 0,
     points: 0,
     score: 0,
     turn: undefined,
@@ -60,6 +63,8 @@ export function persistLobbyCreation(
       lobbyPlayers.push({
         nftId: PRACTICE_BOT_NFT_ID,
         startingDeck: botDeck,
+        currentDeck: botDeck,
+        currentDraw: 0,
         points: 0,
         score: 0,
         turn: undefined,
@@ -68,6 +73,7 @@ export function persistLobbyCreation(
         lobby_id,
         nft_id: PRACTICE_BOT_NFT_ID,
         starting_deck: serializeDeck(botDeck),
+        current_deck: serializeDeck(botDeck),
       });
     });
 

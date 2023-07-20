@@ -2,12 +2,12 @@ import type Prando from 'paima-sdk/paima-prando';
 import type {
   ApplyPointsTickEvent,
   MatchEndTickEvent,
-  RollTickEvent,
+  DrawTickEvent,
   RoundEndTickEvent,
   TurnEndTickEvent,
 } from '@dice/utils';
 import { type MatchState, type MatchEnvironment, type TickEvent, TickEventKind } from '@dice/utils';
-import { genDiceRolls, getPlayerScore, matchResults } from '.';
+import { genDiceRolls, getTurnPlayer, matchResults } from '.';
 import type { IGetRoundMovesResult } from '@dice/db';
 
 // TODO: variable number of players
@@ -33,12 +33,17 @@ export function processTick(
 
   // If a move does exist, we continue processing the tick by generating the event.
   // Required for frontend visualization and applying match state updates.
-  const score = getPlayerScore(matchState);
-  const diceRolls = genDiceRolls(score, randomnessGenerator);
-  const rollEvents: RollTickEvent[] = diceRolls.dice.map((dice, i) => {
+  const player = getTurnPlayer(matchState);
+  const diceRolls = genDiceRolls(
+    player.score,
+    player.currentDraw,
+    player.currentDeck,
+    randomnessGenerator
+  );
+  const rollEvents: DrawTickEvent[] = diceRolls.dice.map((dice, i) => {
     const isLast = i === diceRolls.dice.length - 1;
     return {
-      kind: TickEventKind.roll,
+      kind: TickEventKind.draw,
       diceRolls: dice,
       rollAgain: !isLast || move.roll_again,
     };
@@ -117,10 +122,13 @@ export function processTick(
 
 // Apply events to match state for the roundExecutor.
 export function applyEvent(matchState: MatchState, event: TickEvent): void {
-  if (event.kind === TickEventKind.roll) {
-    const addedScore = event.diceRolls.reduce((acc, next) => acc + next, 0);
+  if (event.kind === TickEventKind.draw) {
+    const addedScore = event.diceRolls.reduce((acc, next) => acc + next.die, 0);
     const turnPlayerIndex = matchState.players.findIndex(player => player.turn === matchState.turn);
     matchState.players[turnPlayerIndex].score += addedScore;
+    matchState.players[turnPlayerIndex].currentDraw += event.diceRolls.length;
+    matchState.players[turnPlayerIndex].currentDeck =
+      event.diceRolls[event.diceRolls.length - 1].newDeck;
     return;
   }
 
