@@ -338,6 +338,13 @@ const DiceGame: React.FC<DiceGameProps> = ({
 
   if (lobbyState == null) return <></>;
 
+  const displayedThisPlayer = displayedState.players.find(
+    (player) => player.nftId === thisPlayer.nftId
+  );
+  const displayedOpponent = displayedState.players.find(
+    (player) => player.nftId !== thisPlayer.nftId
+  );
+
   return (
     <>
       <Typography
@@ -355,22 +362,30 @@ const DiceGame: React.FC<DiceGameProps> = ({
         sx={{
           width: "100%",
           display: "flex",
+          flexDirection: "column",
           gap: 5,
         }}
       >
-        {displayedState.players.map((player) => (
-          <Player
-            key={`player-${player.nftId}`}
-            lobbyPlayer={player}
-            thisClientPlayer={thisPlayer.nftId}
-            turn={displayedState.turn}
-            diceRef={(elem) => {
-              diceRefs.current[player.turn] = elem;
-            }}
-            onRoll={canRoll ? handleRoll : undefined}
-            onPass={canPass ? handlePass : undefined}
-          />
-        ))}
+        <Player
+          lobbyPlayer={displayedOpponent}
+          thisClientPlayer={thisPlayer.nftId}
+          turn={displayedState.turn}
+          diceRef={(elem) => {
+            diceRefs.current[displayedOpponent.turn] = elem;
+          }}
+          onRoll={canRoll ? handleRoll : undefined}
+          onPass={canPass ? handlePass : undefined}
+        />
+        <Player
+          lobbyPlayer={displayedThisPlayer}
+          thisClientPlayer={thisPlayer.nftId}
+          turn={displayedState.turn}
+          diceRef={(elem) => {
+            diceRefs.current[displayedThisPlayer.turn] = elem;
+          }}
+          onRoll={canRoll ? handleRoll : undefined}
+          onPass={canPass ? handlePass : undefined}
+        />
       </Box>
     </>
   );

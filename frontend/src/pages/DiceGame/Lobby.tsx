@@ -42,7 +42,7 @@ export function Lobby({
   return (
     <>
       <Navbar />
-      <Wrapper small blurred={false}>
+      <Wrapper blurred={false}>
         <Typography variant="h1">Lobby {initialLobbyRaw.lobby_id}</Typography>
         {lobbyState == null && (
           <>

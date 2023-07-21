@@ -4,6 +4,8 @@ import { Box, Typography } from "@mui/material";
 import Button from "@src/components/Button";
 import { Dice, DiceRef } from "./Dice";
 import { LobbyPlayer } from "@dice/utils";
+import Card from "../CardGame/Card";
+import Deck from "../CardGame/Deck";
 
 export type PlayerProps = {
   lobbyPlayer: LobbyPlayer;
@@ -29,69 +31,97 @@ export default function Player({
     <Box
       sx={{
         flex: 1,
-        padding: 2,
-        background: isMyTurn
-          ? "rgba(219, 109, 104, 0.5)"
-          : "rgba(119, 109, 104, 0.5)",
         display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
+        gap: 2,
       }}
     >
-      <Typography
-        variant="caption"
+      <Box
         sx={{
-          fontSize: "1rem",
-          lineHeight: "1.5rem",
+          flex: "none",
+          width: "180px",
+          padding: 2,
+          background: isMyTurn
+            ? "rgba(219, 109, 104, 0.5)"
+            : "rgba(119, 109, 104, 0.5)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
         }}
       >
-        {isMeThisClient ? "You" : "Opponent"}
-      </Typography>
-      <Typography
-        variant="caption"
-        sx={{
-          fontSize: "1.25rem",
-          lineHeight: "1.75rem",
-        }}
-      >
-        Points: {lobbyPlayer.points}
-      </Typography>
-      <Typography
-        variant="caption"
-        sx={{
-          fontSize: "1.25rem",
-          lineHeight: "1.75rem",
-        }}
-      >
-        Score: {lobbyPlayer.score}
-      </Typography>
-      <Dice
-        ref={diceRef}
-        disableIndividual
-        faceColor="#A51C3E"
-        dotColor="#FFEEEE"
-      />
-      {isMeThisClient && (
-        <Box
+        <Typography
+          variant="caption"
           sx={{
-            display: "flex",
-            gap: 1,
+            fontSize: "1rem",
+            lineHeight: "1.5rem",
           }}
         >
-          {onRoll == null && onPass != null ? (
-            <Button onClick={onPass}>end turn</Button>
-          ) : (
-            <>
-              <Button disabled={onRoll == null} onClick={onRoll}>
-                roll
-              </Button>
-              <Button disabled={onPass == null} onClick={onPass}>
-                pass
-              </Button>
-            </>
-          )}
-        </Box>
-      )}
+          {isMeThisClient ? "You" : "Opponent"}
+        </Typography>
+        <Typography
+          variant="caption"
+          sx={{
+            fontSize: "1.25rem",
+            lineHeight: "1.75rem",
+          }}
+        >
+          Points: {lobbyPlayer.points}
+        </Typography>
+        <Typography
+          variant="caption"
+          sx={{
+            fontSize: "1.25rem",
+            lineHeight: "1.75rem",
+          }}
+        >
+          Score: {lobbyPlayer.score}
+        </Typography>
+        <Dice
+          ref={diceRef}
+          disableIndividual
+          faceColor="#A51C3E"
+          dotColor="#FFEEEE"
+        />
+        {isMeThisClient && (
+          <Box
+            sx={{
+              display: "flex",
+              gap: 1,
+            }}
+          >
+            {onRoll == null && onPass != null ? (
+              <Button onClick={onPass}>end turn</Button>
+            ) : (
+              <>
+                <Button disabled={onRoll == null} onClick={onRoll}>
+                  roll
+                </Button>
+                <Button disabled={onPass == null} onClick={onPass}>
+                  pass
+                </Button>
+              </>
+            )}
+          </Box>
+        )}
+      </Box>
+      <Box
+        sx={{
+          flex: 1,
+          padding: 2,
+          background: isMyTurn
+            ? "rgba(219, 109, 104, 0.5)"
+            : "rgba(119, 109, 104, 0.5)",
+          display: "flex",
+          overflow: "auto",
+          minWidth: 0,
+        }}
+      >
+        {lobbyPlayer.currentHand
+          .filter((card) => card.cardId != null)
+          .map((card) => (
+            <Card key={card.draw} cardId={card.cardId} overlap />
+          ))}
+      </Box>
+      <Deck size={lobbyPlayer.currentDeck.length} />
     </Box>
   );
 }

@@ -155,6 +155,10 @@ export function cloneMatchState(template: MatchState): MatchState {
     players: template.players.map(template => ({
       ...template,
       startingDeck: [...template.startingDeck],
+      currentDeck: [...template.currentDeck],
+      currentHand: template.currentHand.map(template => ({
+        ...template,
+      })),
     })),
   };
 }
