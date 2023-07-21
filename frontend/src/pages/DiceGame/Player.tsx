@@ -111,7 +111,6 @@ export default function Player({
             ? "rgba(219, 109, 104, 0.5)"
             : "rgba(119, 109, 104, 0.5)",
           display: "flex",
-          gap: 1,
           overflow: "auto",
           minWidth: 0,
         }}
@@ -119,7 +118,7 @@ export default function Player({
         {lobbyPlayer.currentHand
           .filter((card) => card.cardId != null)
           .map((card) => (
-            <Card key={card.draw} cardId={card.cardId} />
+            <Card key={card.draw} cardId={card.cardId} overlap />
           ))}
       </Box>
       <Deck size={lobbyPlayer.currentDeck.length} />
