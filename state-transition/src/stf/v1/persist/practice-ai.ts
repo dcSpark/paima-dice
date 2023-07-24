@@ -1,4 +1,4 @@
-import type { MatchState, MoveKind } from '@dice/game-logic';
+import type { MatchState, Move } from '@dice/game-logic';
 import { MOVE_KIND, getTurnPlayer } from '@dice/game-logic';
 import { PRACTICE_BOT_NFT_ID } from '@dice/utils';
 import type Prando from 'paima-sdk/paima-prando';
@@ -19,12 +19,12 @@ export class PracticeAI {
   //
   // Return next move
   // Return null to not send next move.
-  public getNextMove(): MoveKind {
+  public getNextMove(): Move {
     const me = getTurnPlayer(this.matchState);
     if (me.nftId !== PRACTICE_BOT_NFT_ID)
       throw new Error(`getNextMove: bot move for non-bot player`);
     // Note: matchState is at the end of last round, i.e. without current round's post-tx events.
     // That means this way the bot will draw until it has 5 cards
-    return me.currentHand.length < 4 ? MOVE_KIND.drawCard : MOVE_KIND.endTurn;
+    return { kind: me.currentHand.length < 4 ? MOVE_KIND.drawCard : MOVE_KIND.endTurn };
   }
 }

@@ -9,9 +9,10 @@ import type {
   TickEvent,
   PostTxTickEvent,
   TxTickEvent,
+  PlayCardTickEvent,
 } from './types';
 import { MOVE_KIND, TICK_EVENT_KIND } from './constants';
-import { matchResults } from '.';
+import { deserializeMove, getTurnPlayer, matchResults } from '.';
 import type { IGetRoundMovesResult } from '@dice/db';
 import { genPostTxEvents } from './cards-logic';
 
@@ -29,12 +30,13 @@ export function processTick(
 ): TickEvent[] | null {
   const events: TickEvent[] = [];
   // Every tick we intend to process a single move.
-  const move = moves[currentTick - 1];
+  const rawMove = moves[currentTick - 1];
 
   // Round ends (by returning null) if no more moves in round or game is finished.
   // This is nearly identical to writing a recursive function, where you want to check
   // the base/halt case before running the rest of the logic.
-  if (!move) return null;
+  if (!rawMove) return null;
+  const move = deserializeMove(rawMove.serialized_move);
 
   // If a move does exist, we continue processing the tick by generating the event.
   // Required for frontend visualization and applying match state updates.
@@ -46,7 +48,26 @@ export function processTick(
     events.push(event);
   }
 
-  const turnEnds = move.move_kind === MOVE_KIND.endTurn;
+  const playCardEvents: PlayCardTickEvent[] =
+    move.kind === MOVE_KIND.playCard
+      ? [
+          {
+            kind: TICK_EVENT_KIND.playCard,
+            handPosition: move.handPosition,
+            newHand: getTurnPlayer(matchState).currentHand.filter(
+              (_, i) => i !== move.handPosition
+            ),
+          },
+        ]
+      : [];
+
+  // We then call `applyEvents` to mutate the `matchState` based off of the event.
+  for (const event of playCardEvents) {
+    applyEvent(matchState, event);
+    events.push(event);
+  }
+
+  const turnEnds = move.kind === MOVE_KIND.endTurn;
   const roundEnds = turnEnds && matchState.turn === numPlayers - 1;
   const matchEnds = roundEnds && matchState.properRound === matchEnvironment.numberOfRounds - 1;
 
@@ -107,7 +128,7 @@ export function processTick(
   }
 
   // Note: In this game, move === round. If there were multiple moves per tx round, this wouldn't always happen.
-  const txEvents: TxTickEvent[] = [{ kind: TICK_EVENT_KIND.tx, moveKind: move.move_kind }];
+  const txEvents: TxTickEvent[] = [{ kind: TICK_EVENT_KIND.tx, move }];
   for (const event of txEvents) {
     applyEvent(matchState, event);
     events.push(event);
@@ -126,6 +147,11 @@ export function applyEvent(matchState: MatchState, event: TickEvent): void {
     matchState.players[turnPlayerIndex].currentDeck = event.draw.newDeck;
     matchState.players[turnPlayerIndex].currentHand.push(event.draw.card);
     return;
+  }
+
+  if (event.kind === TICK_EVENT_KIND.playCard) {
+    const turnPlayerIndex = matchState.players.findIndex(player => player.turn === matchState.turn);
+    matchState.players[turnPlayerIndex].currentHand = event.newHand;
   }
 
   if (event.kind === TICK_EVENT_KIND.applyPoints) {
@@ -151,6 +177,6 @@ export function applyEvent(matchState: MatchState, event: TickEvent): void {
   }
 
   if (event.kind === TICK_EVENT_KIND.tx) {
-    matchState.txEventMove = event.moveKind;
+    matchState.txEventMove = event.move;
   }
 }

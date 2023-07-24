@@ -4,12 +4,14 @@ import type {
   Deck,
   Hand,
   HandCard,
+  Move,
   SerializedCard,
   SerializedDeck,
   SerializedHand,
   SerializedHandCard,
+  SerializedMove,
 } from './types';
-import { DECK_SIZE } from './constants';
+import { DECK_SIZE, MOVE_KIND } from './constants';
 
 /**
  * Generate Fisher-Yates shuffle of range 0 to size.
@@ -74,4 +76,34 @@ export function deserializeHandCard(card: SerializedHandCard): HandCard {
 export function deserializeHand(hand: SerializedHand): Hand {
   if (hand === '') return [];
   return hand.split(handCardDelimiter).map(deserializeHandCard);
+}
+
+const movePropDelimiter = '+';
+export function serializeMove(move: Move): SerializedMove {
+  const props: String[] = [move.kind];
+
+  if (move.kind === MOVE_KIND.playCard) {
+    props.push(move.handPosition.toString());
+  }
+
+  return props.join(movePropDelimiter);
+}
+
+export function deserializeMove(move: SerializedMove): Move {
+  const parts = move.split(movePropDelimiter);
+
+  if (parts[0] === MOVE_KIND.playCard) {
+    return {
+      kind: parts[0],
+      handPosition: Number.parseInt(parts[1]),
+    };
+  }
+
+  if (parts[0] === MOVE_KIND.endTurn || parts[0] === MOVE_KIND.drawCard) {
+    return {
+      kind: parts[0],
+    };
+  }
+
+  throw new Error(`deserializeMove: unknown kind`);
 }

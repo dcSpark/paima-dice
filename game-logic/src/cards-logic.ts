@@ -8,7 +8,7 @@ import type {
   PostTxTickEvent,
 } from './types';
 import Prando from 'paima-sdk/paima-prando';
-import { deserializeDeck, deserializeHand } from './helpers';
+import { deserializeDeck, deserializeHand, deserializeMove } from './helpers';
 import { MOVE_KIND, TICK_EVENT_KIND } from './constants';
 import { getTurnPlayer } from './dice-logic';
 
@@ -50,7 +50,10 @@ export function buildCurrentMatchState(
     players,
     properRound: lobby.current_proper_round,
     turn: lobby.current_turn,
-    txEventMove: lobby.current_tx_event_move ?? undefined,
+    txEventMove:
+      lobby.current_tx_event_move == null
+        ? undefined
+        : deserializeMove(lobby.current_tx_event_move),
     result: undefined,
   };
 }
@@ -62,7 +65,7 @@ export function genPostTxEvents(
   const player = getTurnPlayer(matchState);
   const currentDraw = player.currentDraw;
   const currentDeck = player.currentDeck;
-  if (matchState.txEventMove === MOVE_KIND.drawCard) {
+  if (matchState.txEventMove?.kind === MOVE_KIND.drawCard) {
     return [
       {
         kind: TICK_EVENT_KIND.postTx,

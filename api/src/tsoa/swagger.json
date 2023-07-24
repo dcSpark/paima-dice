@@ -6,13 +6,6 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
-			"move_kind": {
-				"type": "string",
-				"enum": [
-					"draw",
-					"end"
-				]
-			},
 			"lobby_status": {
 				"type": "string",
 				"enum": [
@@ -54,11 +47,7 @@
 						"nullable": true
 					},
 					"current_tx_event_move": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/move_kind"
-							}
-						],
+						"type": "string",
 						"nullable": true
 					},
 					"hidden": {
@@ -164,11 +153,7 @@
 						"nullable": true
 					},
 					"current_tx_event_move": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/move_kind"
-							}
-						],
+						"type": "string",
 						"nullable": true
 					},
 					"hidden": {
@@ -272,11 +257,7 @@
 						"nullable": true
 					},
 					"current_tx_event_move": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/move_kind"
-							}
-						],
+						"type": "string",
 						"nullable": true
 					},
 					"hidden": {
@@ -382,11 +363,7 @@
 						"nullable": true
 					},
 					"current_tx_event_move": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/move_kind"
-							}
-						],
+						"type": "string",
 						"nullable": true
 					},
 					"hidden": {
@@ -475,11 +452,7 @@
 						"nullable": true
 					},
 					"current_tx_event_move": {
-						"allOf": [
-							{
-								"$ref": "#/components/schemas/move_kind"
-							}
-						],
+						"type": "string",
 						"nullable": true
 					},
 					"hidden": {

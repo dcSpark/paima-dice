@@ -7,7 +7,7 @@ import type {
   LobbyWithStateProps,
   MatchState,
 } from '@dice/game-logic';
-import { genPermutation, serializeDeck, serializeHand } from '@dice/game-logic';
+import { genPermutation, serializeDeck, serializeHand, serializeMove } from '@dice/game-logic';
 import { scheduleZombieRound } from './zombie.js';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
 import {
@@ -178,7 +178,7 @@ export function persistMoveSubmission(
     // TODO: currently round === move
     move_within_round: 0,
     nft_id: inputData.nftId,
-    move_kind: inputData.moveKind,
+    serialized_move: inputData.move,
   };
   const newMoveUpdates: SQLUpdate[] = [[newMove, newMoveParams]];
 
@@ -244,7 +244,8 @@ export function persistUpdateMatchState(
     lobby_id: lobbyId,
     current_turn: newMatchState.turn,
     current_proper_round: newMatchState.properRound,
-    current_tx_event_move: newMatchState.txEventMove,
+    current_tx_event_move:
+      newMatchState.txEventMove == null ? undefined : serializeMove(newMatchState.txEventMove),
   };
   const lobbyUpdates: SQLUpdate[] = [[updateLobbyMatchState, lobbyParams]];
 

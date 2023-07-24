@@ -1,4 +1,4 @@
-import { LobbyState, MoveKind } from "@dice/game-logic";
+import { LobbyState, Move, MoveKind } from "@dice/game-logic";
 import * as Paima from "@dice/middleware";
 import { OldResult } from "paima-sdk/paima-mw-core";
 
@@ -20,7 +20,7 @@ export class DiceService {
   static async submitMove(
     nftId: number,
     lobbyState: LobbyState,
-    move: MoveKind
+    move: Move
   ): Promise<OldResult> {
     const result = await Paima.default.submitMoves(
       nftId,

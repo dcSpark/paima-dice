@@ -32,11 +32,6 @@ import * as express from 'express';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
 const models: TsoaRoute.Models = {
-    "move_kind": {
-        "dataType": "refAlias",
-        "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["draw"]},{"dataType":"enum","enums":["end"]}],"validators":{}},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "lobby_status": {
         "dataType": "refAlias",
         "type": {"dataType":"union","subSchemas":[{"dataType":"enum","enums":["active"]},{"dataType":"enum","enums":["closed"]},{"dataType":"enum","enums":["finished"]},{"dataType":"enum","enums":["open"]}],"validators":{}},
@@ -51,7 +46,7 @@ const models: TsoaRoute.Models = {
             "current_proper_round": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
             "current_round": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
             "current_turn": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
-            "current_tx_event_move": {"dataType":"union","subSchemas":[{"ref":"move_kind"},{"dataType":"enum","enums":[null]}],"required":true},
+            "current_tx_event_move": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},
             "hidden": {"dataType":"boolean","required":true},
             "lobby_creator": {"dataType":"double","required":true},
             "lobby_id": {"dataType":"string","required":true},
@@ -82,7 +77,7 @@ const models: TsoaRoute.Models = {
             "current_proper_round": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
             "current_round": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
             "current_turn": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
-            "current_tx_event_move": {"dataType":"union","subSchemas":[{"ref":"move_kind"},{"dataType":"enum","enums":[null]}],"required":true},
+            "current_tx_event_move": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},
             "hidden": {"dataType":"boolean","required":true},
             "lobby_creator": {"dataType":"double","required":true},
             "lobby_id": {"dataType":"string","required":true},
@@ -113,7 +108,7 @@ const models: TsoaRoute.Models = {
             "current_proper_round": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
             "current_round": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
             "current_turn": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
-            "current_tx_event_move": {"dataType":"union","subSchemas":[{"ref":"move_kind"},{"dataType":"enum","enums":[null]}],"required":true},
+            "current_tx_event_move": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},
             "hidden": {"dataType":"boolean","required":true},
             "lobby_creator": {"dataType":"double","required":true},
             "lobby_id": {"dataType":"string","required":true},
@@ -144,7 +139,7 @@ const models: TsoaRoute.Models = {
             "current_proper_round": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
             "current_round": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
             "current_turn": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
-            "current_tx_event_move": {"dataType":"union","subSchemas":[{"ref":"move_kind"},{"dataType":"enum","enums":[null]}],"required":true},
+            "current_tx_event_move": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},
             "hidden": {"dataType":"boolean","required":true},
             "lobby_creator": {"dataType":"double","required":true},
             "lobby_id": {"dataType":"string","required":true},
@@ -167,7 +162,7 @@ const models: TsoaRoute.Models = {
             "current_proper_round": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
             "current_round": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
             "current_turn": {"dataType":"union","subSchemas":[{"dataType":"double"},{"dataType":"enum","enums":[null]}],"required":true},
-            "current_tx_event_move": {"dataType":"union","subSchemas":[{"ref":"move_kind"},{"dataType":"enum","enums":[null]}],"required":true},
+            "current_tx_event_move": {"dataType":"union","subSchemas":[{"dataType":"string"},{"dataType":"enum","enums":[null]}],"required":true},
             "hidden": {"dataType":"boolean","required":true},
             "lobby_creator": {"dataType":"double","required":true},
             "lobby_id": {"dataType":"string","required":true},

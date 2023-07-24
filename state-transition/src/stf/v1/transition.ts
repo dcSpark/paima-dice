@@ -10,6 +10,7 @@ import type {
   MatchEnvironment,
   MatchState,
   SerializedDeck,
+  Move,
 } from '@dice/game-logic';
 import {
   initRoundExecutor,
@@ -19,6 +20,8 @@ import {
   deserializeHand,
   isLobbyWithStateProps,
   DECK_SIZE,
+  serializeMove,
+  deserializeMove,
 } from '@dice/game-logic';
 import {
   persistUpdateMatchState,
@@ -299,7 +302,7 @@ export const practiceMoves = async (
     ...input,
     input: 'submittedMoves',
     nftId: PRACTICE_BOT_NFT_ID,
-    moveKind: practiceMove,
+    move: serializeMove(practiceMove),
   };
 
   return submittedMoves(player, blockHeight, regularInput, dbConn);
@@ -342,8 +345,16 @@ function validateSubmittedMoves(
     return false;
   }
 
+  let move: Move;
+  try {
+    move = deserializeMove(input.move);
+  } catch (e) {
+    console.log('INVALID MOVE: deserialize failed');
+    return false;
+  }
+
   // If a move is sent that is invalid
-  if (!isValidMove(randomnessGenerator, buildCurrentMatchState(lobby, players), input.moveKind)) {
+  if (!isValidMove(randomnessGenerator, buildCurrentMatchState(lobby, players), move)) {
     console.log('INVALID MOVE: invalid move');
     return false;
   }

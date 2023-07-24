@@ -4,11 +4,13 @@ export const DECK_SIZE = 10;
 export const MOVE_KIND = {
   endTurn: 'end',
   drawCard: 'draw',
+  playCard: 'play',
 } as const;
 
 export const TICK_EVENT_KIND = {
   tx: 'tx',
   postTx: 'postTx',
+  playCard: 'playCard',
   applyPoints: 'applyPoints',
   turnEnd: 'turnEnd',
   roundEnd: 'roundEnd',

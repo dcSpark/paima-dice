@@ -3,8 +3,6 @@ import { PreparedQuery } from '@pgtyped/query';
 
 export type lobby_status = 'active' | 'closed' | 'finished' | 'open';
 
-export type move_kind = 'draw' | 'end';
-
 /** 'UpdateLobbyState' parameters type */
 export interface IUpdateLobbyStateParams {
   lobby_id: string;
@@ -93,7 +91,7 @@ export const updateLobbyCurrentRound = new PreparedQuery<IUpdateLobbyCurrentRoun
 export interface IUpdateLobbyMatchStateParams {
   current_proper_round: number;
   current_turn: number;
-  current_tx_event_move: move_kind | null | void;
+  current_tx_event_move: string | null | void;
   lobby_id: string;
 }
 

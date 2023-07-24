@@ -5,14 +5,12 @@ import type {
   MatchState,
   TickEvent,
   LobbyState,
-  MoveKind,
   PostTxTickEvent,
+  Move,
 } from "@dice/game-logic";
 import {
   applyEvent,
-  getPlayerScore,
   cloneMatchState,
-  getTurnPlayer,
   genPostTxEvents,
   MOVE_KIND,
   TICK_EVENT_KIND,
@@ -51,7 +49,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
       turn: lobbyState.current_turn,
       properRound: lobbyState.current_proper_round,
       players: lobbyState.players,
-      txEventMove: lobbyState.current_tx_event_move,
+      txEventMove: lobbyState.txEventMove,
       result: undefined,
     },
     isPostTxDone: false,
@@ -135,7 +133,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
     [isTickDisplaying, postTxEventQueue]
   );
 
-  async function submit(move: MoveKind) {
+  async function submit(move: Move) {
     const moveResult = await DiceService.submitMove(
       selectedNft,
       lobbyState,
@@ -174,8 +172,9 @@ const DiceGame: React.FC<DiceGameProps> = ({
         });
 
         // show animations after applying events to sate
-        if (tickEvent.kind === TICK_EVENT_KIND.postTx)
+        if (tickEvent.kind === TICK_EVENT_KIND.postTx) {
           await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
 
         if (tickEvent.kind === TICK_EVENT_KIND.applyPoints) {
           setCaption(
@@ -236,7 +235,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
     turn: lobbyState.current_turn,
     properRound: lobbyState.current_proper_round,
     players: lobbyState.players,
-    txEventMove: lobbyState.current_tx_event_move,
+    txEventMove: lobbyState.txEventMove,
     result: undefined,
   });
   const [nextFetchedRound, setNextFetchedRound] = useState(
@@ -301,6 +300,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
 
   const canRoll = !disableInteraction;
   const canPass = !disableInteraction;
+  const canPlay = !disableInteraction;
 
   if (lobbyState == null) return <></>;
 
@@ -335,14 +335,21 @@ const DiceGame: React.FC<DiceGameProps> = ({
           onDraw={
             canRoll
               ? () => {
-                  submit(MOVE_KIND.drawCard);
+                  submit({ kind: MOVE_KIND.drawCard });
                 }
               : undefined
           }
           onEndTurn={
             canPass
               ? () => {
-                  submit(MOVE_KIND.endTurn);
+                  submit({ kind: MOVE_KIND.endTurn });
+                }
+              : undefined
+          }
+          onPlayCard={
+            canPlay
+              ? (handPosition) => {
+                  submit({ kind: MOVE_KIND.playCard, handPosition });
                 }
               : undefined
           }

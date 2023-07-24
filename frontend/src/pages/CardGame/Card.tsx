@@ -8,6 +8,7 @@ export const cardWidth = "100px";
 export type CardProps = {
   cardId: undefined | CardId;
   overlap?: boolean;
+  onPlay?: undefined | (() => void);
 };
 
 function StaticCard({
@@ -59,6 +60,7 @@ function StaticCard({
 export default function Card({
   cardId,
   overlap,
+  onPlay,
 }: CardProps): React.ReactElement {
   const [closeup, setCloseup] = useState(false);
 
@@ -87,13 +89,7 @@ export default function Card({
             transform: "translate(-50%, -50%)",
           }}
         >
-          <StaticCard
-            cardId={cardId}
-            scale={2}
-            onClick={() => {
-              // TODO: play card
-            }}
-          />
+          <StaticCard cardId={cardId} scale={2} onClick={onPlay} />
         </Box>
       </Modal>
     </>

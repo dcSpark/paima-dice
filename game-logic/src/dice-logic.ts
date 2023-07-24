@@ -1,4 +1,4 @@
-import type { MatchState, LobbyPlayer, ConciseResult, MatchResult, MoveKind } from './types';
+import type { MatchState, LobbyPlayer, ConciseResult, MatchResult, Move } from './types';
 import type Prando from 'paima-sdk/paima-prando';
 
 export function canRollAgain(dice: [number, number]): boolean {
@@ -8,7 +8,7 @@ export function canRollAgain(dice: [number, number]): boolean {
 export function isValidMove(
   _randomnessGenerator: Prando,
   _matchState: MatchState,
-  _moveKind: MoveKind
+  _move: Move
 ): boolean {
   return true;
 }

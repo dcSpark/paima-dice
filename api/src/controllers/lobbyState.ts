@@ -3,6 +3,7 @@ import { getLobbyById, getLobbyPlayers, requirePool } from '@dice/db';
 import {
   deserializeDeck,
   deserializeHand,
+  deserializeMove,
   isLobbyWithStateProps,
   type LobbyPlayer,
   type LobbyState,
@@ -70,11 +71,17 @@ export class LobbyStatecontroller extends Controller {
       turn: raw.turn ?? undefined,
     }));
 
+    const txEventMove =
+      lobby.current_tx_event_move == null
+        ? undefined
+        : deserializeMove(lobby.current_tx_event_move);
+
     return {
       lobby: {
         ...lobby,
         roundSeed,
         players,
+        txEventMove,
       },
     };
   }

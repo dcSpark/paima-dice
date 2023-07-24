@@ -10,8 +10,9 @@ export type PlayerProps = {
   lobbyPlayer: LobbyPlayer;
   isThisPlayer?: boolean;
   turn: number;
-  onDraw?: undefined | (() => void);
-  onEndTurn?: undefined | (() => void);
+  onDraw?: () => void;
+  onEndTurn?: () => void;
+  onPlayCard?: (handPosition: number) => void;
 };
 
 export default function Player({
@@ -20,6 +21,7 @@ export default function Player({
   turn,
   onDraw,
   onEndTurn,
+  onPlayCard,
 }: PlayerProps): React.ReactElement {
   const isMyTurn = lobbyPlayer.turn === turn;
 
@@ -101,8 +103,13 @@ export default function Player({
       >
         {lobbyPlayer.currentHand
           .filter((card) => card.cardId != null)
-          .map((card) => (
-            <Card key={card.draw} cardId={card.cardId} overlap />
+          .map((card, i) => (
+            <Card
+              key={card.draw}
+              cardId={card.cardId}
+              overlap
+              onPlay={() => onPlayCard(i)}
+            />
           ))}
       </Box>
       <Deck size={lobbyPlayer.currentDeck.length} />

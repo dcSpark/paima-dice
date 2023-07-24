@@ -1,4 +1,4 @@
-import type { ConciseResult, SerializedDeck } from '@dice/game-logic';
+import type { ConciseResult, SerializedDeck, SerializedMove } from '@dice/game-logic';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
 import type { MoveKind } from '@dice/game-logic';
 
@@ -52,7 +52,7 @@ export interface SubmittedMovesInput {
   lobbyID: string;
   matchWithinLobby: number;
   roundWithinMatch: number;
-  moveKind: MoveKind;
+  move: SerializedMove;
 }
 
 export interface PracticeMovesInput {

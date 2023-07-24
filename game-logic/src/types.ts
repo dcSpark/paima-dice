@@ -1,8 +1,6 @@
 import type { ValuesType } from 'utility-types';
 import type { MOVE_KIND, TICK_EVENT_KIND } from './constants';
 
-export type MoveKind = ValuesType<typeof MOVE_KIND>;
-
 import type {
   IGetLobbyByIdResult,
   IGetUserStatsResult,
@@ -26,11 +24,16 @@ export type TickEventKind = ValuesType<typeof TICK_EVENT_KIND>;
 
 export type TxTickEvent = {
   kind: typeof TICK_EVENT_KIND.tx;
-  moveKind: MoveKind;
+  move: Move;
 };
 export type PostTxTickEvent = {
   kind: typeof TICK_EVENT_KIND.postTx;
   draw: CardDraw;
+};
+export type PlayCardTickEvent = {
+  kind: typeof TICK_EVENT_KIND.playCard;
+  handPosition: number;
+  newHand: Hand;
 };
 export type ApplyPointsTickEvent = {
   kind: typeof TICK_EVENT_KIND.applyPoints;
@@ -50,6 +53,7 @@ export type MatchEndTickEvent = {
 export type TickEvent =
   | TxTickEvent
   | PostTxTickEvent
+  | PlayCardTickEvent
   | ApplyPointsTickEvent
   | TurnEndTickEvent
   | RoundEndTickEvent
@@ -70,7 +74,7 @@ export interface MatchState {
   result: undefined | MatchResult;
   // Move that required a tx submission. It it was for new randomness,
   // we'll want to provide new randomness in postTx event (e.g. decide to draw a card).
-  txEventMove: undefined | MoveKind;
+  txEventMove: undefined | Move;
 }
 
 export type LobbyStatus = 'open' | 'active' | 'finished' | 'closed';
@@ -139,6 +143,7 @@ export type LobbyWithStateProps = Omit<IGetLobbyByIdResult, LobbyStateProps> &
 export interface LobbyState extends LobbyWithStateProps {
   roundSeed: string;
   players: LobbyPlayer[];
+  txEventMove: undefined | Move;
 }
 
 export type CardId = number;
@@ -154,3 +159,17 @@ export type HandCard = {
 export type Hand = HandCard[];
 export type SerializedHandCard = string;
 export type SerializedHand = string;
+
+export type MoveKind = ValuesType<typeof MOVE_KIND>;
+export type Move =
+  | {
+      kind: typeof MOVE_KIND.drawCard;
+    }
+  | {
+      kind: typeof MOVE_KIND.endTurn;
+    }
+  | {
+      kind: typeof MOVE_KIND.playCard;
+      handPosition: number;
+    };
+export type SerializedMove = string;
