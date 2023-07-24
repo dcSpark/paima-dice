@@ -46,6 +46,10 @@
 						"format": "double",
 						"nullable": true
 					},
+					"current_tx_event_move": {
+						"type": "string",
+						"nullable": true
+					},
 					"hidden": {
 						"type": "boolean"
 					},
@@ -86,6 +90,7 @@
 					"current_proper_round",
 					"current_round",
 					"current_turn",
+					"current_tx_event_move",
 					"hidden",
 					"lobby_creator",
 					"lobby_id",
@@ -147,6 +152,10 @@
 						"format": "double",
 						"nullable": true
 					},
+					"current_tx_event_move": {
+						"type": "string",
+						"nullable": true
+					},
 					"hidden": {
 						"type": "boolean"
 					},
@@ -187,6 +196,7 @@
 					"current_proper_round",
 					"current_round",
 					"current_turn",
+					"current_tx_event_move",
 					"hidden",
 					"lobby_creator",
 					"lobby_id",
@@ -246,6 +256,10 @@
 						"format": "double",
 						"nullable": true
 					},
+					"current_tx_event_move": {
+						"type": "string",
+						"nullable": true
+					},
 					"hidden": {
 						"type": "boolean"
 					},
@@ -286,6 +300,7 @@
 					"current_proper_round",
 					"current_round",
 					"current_turn",
+					"current_tx_event_move",
 					"hidden",
 					"lobby_creator",
 					"lobby_id",
@@ -347,6 +362,10 @@
 						"format": "double",
 						"nullable": true
 					},
+					"current_tx_event_move": {
+						"type": "string",
+						"nullable": true
+					},
 					"hidden": {
 						"type": "boolean"
 					},
@@ -387,6 +406,7 @@
 					"current_proper_round",
 					"current_round",
 					"current_turn",
+					"current_tx_event_move",
 					"hidden",
 					"lobby_creator",
 					"lobby_id",
@@ -431,6 +451,10 @@
 						"format": "double",
 						"nullable": true
 					},
+					"current_tx_event_move": {
+						"type": "string",
+						"nullable": true
+					},
 					"hidden": {
 						"type": "boolean"
 					},
@@ -471,6 +495,7 @@
 					"current_proper_round",
 					"current_round",
 					"current_turn",
+					"current_tx_event_move",
 					"hidden",
 					"lobby_creator",
 					"lobby_id",

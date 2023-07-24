@@ -12,7 +12,8 @@ import { buildEndpointErrorFxn, MiddlewareErrorCode } from '../errors';
 import { getLobbyStateWithUser, getNonemptyNewLobbies } from '../helpers/auxiliary-queries';
 import { lobbyWasClosed, userCreatedLobby, userJoinedLobby } from '../helpers/utility-functions';
 import type { CreateLobbySuccessfulResponse } from '../types';
-import { serializeDeck, type Deck } from '@dice/utils';
+import type { Deck, Move } from '@dice/game-logic';
+import { serializeDeck, serializeMove } from '@dice/game-logic';
 
 const RETRY_PERIOD = 1000;
 const RETRIES_COUNT = 8;
@@ -199,7 +200,7 @@ async function submitMoves(
   lobbyID: string,
   matchWithinLobby: number,
   roundWithinMatch: number,
-  rollAgain: boolean
+  move: Move
 ): Promise<OldResult> {
   const errorFxn = buildEndpointErrorFxn('submitMoves');
 
@@ -209,7 +210,7 @@ async function submitMoves(
   conciseBuilder.addValue({ value: lobbyID, isStateIdentifier: true });
   conciseBuilder.addValue({ value: matchWithinLobby.toString(10) });
   conciseBuilder.addValue({ value: roundWithinMatch.toString(10) });
-  conciseBuilder.addValue({ value: rollAgain ? 'T' : 'F' });
+  conciseBuilder.addValue({ value: serializeMove(move) });
 
   try {
     const result = await postConciselyEncodedData(conciseBuilder.build());

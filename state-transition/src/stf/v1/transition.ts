@@ -10,11 +10,18 @@ import type {
   MatchEnvironment,
   MatchState,
   SerializedDeck,
-} from '@dice/utils';
+  Move,
+} from '@dice/game-logic';
 import {
   initRoundExecutor,
   buildCurrentMatchState,
   extractMatchEnvironment,
+  deserializeDeck,
+  deserializeHand,
+  isLobbyWithStateProps,
+  DECK_SIZE,
+  serializeMove,
+  deserializeMove,
 } from '@dice/game-logic';
 import {
   persistUpdateMatchState,
@@ -40,14 +47,7 @@ import type {
   SubmittedMovesInput,
 } from './types.js';
 import { isUserStats, isZombieRound } from './types.js';
-import {
-  DECK_SIZE,
-  NFT_NAME,
-  PRACTICE_BOT_NFT_ID,
-  deserializeDeck,
-  deserializeHand,
-  isLobbyWithStateProps,
-} from '@dice/utils';
+import { NFT_NAME, PRACTICE_BOT_NFT_ID } from '@dice/utils';
 import { getBlockHeight, type SQLUpdate } from 'paima-sdk/paima-db';
 import { PracticeAI } from './persist/practice-ai';
 import { getOwnedNfts } from 'paima-sdk/paima-utils-backend';
@@ -302,7 +302,7 @@ export const practiceMoves = async (
     ...input,
     input: 'submittedMoves',
     nftId: PRACTICE_BOT_NFT_ID,
-    rollAgain: practiceMove,
+    move: serializeMove(practiceMove),
   };
 
   return submittedMoves(player, blockHeight, regularInput, dbConn);
@@ -345,8 +345,16 @@ function validateSubmittedMoves(
     return false;
   }
 
+  let move: Move;
+  try {
+    move = deserializeMove(input.move);
+  } catch (e) {
+    console.log('INVALID MOVE: deserialize failed');
+    return false;
+  }
+
   // If a move is sent that is invalid
-  if (!isValidMove(randomnessGenerator, buildCurrentMatchState(lobby, players), input.rollAgain)) {
+  if (!isValidMove(randomnessGenerator, buildCurrentMatchState(lobby, players), move)) {
     console.log('INVALID MOVE: invalid move');
     return false;
   }

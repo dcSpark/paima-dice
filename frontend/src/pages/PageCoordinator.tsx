@@ -6,7 +6,6 @@ import OpenLobbies from "./OpenLobbies";
 import MyGames from "./MyGames";
 import CreateLobby from "./CreateLobby";
 import { Routes, Route, useNavigate } from "react-router-dom";
-import { LobbyState } from "@dice/utils";
 import "./PageCoordinator.scss";
 import { AppContext } from "@src/main";
 import { Lobby } from "./DiceGame/Lobby";

@@ -1,15 +1,13 @@
 import type { SubmittedMovesInput } from '../types.js';
 import type { INewRoundParams, IExecutedRoundParams, IUpdateLobbyPlayerParams } from '@dice/db';
 import { newRound, executedRound, updateLobbyPlayer } from '@dice/db';
-import type { LobbyPlayer, MatchEnvironment } from '@dice/utils';
-import {
-  genPermutation,
-  type LobbyWithStateProps,
-  type MatchState,
-  PRACTICE_BOT_NFT_ID,
-  serializeDeck,
-  serializeHand,
-} from '@dice/utils';
+import type {
+  LobbyPlayer,
+  MatchEnvironment,
+  LobbyWithStateProps,
+  MatchState,
+} from '@dice/game-logic';
+import { genPermutation, serializeDeck, serializeHand, serializeMove } from '@dice/game-logic';
 import { scheduleZombieRound } from './zombie.js';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
 import {
@@ -30,6 +28,7 @@ import type { IGetRoundResult } from '@dice/db/src/select.queries.js';
 import type Prando from 'paima-sdk/paima-prando';
 import { schedulePracticeMove } from './practice.js';
 import { scheduleStatsUpdate } from './stats.js';
+import { PRACTICE_BOT_NFT_ID } from '@dice/utils';
 
 export function persistStartMatch(
   lobbyId: string,
@@ -98,6 +97,7 @@ export function persistInitialMatchState(
       score: 0,
     })),
     result: undefined,
+    txEventMove: undefined,
   };
   const matchStateUpdates = persistUpdateMatchState(
     lobbyId,
@@ -178,7 +178,7 @@ export function persistMoveSubmission(
     // TODO: currently round === move
     move_within_round: 0,
     nft_id: inputData.nftId,
-    roll_again: inputData.rollAgain,
+    serialized_move: inputData.move,
   };
   const newMoveUpdates: SQLUpdate[] = [[newMove, newMoveParams]];
 
@@ -244,6 +244,8 @@ export function persistUpdateMatchState(
     lobby_id: lobbyId,
     current_turn: newMatchState.turn,
     current_proper_round: newMatchState.properRound,
+    current_tx_event_move:
+      newMatchState.txEventMove == null ? undefined : serializeMove(newMatchState.txEventMove),
   };
   const lobbyUpdates: SQLUpdate[] = [[updateLobbyMatchState, lobbyParams]];
 

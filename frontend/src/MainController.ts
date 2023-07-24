@@ -1,4 +1,9 @@
-import { MatchState, TickEvent, LobbyState, genBotDeck } from "@dice/utils";
+import {
+  MatchState,
+  TickEvent,
+  LobbyState,
+  genBotDeck,
+} from "@dice/game-logic";
 import * as Paima from "@dice/middleware";
 import { MatchExecutor } from "paima-sdk/paima-executors";
 import { IGetLobbyByIdResult, IGetPaginatedUserLobbiesResult } from "@dice/db";

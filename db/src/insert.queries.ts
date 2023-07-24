@@ -200,8 +200,8 @@ export interface INewMoveParams {
   match_within_lobby: number;
   move_within_round: number;
   nft_id: number;
-  roll_again: boolean;
   round_within_match: number;
+  serialized_move: string;
 }
 
 /** 'NewMove' return type */
@@ -213,7 +213,7 @@ export interface INewMoveQuery {
   result: INewMoveResult;
 }
 
-const newMoveIR: any = {"usedParamSet":{"lobby_id":true,"match_within_lobby":true,"round_within_match":true,"move_within_round":true,"nft_id":true,"roll_again":true},"params":[{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":137,"b":146}]},{"name":"match_within_lobby","required":true,"transform":{"type":"scalar"},"locs":[{"a":151,"b":170}]},{"name":"round_within_match","required":true,"transform":{"type":"scalar"},"locs":[{"a":175,"b":194}]},{"name":"move_within_round","required":true,"transform":{"type":"scalar"},"locs":[{"a":199,"b":217}]},{"name":"nft_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":222,"b":229}]},{"name":"roll_again","required":true,"transform":{"type":"scalar"},"locs":[{"a":234,"b":245}]}],"statement":"INSERT INTO round_move(\n  lobby_id,\n  match_within_lobby,\n  round_within_match,\n  move_within_round,\n  nft_id,\n  roll_again\n)\nVALUES (\n  :lobby_id!,\n  :match_within_lobby!,\n  :round_within_match!,\n  :move_within_round!,\n  :nft_id!,\n  :roll_again!\n)"};
+const newMoveIR: any = {"usedParamSet":{"lobby_id":true,"match_within_lobby":true,"round_within_match":true,"move_within_round":true,"nft_id":true,"serialized_move":true},"params":[{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":142,"b":151}]},{"name":"match_within_lobby","required":true,"transform":{"type":"scalar"},"locs":[{"a":156,"b":175}]},{"name":"round_within_match","required":true,"transform":{"type":"scalar"},"locs":[{"a":180,"b":199}]},{"name":"move_within_round","required":true,"transform":{"type":"scalar"},"locs":[{"a":204,"b":222}]},{"name":"nft_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":227,"b":234}]},{"name":"serialized_move","required":true,"transform":{"type":"scalar"},"locs":[{"a":239,"b":255}]}],"statement":"INSERT INTO round_move(\n  lobby_id,\n  match_within_lobby,\n  round_within_match,\n  move_within_round,\n  nft_id,\n  serialized_move\n)\nVALUES (\n  :lobby_id!,\n  :match_within_lobby!,\n  :round_within_match!,\n  :move_within_round!,\n  :nft_id!,\n  :serialized_move!\n)"};
 
 /**
  * Query generated from SQL:
@@ -224,7 +224,7 @@ const newMoveIR: any = {"usedParamSet":{"lobby_id":true,"match_within_lobby":tru
  *   round_within_match,
  *   move_within_round,
  *   nft_id,
- *   roll_again
+ *   serialized_move
  * )
  * VALUES (
  *   :lobby_id!,
@@ -232,7 +232,7 @@ const newMoveIR: any = {"usedParamSet":{"lobby_id":true,"match_within_lobby":tru
  *   :round_within_match!,
  *   :move_within_round!,
  *   :nft_id!,
- *   :roll_again!
+ *   :serialized_move!
  * )
  * ```
  */

@@ -3,10 +3,11 @@ import { requirePool, getLobbyById, getMatchSeeds, getLobbyPlayers } from '@dice
 import {
   deserializeDeck,
   deserializeHand,
+  deserializeMove,
   isLobbyWithStateProps,
   type LobbyPlayer,
   type MatchExecutorData,
-} from '@dice/utils';
+} from '@dice/game-logic';
 import { psqlInt } from '../validation';
 import { isLeft } from 'fp-ts/lib/Either';
 import { getMatch, getMatchMoves } from '@dice/db/src/select.queries';
@@ -44,6 +45,11 @@ export class MatchExecutorController extends Controller {
       turn: raw.turn ?? undefined,
     }));
 
+    const txEventMove =
+      lobby.current_tx_event_move == null
+        ? undefined
+        : deserializeMove(lobby.current_tx_event_move);
+
     const [initialSeed] = await getBlockHeight.run(
       { block_height: match.starting_block_height },
       pool
@@ -64,7 +70,12 @@ export class MatchExecutorController extends Controller {
     );
 
     return {
-      lobby: { ...lobby, roundSeed: initialSeed.seed, players },
+      lobby: {
+        ...lobby,
+        roundSeed: initialSeed.seed,
+        players,
+        txEventMove,
+      },
       seeds,
       moves,
     };

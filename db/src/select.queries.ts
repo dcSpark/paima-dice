@@ -18,6 +18,7 @@ export interface IGetPaginatedOpenLobbiesResult {
   current_proper_round: number | null;
   current_round: number | null;
   current_turn: number | null;
+  current_tx_event_move: string | null;
   hidden: boolean;
   lobby_creator: number;
   lobby_id: string;
@@ -67,6 +68,7 @@ export interface ISearchPaginatedOpenLobbiesResult {
   current_proper_round: number | null;
   current_round: number | null;
   current_turn: number | null;
+  current_tx_event_move: string | null;
   hidden: boolean;
   lobby_creator: number;
   lobby_id: string;
@@ -114,6 +116,7 @@ export interface IGetOpenLobbyByIdResult {
   current_proper_round: number | null;
   current_round: number | null;
   current_turn: number | null;
+  current_tx_event_move: string | null;
   hidden: boolean;
   lobby_creator: number;
   lobby_id: string;
@@ -193,6 +196,7 @@ export interface IGetRandomLobbyResult {
   current_proper_round: number | null;
   current_round: number | null;
   current_turn: number | null;
+  current_tx_event_move: string | null;
   hidden: boolean;
   lobby_creator: number;
   lobby_id: string;
@@ -236,6 +240,7 @@ export interface IGetRandomActiveLobbyResult {
   current_proper_round: number | null;
   current_round: number | null;
   current_turn: number | null;
+  current_tx_event_move: string | null;
   hidden: boolean;
   lobby_creator: number;
   lobby_id: string;
@@ -280,6 +285,7 @@ export interface IGetUserLobbiesResult {
   current_proper_round: number | null;
   current_round: number | null;
   current_turn: number | null;
+  current_tx_event_move: string | null;
   hidden: boolean;
   lobby_creator: number;
   lobby_id: string;
@@ -329,6 +335,7 @@ export interface IGetPaginatedUserLobbiesResult {
   current_proper_round: number | null;
   current_round: number | null;
   current_turn: number | null;
+  current_tx_event_move: string | null;
   hidden: boolean;
   lobby_creator: number;
   lobby_id: string;
@@ -382,6 +389,7 @@ export interface IGetAllPaginatedUserLobbiesResult {
   current_proper_round: number | null;
   current_round: number | null;
   current_turn: number | null;
+  current_tx_event_move: string | null;
   hidden: boolean;
   lobby_creator: number;
   lobby_id: string;
@@ -433,6 +441,7 @@ export interface IGetActiveLobbiesResult {
   current_proper_round: number | null;
   current_round: number | null;
   current_turn: number | null;
+  current_tx_event_move: string | null;
   hidden: boolean;
   lobby_creator: number;
   lobby_id: string;
@@ -475,6 +484,7 @@ export interface IGetLobbyByIdResult {
   current_proper_round: number | null;
   current_round: number | null;
   current_turn: number | null;
+  current_tx_event_move: string | null;
   hidden: boolean;
   lobby_creator: number;
   lobby_id: string;
@@ -617,8 +627,8 @@ export interface IGetRoundMovesResult {
   match_within_lobby: number;
   move_within_round: number;
   nft_id: number;
-  roll_again: boolean;
   round_within_match: number;
+  serialized_move: string;
 }
 
 /** 'GetRoundMoves' query type */
@@ -657,8 +667,8 @@ export interface IGetMatchMovesResult {
   match_within_lobby: number;
   move_within_round: number;
   nft_id: number;
-  roll_again: boolean;
   round_within_match: number;
+  serialized_move: string;
 }
 
 /** 'GetMatchMoves' query type */
