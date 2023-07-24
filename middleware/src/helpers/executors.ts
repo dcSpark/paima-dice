@@ -9,7 +9,7 @@ import {
   type MatchState,
   type TickEvent,
   genPermutation,
-} from '@dice/utils';
+} from '@dice/game-logic';
 
 export function buildRoundExecutor(data: RoundExecutorData): RoundExecutor<MatchState, TickEvent> {
   const seed = data.seed;
@@ -40,6 +40,7 @@ export function buildMatchExecutor({
     properRound: 0,
     turn: 0,
     result: undefined,
+    txEventMove: undefined,
   };
 
   const paimaMoves = moves.map(move => ({

@@ -2,7 +2,7 @@ import { Controller, Get, Query, Route, ValidateError } from 'tsoa';
 import { requirePool, getLobbyById, getRoundMoves } from '@dice/db';
 import { isLeft } from 'fp-ts/Either';
 import { psqlInt } from '../validation.js';
-import type { RoundStatusData } from '@dice/utils';
+import type { RoundStatusData } from '@dice/game-logic';
 import { getRound } from '@dice/db/src/select.queries.js';
 
 type Response = RoundStatusData | Error;

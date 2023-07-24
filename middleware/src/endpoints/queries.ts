@@ -10,7 +10,7 @@ import type {
   RoundExecutorBackendData,
   MatchState,
   TickEvent,
-} from '@dice/utils';
+} from '@dice/game-logic';
 
 import { buildEndpointErrorFxn, MiddlewareErrorCode } from '../errors';
 import { auxGetLobbyRaw, auxGetLobbyState, getRawNewLobbies } from '../helpers/auxiliary-queries';

@@ -9,7 +9,7 @@ import type {
   SerializedHand,
   SerializedHandCard,
 } from './types';
-import { DECK_SIZE } from '.';
+import { DECK_SIZE } from './constants';
 
 /**
  * Generate Fisher-Yates shuffle of range 0 to size.

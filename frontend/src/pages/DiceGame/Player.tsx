@@ -1,30 +1,26 @@
-import React, { Ref } from "react";
+import React from "react";
 import "./DiceGame.scss";
 import { Box, Typography } from "@mui/material";
 import Button from "@src/components/Button";
-import { Dice, DiceRef } from "./Dice";
-import { LobbyPlayer } from "@dice/utils";
 import Card from "../CardGame/Card";
 import Deck from "../CardGame/Deck";
+import { LobbyPlayer } from "@dice/game-logic";
 
 export type PlayerProps = {
   lobbyPlayer: LobbyPlayer;
-  thisClientPlayer: number;
+  isThisPlayer?: boolean;
   turn: number;
-  diceRef: Ref<DiceRef>;
-  onRoll: undefined | (() => void);
-  onPass: undefined | (() => void);
+  onDraw?: undefined | (() => void);
+  onEndTurn?: undefined | (() => void);
 };
 
 export default function Player({
   lobbyPlayer,
-  thisClientPlayer,
+  isThisPlayer,
   turn,
-  diceRef,
-  onRoll,
-  onPass,
+  onDraw,
+  onEndTurn,
 }: PlayerProps): React.ReactElement {
-  const isMeThisClient = lobbyPlayer.nftId === thisClientPlayer;
   const isMyTurn = lobbyPlayer.turn === turn;
 
   return (
@@ -55,7 +51,7 @@ export default function Player({
             lineHeight: "1.5rem",
           }}
         >
-          {isMeThisClient ? "You" : "Opponent"}
+          {isThisPlayer ? "You" : "Opponent"}
         </Typography>
         <Typography
           variant="caption"
@@ -75,31 +71,19 @@ export default function Player({
         >
           Score: {lobbyPlayer.score}
         </Typography>
-        <Dice
-          ref={diceRef}
-          disableIndividual
-          faceColor="#A51C3E"
-          dotColor="#FFEEEE"
-        />
-        {isMeThisClient && (
+        {isThisPlayer && (
           <Box
             sx={{
               display: "flex",
               gap: 1,
             }}
           >
-            {onRoll == null && onPass != null ? (
-              <Button onClick={onPass}>end turn</Button>
-            ) : (
-              <>
-                <Button disabled={onRoll == null} onClick={onRoll}>
-                  roll
-                </Button>
-                <Button disabled={onPass == null} onClick={onPass}>
-                  pass
-                </Button>
-              </>
-            )}
+            <Button disabled={onDraw == null} onClick={onDraw}>
+              draw
+            </Button>
+            <Button disabled={onEndTurn == null} onClick={onEndTurn}>
+              end turn
+            </Button>
           </Box>
         )}
       </Box>

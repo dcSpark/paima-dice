@@ -1,5 +1,6 @@
-import type { ConciseResult, SerializedDeck } from '@dice/utils';
+import type { ConciseResult, SerializedDeck } from '@dice/game-logic';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
+import type { MoveKind } from '@dice/game-logic';
 
 export type ParsedSubmittedInput =
   | NftMintInput
@@ -51,7 +52,7 @@ export interface SubmittedMovesInput {
   lobbyID: string;
   matchWithinLobby: number;
   roundWithinMatch: number;
-  rollAgain: boolean;
+  moveKind: MoveKind;
 }
 
 export interface PracticeMovesInput {

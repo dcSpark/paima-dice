@@ -6,7 +6,7 @@ import {
   isLobbyWithStateProps,
   type LobbyPlayer,
   type MatchExecutorData,
-} from '@dice/utils';
+} from '@dice/game-logic';
 import { psqlInt } from '../validation';
 import { isLeft } from 'fp-ts/lib/Either';
 import { getMatch, getMatchMoves } from '@dice/db/src/select.queries';

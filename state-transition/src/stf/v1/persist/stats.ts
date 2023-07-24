@@ -2,7 +2,7 @@ import type { IGetUserStatsResult, INewStatsParams, IUpdateStatsParams } from '@
 import { newStats, updateStats } from '@dice/db';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
 import { createScheduledData } from 'paima-sdk/paima-db';
-import type { ConciseResult } from '@dice/utils';
+import type { ConciseResult } from '@dice/game-logic';
 
 // Generate blank/empty user stats
 export function blankStats(nftId: number): SQLUpdate {

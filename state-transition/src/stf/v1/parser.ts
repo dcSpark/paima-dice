@@ -12,13 +12,14 @@ import type {
   ZombieRound,
 } from './types';
 import { SAFE_NUMBER } from '@dice/utils';
+import { MOVE_KIND } from '@dice/game-logic';
 
 const myGrammar = `
 nftMint             = nftmint|address|tokenId
 createdLobby        = c|creatorNftId|creatorDeck|numOfRounds|roundLength|playTimePerPlayer|isHidden?|isPractice?
 joinedLobby         = j|nftId|*lobbyID|deck
 closedLobby         = cs|*lobbyID
-submittedMoves      = s|nftId|*lobbyID|matchWithinLobby|roundWithinMatch|rollAgain
+submittedMoves      = s|nftId|*lobbyID|matchWithinLobby|roundWithinMatch|moveKind
 practiceMoves       = p|*lobbyID|matchWithinLobby|roundWithinMatch
 zombieScheduledData = z|*lobbyID
 userScheduledData   = u|*user|result
@@ -50,7 +51,7 @@ const submittedMoves: ParserRecord<SubmittedMovesInput> = {
   lobbyID: PaimaParser.NCharsParser(12, 12),
   matchWithinLobby: PaimaParser.NumberParser(0, SAFE_NUMBER),
   roundWithinMatch: PaimaParser.NumberParser(0, SAFE_NUMBER),
-  rollAgain: PaimaParser.TrueFalseParser(),
+  moveKind: PaimaParser.EnumParser(Object.values(MOVE_KIND)),
 };
 const practiceMoves: ParserRecord<PracticeMovesInput> = {
   lobbyID: PaimaParser.NCharsParser(12, 12),

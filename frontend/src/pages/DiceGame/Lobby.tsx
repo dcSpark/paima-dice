@@ -1,7 +1,7 @@
 import React, { Ref, useEffect, useMemo, useRef, useState } from "react";
 import "./Lobby.scss";
 import { Box, CircularProgress, Typography } from "@mui/material";
-import type { LobbyState } from "@dice/utils";
+import type { LobbyState } from "@dice/game-logic";
 import Navbar from "@src/components/Navbar";
 import Wrapper from "@src/components/Wrapper";
 import { DiceService } from "./GameLogic";

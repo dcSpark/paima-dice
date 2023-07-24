@@ -1,6 +1,12 @@
 import type { Hash } from 'paima-sdk/paima-utils';
 
-import type { BaseRoundStatus, LobbyState, LobbyStatus, NewLobby, UserStats } from '@dice/utils';
+import type {
+  BaseRoundStatus,
+  LobbyState,
+  LobbyStatus,
+  NewLobby,
+  UserStats,
+} from '@dice/game-logic';
 import type { IGetLobbyByIdResult, IGetPaginatedUserLobbiesResult } from '@dice/db';
 
 export interface RoundEnd {

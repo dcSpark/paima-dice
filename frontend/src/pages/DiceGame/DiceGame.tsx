@@ -1,23 +1,21 @@
 import React, { Ref, useEffect, useMemo, useRef, useState } from "react";
 import "./DiceGame.scss";
 import { Box, Typography } from "@mui/material";
-import {
-  type MatchState,
-  type TickEvent,
-  type LobbyState,
-  TickEventKind,
-  LobbyPlayer,
-  Deck,
-  CardId,
-  CardDraw,
-} from "@dice/utils";
+import type {
+  MatchState,
+  TickEvent,
+  LobbyState,
+  MoveKind,
+  PostTxTickEvent,
+} from "@dice/game-logic";
 import {
   applyEvent,
-  genDieRoll,
-  genInitialDiceRolls,
   getPlayerScore,
   cloneMatchState,
   getTurnPlayer,
+  genPostTxEvents,
+  MOVE_KIND,
+  TICK_EVENT_KIND,
 } from "@dice/game-logic";
 import * as Paima from "@dice/middleware";
 import { DiceService } from "./GameLogic";
@@ -40,18 +38,23 @@ const DiceGame: React.FC<DiceGameProps> = ({
   const [matchOver, setMatchOver] = useState(false);
   const [caption, setCaption] = useState<undefined | string>();
 
-  // round being currently shown
-  // interactive if this player's round,
-  // passive replay if other player's round
-  const [displayedRound, setDisplayedRound] = useState<number>(
-    lobbyState.current_round
-  );
-  // end state of last round (latest finished round)
-  const [displayedState, setDisplayedState] = useState<MatchState>({
-    turn: lobbyState.current_turn,
-    properRound: lobbyState.current_proper_round,
-    players: lobbyState.players,
-    result: undefined,
+  // Game data for what is being currently shown to user.
+  // Lags behind lobby's current state when waiting for animations.
+  // Jumps ahead when letting user interact with the game.
+  const [display, setDisplay] = useState<{
+    round: number;
+    matchState: MatchState;
+    isPostTxDone: boolean;
+  }>({
+    round: lobbyState.current_round,
+    matchState: {
+      turn: lobbyState.current_turn,
+      properRound: lobbyState.current_proper_round,
+      players: lobbyState.players,
+      txEventMove: lobbyState.current_tx_event_move,
+      result: undefined,
+    },
+    isPostTxDone: false,
   });
   // cache of state that was fetched, but still needs to be displayed
   // the actual round executor is stateful so we store all it's end results instead
@@ -64,130 +67,87 @@ const DiceGame: React.FC<DiceGameProps> = ({
   >();
   const [isTickDisplaying, setIsTickDisplaying] = useState(false);
 
-  const thisPlayer = useMemo(() => {
-    const result = lobbyState.players.find(
+  const { thisPlayer, opponent } = useMemo(() => {
+    const thisPlayer = display.matchState.players.find(
       (player) => player.nftId === selectedNft
     );
-    if (result == null) throw new Error(`DiceGame: nft not in lobby`);
-    return result;
+    if (thisPlayer == null) throw new Error(`DiceGame: nft not in lobby`);
+
+    const opponent = display.matchState.players.find(
+      (player) => player.nftId !== selectedNft
+    );
+    if (thisPlayer == null) throw new Error(`DiceGame: opponent not in lobby`);
+    return { thisPlayer, opponent };
   }, [lobbyState, selectedNft]);
 
-  // "forced moves", user has to roll until he gets score 16
-  const [initialRollQueue, setInitialRollQueue] = React.useState<
-    [CardDraw, CardDraw][]
+  // Note: we could just async play the post tx animations, but in some games you want a user interaction for it.
+  // E.g. in blackjack dice we let the user click "roll" to roll their dice at the start of their turn.
+  const [postTxEventQueue, setPostTxEventQueue] = React.useState<
+    PostTxTickEvent[]
   >([]);
 
-  async function submit(rollAgain: boolean) {
+  useEffect(() => {
+    // Set post-tx event queue:
+    // Someone submitted a tx and it now this player's turn. This means we have to play
+    // post-tx events from the start of the current round (interactively, before executor is available).
+    // In cards this can mean they chose to draw a card and are waiting for it to happen.
+
+    if (
+      // not displaying current round
+      display.round < lobbyState.current_round ||
+      // not interactive round
+      thisPlayer.turn !== lobbyState.current_turn ||
+      // already set
+      postTxEventQueue.length !== 0 ||
+      display.isPostTxDone
+    )
+      return;
+
+    setPostTxEventQueue(
+      genPostTxEvents(display.matchState, new Prando(lobbyState.roundSeed))
+    );
+    setDisplay((oldDisplay) => ({
+      ...oldDisplay,
+      isPostTxDone: true,
+    }));
+  }, [display, lobbyState, thisPlayer, postTxEventQueue]);
+
+  useEffect(
+    () =>
+      void (async () => {
+        // Play post-tx event, this doesn't have to be just an effect, see comment before the queue.
+        if (isTickDisplaying || postTxEventQueue.length === 0) return;
+
+        setIsTickDisplaying(true);
+        const [playedEvent, ...restEvents] = postTxEventQueue;
+        setPostTxEventQueue(restEvents);
+        setDisplay((oldDisplay) => {
+          const newMatchState = cloneMatchState(oldDisplay.matchState);
+          applyEvent(newMatchState, playedEvent);
+          return {
+            ...oldDisplay,
+            matchState: newMatchState,
+          };
+        });
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        setIsTickDisplaying(false);
+      })(),
+    [isTickDisplaying, postTxEventQueue]
+  );
+
+  async function submit(move: MoveKind) {
     const moveResult = await DiceService.submitMove(
       selectedNft,
       lobbyState,
-      rollAgain
+      move
     );
     console.log("Move result:", moveResult);
     await refetchLobbyState();
   }
-  async function handleRoll(): Promise<void> {
-    const startingScore = getPlayerScore(displayedState);
-    const player = getTurnPlayer(displayedState);
-    const diceRef = diceRefs.current[displayedState.turn];
-
-    async function playInitialRollFromQueue(queue: [CardDraw, CardDraw][]) {
-      setIsTickDisplaying(true);
-      const [playedInitialRoll, ...restInitialRolls] = queue;
-      setInitialRollQueue(restInitialRolls);
-      await diceRef?.roll([playedInitialRoll[0].die, playedInitialRoll[1].die]);
-      setDisplayedState((oldDisplayedState) => {
-        const newDisplayedState = cloneMatchState(oldDisplayedState);
-        applyEvent(newDisplayedState, {
-          kind: TickEventKind.draw,
-          diceRolls: playedInitialRoll,
-          // won't be used, just mock value
-          rollAgain: true,
-        });
-        return newDisplayedState;
-      });
-      setIsTickDisplaying(false);
-    }
-
-    // create initial roll queue and roll first
-    if (startingScore === 0 && initialRollQueue.length === 0) {
-      const newInitialRolls = genInitialDiceRolls(
-        player.currentDraw,
-        player.currentDeck,
-        new Prando(lobbyState.roundSeed)
-      ).dice;
-      playInitialRollFromQueue(newInitialRolls);
-      return;
-    }
-
-    // initial roll from existing queue
-    if (startingScore < 16 && initialRollQueue.length > 0) {
-      playInitialRollFromQueue(initialRollQueue);
-      return;
-    }
-
-    // real move: submit
-    submit(true);
-  }
-
-  // User submitted "roll again", we are expecting an extra roll to be shown.
-  // This requires a different animation. Basically, we want to show the first roll tick event
-  // of the next round, before the next round is complete, and also apply its state changes.
-  const isExtraRoll = useMemo(
-    () =>
-      lobbyState.current_round === displayedRound + 1 &&
-      thisPlayer.turn === displayedState.turn &&
-      thisPlayer.turn === lobbyState.current_turn,
-    [lobbyState, displayedRound, thisPlayer]
-  );
-
-  useEffect(() => {
-    // after user submits an extra roll, we have to wait for the lobby to update
-    // and then automatically display the roll
-    if (isTickDisplaying || !isExtraRoll) return;
-
-    void (async () => {
-      setIsTickDisplaying(true);
-      const player = getTurnPlayer(displayedState);
-      const diceRef = diceRefs.current[displayedState.turn];
-      const dieRoll = genDieRoll(
-        player.currentDraw,
-        player.currentDeck,
-        new Prando(lobbyState.roundSeed)
-      );
-      await diceRef.roll([dieRoll.die]);
-      setDisplayedState((oldDisplayedState) => {
-        const newDisplayedState = cloneMatchState(oldDisplayedState);
-        applyEvent(newDisplayedState, {
-          kind: TickEventKind.draw,
-          diceRolls: [dieRoll],
-          // won't be used, just mock value
-          rollAgain: true,
-        });
-        return newDisplayedState;
-      });
-      setDisplayedRound(displayedRound + 1);
-      // This is a special case, where we didn't use round executor to show replay,
-      // but it still got fetched. We have to unset it to allow fetching next round.
-      setRoundExecutor(undefined);
-      setIsTickDisplaying(false);
-    })();
-  }, [isTickDisplaying, displayedRound, lobbyState, diceRefs]);
-
-  async function handlePass(): Promise<void> {
-    submit(false);
-  }
 
   useEffect(() => {
     // past turn animation (mostly opponents' turns)
-
-    if (
-      isTickDisplaying ||
-      roundExecutor == null ||
-      // see comment before definition of this
-      isExtraRoll
-    )
-      return;
+    if (isTickDisplaying || roundExecutor == null) return;
 
     void (async () => {
       setIsTickDisplaying(true);
@@ -198,30 +158,29 @@ const DiceGame: React.FC<DiceGameProps> = ({
       for (const tickEvent of tickEvents) {
         // skip replay of this player's actions that already happened interactively
         if (
-          thisPlayer.turn === displayedState.turn &&
-          tickEvent.kind === TickEventKind.draw
+          thisPlayer.turn === display.matchState.turn &&
+          tickEvent.kind === TICK_EVENT_KIND.postTx
         )
           continue;
 
-        if (tickEvent.kind === TickEventKind.draw) {
-          const diceRolls = tickEvent.diceRolls.map((draw) => draw.die) as
-            | [number]
-            | [number, number];
-          await diceRefs.current[displayedState.turn].roll(diceRolls);
-        }
-        setDisplayedState((oldDisplayedState) => {
-          const newDisplayedState = cloneMatchState(oldDisplayedState);
-          applyEvent(newDisplayedState, tickEvent);
-          return newDisplayedState;
+        // show animations before applying events to sate
+        // TODO: we don't have any at the moment
+
+        // apply events to state
+        setDisplay((oldDisplay) => {
+          const newMatchState = cloneMatchState(oldDisplay.matchState);
+          applyEvent(newMatchState, tickEvent);
+          return { ...oldDisplay, matchState: newMatchState };
         });
 
-        if (tickEvent.kind === TickEventKind.draw)
-          await new Promise((resolve) => setTimeout(resolve, 2000));
+        // show animations after applying events to sate
+        if (tickEvent.kind === TICK_EVENT_KIND.postTx)
+          await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        if (tickEvent.kind === TickEventKind.applyPoints) {
+        if (tickEvent.kind === TICK_EVENT_KIND.applyPoints) {
           setCaption(
             (() => {
-              const thisPlayerIndex = displayedState.players.findIndex(
+              const thisPlayerIndex = display.matchState.players.findIndex(
                 (player) => player.nftId === selectedNft
               );
 
@@ -243,9 +202,9 @@ const DiceGame: React.FC<DiceGameProps> = ({
           setCaption(undefined);
         }
 
-        if (tickEvent.kind === TickEventKind.matchEnd) {
+        if (tickEvent.kind === TICK_EVENT_KIND.matchEnd) {
           setCaption(() => {
-            const thisPlayerIndex = displayedState.players.findIndex(
+            const thisPlayerIndex = display.matchState.players.findIndex(
               (player) => player.nftId === selectedNft
             );
             const thisPlayerResult = tickEvent.result[thisPlayerIndex];
@@ -254,17 +213,18 @@ const DiceGame: React.FC<DiceGameProps> = ({
             if (thisPlayerResult === "l") return "You lose!";
             return "It's a tie!";
           });
-          setDisplayedState((oldDisplayedState) => {
-            const newDisplayedState = cloneMatchState(oldDisplayedState);
-            applyEvent(newDisplayedState, tickEvent);
-            return newDisplayedState;
-          });
           setMatchOver(true);
         }
       }
 
-      setDisplayedRound(displayedRound + 1);
-      setDisplayedState(endState);
+      setDisplay((oldDisplay) => ({
+        // intentionally set using the 'display' we started with instead of 'oldDisplay'
+        round: display.round + 1,
+        // round ended, which means a tx happened, calculate post-tx next render
+        isPostTxDone: false,
+        // resync with backend state in case we applied some events wrong (makes bugs less game-breaking)
+        matchState: endState,
+      }));
 
       setIsTickDisplaying(false);
       setRoundExecutor(undefined);
@@ -276,9 +236,10 @@ const DiceGame: React.FC<DiceGameProps> = ({
     turn: lobbyState.current_turn,
     properRound: lobbyState.current_proper_round,
     players: lobbyState.players,
+    txEventMove: lobbyState.current_tx_event_move,
     result: undefined,
   });
-  const [nextFetchedRound, setFetchedRound] = useState(
+  const [nextFetchedRound, setNextFetchedRound] = useState(
     lobbyState.current_round
   );
   useEffect(() => {
@@ -309,7 +270,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
           };
 
           setRoundExecutor(newRoundExecutorResults);
-          setFetchedRound(nextFetchedRound + 1);
+          setNextFetchedRound(nextFetchedRound + 1);
           setFetchedEndState(newRoundExecutorResults.endState);
           setIsFetchingRound(false);
         } else {
@@ -325,25 +286,23 @@ const DiceGame: React.FC<DiceGameProps> = ({
           }, 1000);
         }
       });
-  }, [isFetchingRound, displayedRound, lobbyState.current_round]);
+  }, [
+    isFetchingRound,
+    lobbyState.current_round,
+    roundExecutor,
+    nextFetchedRound,
+  ]);
 
   const disableInteraction =
     matchOver ||
-    displayedRound !== lobbyState.current_round ||
-    thisPlayer.turn !== displayedState.turn ||
+    display.round !== lobbyState.current_round ||
+    thisPlayer.turn !== display.matchState.turn ||
     isTickDisplaying;
-  const playerScore = getPlayerScore(displayedState);
-  const canRoll = !disableInteraction && playerScore <= 21;
-  const canPass = !disableInteraction && playerScore >= 16;
+
+  const canRoll = !disableInteraction;
+  const canPass = !disableInteraction;
 
   if (lobbyState == null) return <></>;
-
-  const displayedThisPlayer = displayedState.players.find(
-    (player) => player.nftId === thisPlayer.nftId
-  );
-  const displayedOpponent = displayedState.players.find(
-    (player) => player.nftId !== thisPlayer.nftId
-  );
 
   return (
     <>
@@ -351,10 +310,12 @@ const DiceGame: React.FC<DiceGameProps> = ({
         variant="caption"
         sx={{ fontSize: "1.25rem", lineHeight: "1.75rem" }}
       >
-        {matchOver ? "Match over" : `Round: ${displayedState.properRound + 1}`}
+        {matchOver
+          ? "Match over"
+          : `Round: ${display.matchState.properRound + 1}`}
         {" | "}
         {caption ??
-          (thisPlayer.turn === displayedState.turn
+          (thisPlayer.turn === display.matchState.turn
             ? "Your turn"
             : "Opponent's turn")}
       </Typography>
@@ -366,25 +327,25 @@ const DiceGame: React.FC<DiceGameProps> = ({
           gap: 5,
         }}
       >
+        <Player lobbyPlayer={opponent} turn={display.matchState.turn} />
         <Player
-          lobbyPlayer={displayedOpponent}
-          thisClientPlayer={thisPlayer.nftId}
-          turn={displayedState.turn}
-          diceRef={(elem) => {
-            diceRefs.current[displayedOpponent.turn] = elem;
-          }}
-          onRoll={canRoll ? handleRoll : undefined}
-          onPass={canPass ? handlePass : undefined}
-        />
-        <Player
-          lobbyPlayer={displayedThisPlayer}
-          thisClientPlayer={thisPlayer.nftId}
-          turn={displayedState.turn}
-          diceRef={(elem) => {
-            diceRefs.current[displayedThisPlayer.turn] = elem;
-          }}
-          onRoll={canRoll ? handleRoll : undefined}
-          onPass={canPass ? handlePass : undefined}
+          lobbyPlayer={thisPlayer}
+          isThisPlayer
+          turn={display.matchState.turn}
+          onDraw={
+            canRoll
+              ? () => {
+                  submit(MOVE_KIND.drawCard);
+                }
+              : undefined
+          }
+          onEndTurn={
+            canPass
+              ? () => {
+                  submit(MOVE_KIND.endTurn);
+                }
+              : undefined
+          }
         />
       </Box>
     </>

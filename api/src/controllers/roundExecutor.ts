@@ -2,7 +2,7 @@ import { Controller, Get, Query, Route, ValidateError } from 'tsoa';
 import { requirePool, getLobbyById, getRoundMoves } from '@dice/db';
 import { isLeft } from 'fp-ts/Either';
 import { psqlInt } from '../validation.js';
-import type { RoundExecutorBackendData } from '@dice/utils';
+import type { RoundExecutorBackendData } from '@dice/game-logic';
 import { getBlockHeight } from 'paima-sdk/paima-db';
 import { getMatch, getRound } from '@dice/db/src/select.queries.js';
 

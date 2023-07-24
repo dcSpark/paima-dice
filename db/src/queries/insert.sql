@@ -83,7 +83,7 @@ INSERT INTO round_move(
   round_within_match,
   move_within_round,
   nft_id,
-  roll_again
+  move_kind
 )
 VALUES (
   :lobby_id!,
@@ -91,7 +91,7 @@ VALUES (
   :round_within_match!,
   :move_within_round!,
   :nft_id!,
-  :roll_again!
+  :move_kind!
 );
 
 /* @name newStats

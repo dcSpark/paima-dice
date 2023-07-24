@@ -9,6 +9,7 @@ export default function Deck({ size }: { size: number }): React.ReactElement {
     <Box
       sx={{
         flex: "none",
+        minHeight: cardHeight,
         width: cardWidth,
         position: "relative",
       }}

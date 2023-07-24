@@ -6,6 +6,13 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
+			"move_kind": {
+				"type": "string",
+				"enum": [
+					"draw",
+					"end"
+				]
+			},
 			"lobby_status": {
 				"type": "string",
 				"enum": [
@@ -44,6 +51,14 @@
 					"current_turn": {
 						"type": "number",
 						"format": "double",
+						"nullable": true
+					},
+					"current_tx_event_move": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/move_kind"
+							}
+						],
 						"nullable": true
 					},
 					"hidden": {
@@ -86,6 +101,7 @@
 					"current_proper_round",
 					"current_round",
 					"current_turn",
+					"current_tx_event_move",
 					"hidden",
 					"lobby_creator",
 					"lobby_id",
@@ -147,6 +163,14 @@
 						"format": "double",
 						"nullable": true
 					},
+					"current_tx_event_move": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/move_kind"
+							}
+						],
+						"nullable": true
+					},
 					"hidden": {
 						"type": "boolean"
 					},
@@ -187,6 +211,7 @@
 					"current_proper_round",
 					"current_round",
 					"current_turn",
+					"current_tx_event_move",
 					"hidden",
 					"lobby_creator",
 					"lobby_id",
@@ -246,6 +271,14 @@
 						"format": "double",
 						"nullable": true
 					},
+					"current_tx_event_move": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/move_kind"
+							}
+						],
+						"nullable": true
+					},
 					"hidden": {
 						"type": "boolean"
 					},
@@ -286,6 +319,7 @@
 					"current_proper_round",
 					"current_round",
 					"current_turn",
+					"current_tx_event_move",
 					"hidden",
 					"lobby_creator",
 					"lobby_id",
@@ -347,6 +381,14 @@
 						"format": "double",
 						"nullable": true
 					},
+					"current_tx_event_move": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/move_kind"
+							}
+						],
+						"nullable": true
+					},
 					"hidden": {
 						"type": "boolean"
 					},
@@ -387,6 +429,7 @@
 					"current_proper_round",
 					"current_round",
 					"current_turn",
+					"current_tx_event_move",
 					"hidden",
 					"lobby_creator",
 					"lobby_id",
@@ -431,6 +474,14 @@
 						"format": "double",
 						"nullable": true
 					},
+					"current_tx_event_move": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/move_kind"
+							}
+						],
+						"nullable": true
+					},
 					"hidden": {
 						"type": "boolean"
 					},
@@ -471,6 +522,7 @@
 					"current_proper_round",
 					"current_round",
 					"current_turn",
+					"current_tx_event_move",
 					"hidden",
 					"lobby_creator",
 					"lobby_id",

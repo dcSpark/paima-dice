@@ -17,7 +17,8 @@ WHERE lobby_id = :lobby_id!;
 UPDATE lobbies
 SET 
   current_turn = :current_turn!,
-  current_proper_round = :current_proper_round!
+  current_proper_round = :current_proper_round!,
+  current_tx_event_move = :current_tx_event_move
 WHERE lobby_id = :lobby_id!;
 
 /* @name updateLobbyPlayer */

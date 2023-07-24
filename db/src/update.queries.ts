@@ -3,6 +3,8 @@ import { PreparedQuery } from '@pgtyped/query';
 
 export type lobby_status = 'active' | 'closed' | 'finished' | 'open';
 
+export type move_kind = 'draw' | 'end';
+
 /** 'UpdateLobbyState' parameters type */
 export interface IUpdateLobbyStateParams {
   lobby_id: string;
@@ -91,6 +93,7 @@ export const updateLobbyCurrentRound = new PreparedQuery<IUpdateLobbyCurrentRoun
 export interface IUpdateLobbyMatchStateParams {
   current_proper_round: number;
   current_turn: number;
+  current_tx_event_move: move_kind | null | void;
   lobby_id: string;
 }
 
@@ -103,7 +106,7 @@ export interface IUpdateLobbyMatchStateQuery {
   result: IUpdateLobbyMatchStateResult;
 }
 
-const updateLobbyMatchStateIR: any = {"usedParamSet":{"current_turn":true,"current_proper_round":true,"lobby_id":true},"params":[{"name":"current_turn","required":true,"transform":{"type":"scalar"},"locs":[{"a":37,"b":50}]},{"name":"current_proper_round","required":true,"transform":{"type":"scalar"},"locs":[{"a":78,"b":99}]},{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":118,"b":127}]}],"statement":"UPDATE lobbies\nSET \n  current_turn = :current_turn!,\n  current_proper_round = :current_proper_round!\nWHERE lobby_id = :lobby_id!"};
+const updateLobbyMatchStateIR: any = {"usedParamSet":{"current_turn":true,"current_proper_round":true,"current_tx_event_move":true,"lobby_id":true},"params":[{"name":"current_turn","required":true,"transform":{"type":"scalar"},"locs":[{"a":37,"b":50}]},{"name":"current_proper_round","required":true,"transform":{"type":"scalar"},"locs":[{"a":78,"b":99}]},{"name":"current_tx_event_move","required":false,"transform":{"type":"scalar"},"locs":[{"a":128,"b":149}]},{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":168,"b":177}]}],"statement":"UPDATE lobbies\nSET \n  current_turn = :current_turn!,\n  current_proper_round = :current_proper_round!,\n  current_tx_event_move = :current_tx_event_move\nWHERE lobby_id = :lobby_id!"};
 
 /**
  * Query generated from SQL:
@@ -111,7 +114,8 @@ const updateLobbyMatchStateIR: any = {"usedParamSet":{"current_turn":true,"curre
  * UPDATE lobbies
  * SET 
  *   current_turn = :current_turn!,
- *   current_proper_round = :current_proper_round!
+ *   current_proper_round = :current_proper_round!,
+ *   current_tx_event_move = :current_tx_event_move
  * WHERE lobby_id = :lobby_id!
  * ```
  */

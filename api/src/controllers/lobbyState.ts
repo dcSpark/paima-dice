@@ -6,7 +6,7 @@ import {
   isLobbyWithStateProps,
   type LobbyPlayer,
   type LobbyState,
-} from '@dice/utils';
+} from '@dice/game-logic';
 import { getMatch, getRound } from '@dice/db/src/select.queries';
 import { getBlockHeight } from 'paima-sdk/paima-db';
 

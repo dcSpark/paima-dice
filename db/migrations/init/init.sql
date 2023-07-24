@@ -6,6 +6,7 @@ CREATE TABLE block_heights (
 );
 
 -- Extend the schema to fit your needs
+CREATE TYPE move_kind AS ENUM ('end', 'draw');
 CREATE TYPE lobby_status AS ENUM ('open', 'active', 'finished', 'closed');
 CREATE TABLE lobbies (
   lobby_id TEXT PRIMARY KEY,
@@ -17,6 +18,7 @@ CREATE TABLE lobbies (
   current_round INTEGER,
   current_turn INTEGER,
   current_proper_round INTEGER,
+  current_tx_event_move move_kind,
   created_at TIMESTAMP NOT NULL,
   creation_block_height INTEGER NOT NULL,
   hidden BOOLEAN NOT NULL DEFAULT false,
@@ -48,7 +50,7 @@ CREATE TABLE round_move (
   round_within_match INTEGER NOT NULL,
   move_within_round INTEGER NOT NULL,
   nft_id INTEGER NOT NULL,
-  roll_again BOOLEAN NOT NULL
+  move_kind move_kind NOT NULL
 );
 
 CREATE TABLE global_user_state (

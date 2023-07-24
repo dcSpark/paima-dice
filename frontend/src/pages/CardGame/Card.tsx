@@ -1,6 +1,6 @@
 import React, { Ref, useState } from "react";
 import { Box, ButtonBase, Modal, Typography } from "@mui/material";
-import { CardId } from "@dice/utils";
+import { CardId } from "@dice/game-logic";
 
 export const cardHeight = "160px";
 export const cardWidth = "100px";
