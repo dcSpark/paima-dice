@@ -29,14 +29,17 @@ export function matchResults(matchState: MatchState): MatchResult {
 export function cloneMatchState(template: MatchState): MatchState {
   return {
     ...template,
-    players: template.players.map(template => ({
-      ...template,
-      startingDeck: [...template.startingDeck],
-      currentDeck: [...template.currentDeck],
-      currentHand: template.currentHand.map(template => ({
+    players: template.players.map(template => {
+      return {
         ...template,
-      })),
-    })),
+        // note: immutable, no need to clone
+        startingCommitments: template.startingCommitments,
+        currentDeck: [...template.currentDeck],
+        currentHand: template.currentHand.map(template => ({
+          ...template,
+        })),
+      };
+    }),
   };
 }
 

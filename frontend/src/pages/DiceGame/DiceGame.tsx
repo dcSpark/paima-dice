@@ -7,6 +7,7 @@ import type {
   LobbyState,
   PostTxTickEvent,
   Move,
+  LocalCard,
 } from "@dice/game-logic";
 import {
   applyEvent,
@@ -25,12 +26,14 @@ interface DiceGameProps {
   lobbyState: LobbyState;
   refetchLobbyState: () => Promise<void>;
   selectedNft: number;
+  localDeck: LocalCard[];
 }
 
 const DiceGame: React.FC<DiceGameProps> = ({
   lobbyState,
   refetchLobbyState,
   selectedNft,
+  localDeck,
 }) => {
   const diceRefs = useRef<Record<number, undefined | DiceRef>>({});
   const [matchOver, setMatchOver] = useState(false);
@@ -331,6 +334,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
         <Player
           lobbyPlayer={thisPlayer}
           isThisPlayer
+          localDeck={localDeck}
           turn={display.matchState.turn}
           onDraw={
             canRoll
@@ -349,7 +353,16 @@ const DiceGame: React.FC<DiceGameProps> = ({
           onPlayCard={
             canPlay
               ? (handPosition) => {
-                  submit({ kind: MOVE_KIND.playCard, handPosition });
+                  submit({
+                    kind: MOVE_KIND.playCard,
+                    handPosition,
+                    cardIndex: thisPlayer.currentHand[handPosition].index,
+                    salt: localDeck[thisPlayer.currentHand[handPosition].index]
+                      .salt,
+                    cardId:
+                      localDeck[thisPlayer.currentHand[handPosition].index]
+                        .cardId,
+                  });
                 }
               : undefined
           }

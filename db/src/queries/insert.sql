@@ -32,13 +32,13 @@ VALUES(
 INSERT INTO lobby_player(
   lobby_id,
   nft_id,
-  starting_deck,
+  starting_commitments,
   current_deck
 )
 VALUES(
   :lobby_id!,
   :nft_id!,
-  :starting_deck!,
+  :starting_commitments!,
   :current_deck!
 );
 

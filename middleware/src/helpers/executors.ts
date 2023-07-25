@@ -2,7 +2,12 @@ import type { MatchExecutor, RoundExecutor } from 'paima-sdk/paima-executors';
 import { matchExecutor } from 'paima-sdk/paima-executors';
 import Prando from 'paima-sdk/paima-prando';
 
-import { extractMatchEnvironment, initRoundExecutor, processTick } from '@dice/game-logic';
+import {
+  extractMatchEnvironment,
+  initRoundExecutor,
+  initialCurrentDeck,
+  processTick,
+} from '@dice/game-logic';
 import {
   type MatchExecutorData,
   type RoundExecutorData,
@@ -29,8 +34,8 @@ export function buildMatchExecutor({
   const initialState: MatchState = {
     players: lobby.players.map((player, i) => ({
       nftId: player.nftId,
-      startingDeck: player.startingDeck,
-      currentDeck: player.startingDeck,
+      startingCommitments: player.startingCommitments,
+      currentDeck: initialCurrentDeck(),
       currentHand: [],
       currentDraw: 0,
       turn: matchTurnOrder[i],

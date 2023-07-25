@@ -7,6 +7,7 @@ import Wrapper from "@src/components/Wrapper";
 import { DiceService } from "./GameLogic";
 import DiceGame from "./DiceGame";
 import { IGetLobbyByIdResult } from "@dice/db";
+import { localDeckCache } from "@src/GlobalStateContext";
 
 export function Lobby({
   initialLobbyRaw,
@@ -52,19 +53,28 @@ export function Lobby({
             </div>
           </>
         )}
-        {lobbyState != null && (
-          <DiceGame
-            lobbyState={lobbyState}
-            selectedNft={selectedNft}
-            refetchLobbyState={async () => {
-              const response = await DiceService.getLobbyState(
-                initialLobbyRaw.lobby_id
-              );
-              if (response == null) return;
-              setLobbyState(response);
-            }}
-          />
-        )}
+        {lobbyState != null &&
+          (() => {
+            const localDeck = localDeckCache.get(lobbyState.lobby_id);
+            if (localDeck == null) {
+              // TODO: local deck is not guaranteed to be in cache (e.g. reopen browser), handle this better
+              throw new Error(`Lobby: local deck not in cache`);
+            }
+            return (
+              <DiceGame
+                lobbyState={lobbyState}
+                selectedNft={selectedNft}
+                refetchLobbyState={async () => {
+                  const response = await DiceService.getLobbyState(
+                    initialLobbyRaw.lobby_id
+                  );
+                  if (response == null) return;
+                  setLobbyState(response);
+                }}
+                localDeck={localDeck}
+              />
+            );
+          })()}
       </Wrapper>
     </>
   );

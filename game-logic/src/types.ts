@@ -15,9 +15,8 @@ export enum RoundKind {
 }
 
 export type CardDraw = {
-  cardNumber: number;
-  card: HandCard; // deck can be empty
-  newDeck: Deck;
+  card: HandCard;
+  newDeck: CardIndex[];
 };
 
 export type TickEventKind = ValuesType<typeof TICK_EVENT_KIND>;
@@ -33,7 +32,7 @@ export type PostTxTickEvent = {
 export type PlayCardTickEvent = {
   kind: typeof TICK_EVENT_KIND.playCard;
   handPosition: number;
-  newHand: Hand;
+  newHand: HandCard[];
 };
 export type ApplyPointsTickEvent = {
   kind: typeof TICK_EVENT_KIND.applyPoints;
@@ -127,9 +126,9 @@ export type NewLobby = IGetNewLobbiesByUserAndBlockHeightResult;
 
 export type LobbyPlayer = {
   nftId: number;
-  startingDeck: Deck;
-  currentDeck: Deck;
-  currentHand: Hand;
+  readonly startingCommitments: Uint8Array;
+  currentDeck: number[]; // indices
+  currentHand: HandCard[];
   currentDraw: number;
   turn: undefined | number;
   points: number;
@@ -146,19 +145,22 @@ export interface LobbyState extends LobbyWithStateProps {
   txEventMove: undefined | Move;
 }
 
-export type CardId = number;
-export type Deck = CardId[];
-export type SerializedCard = string;
-export type SerializedDeck = string;
+/** Identifies type of card (e.g. 47 -> Queen of Spades) */
+export type CardRegistryId = number;
+/** Index in starting commitments, i.e. in starting deck */
+export type CardIndex = number;
+/** The sequential position among all cards drawn in some match by some player */
+export type DrawIndex = number;
+export type LocalCard = {
+  cardId: CardIndex;
+  salt: string;
+};
 
 export type HandCard = {
-  cardId: undefined | CardId;
-  // the position in all cards drawn this match by this player
-  draw: number;
+  index: CardIndex;
+  draw: DrawIndex;
 };
-export type Hand = HandCard[];
 export type SerializedHandCard = string;
-export type SerializedHand = string;
 
 export type MoveKind = ValuesType<typeof MOVE_KIND>;
 export type Move =
@@ -171,5 +173,8 @@ export type Move =
   | {
       kind: typeof MOVE_KIND.playCard;
       handPosition: number;
+      cardIndex: number;
+      cardId: number;
+      salt: string;
     };
 export type SerializedMove = string;

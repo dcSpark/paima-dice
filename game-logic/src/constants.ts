@@ -1,4 +1,5 @@
-export const DECK_SIZE = 10;
+export const COMMITMENT_LENGTH = 16;
+export const DECK_LENGTH = 10;
 
 // Values must match move_kind in db. No need for a type check, it will cause errors somewhere.
 export const MOVE_KIND = {

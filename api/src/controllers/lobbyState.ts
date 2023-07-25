@@ -1,8 +1,7 @@
 import { Controller, Get, Query, Route } from 'tsoa';
 import { getLobbyById, getLobbyPlayers, requirePool } from '@dice/db';
 import {
-  deserializeDeck,
-  deserializeHand,
+  deserializeHandCard,
   deserializeMove,
   isLobbyWithStateProps,
   type LobbyPlayer,
@@ -62,9 +61,9 @@ export class LobbyStatecontroller extends Controller {
 
     const players: LobbyPlayer[] = rawPlayers.map(raw => ({
       nftId: raw.nft_id,
-      startingDeck: deserializeDeck(raw.starting_deck),
-      currentDeck: deserializeDeck(raw.current_deck),
-      currentHand: deserializeHand(raw.current_hand),
+      startingCommitments: raw.starting_commitments,
+      currentDeck: raw.current_deck,
+      currentHand: raw.current_hand.map(deserializeHandCard),
       currentDraw: raw.current_draw,
       points: raw.points,
       score: raw.score,

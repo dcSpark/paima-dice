@@ -3,6 +3,10 @@ import { PreparedQuery } from '@pgtyped/query';
 
 export type lobby_status = 'active' | 'closed' | 'finished' | 'open';
 
+export type numberArray = (number)[];
+
+export type stringArray = (string)[];
+
 /** 'GetPaginatedOpenLobbies' parameters type */
 export interface IGetPaginatedOpenLobbiesParams {
   count: string | null | void;
@@ -154,15 +158,15 @@ export interface IGetLobbyPlayersParams {
 
 /** 'GetLobbyPlayers' return type */
 export interface IGetLobbyPlayersResult {
-  current_deck: string;
+  current_deck: numberArray;
   current_draw: number;
-  current_hand: string;
+  current_hand: stringArray;
   id: number;
   lobby_id: string;
   nft_id: number;
   points: number;
   score: number;
-  starting_deck: string;
+  starting_commitments: Buffer;
   turn: number | null;
 }
 
