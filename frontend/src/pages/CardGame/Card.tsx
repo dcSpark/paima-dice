@@ -1,6 +1,7 @@
 import React, { Ref, useState } from "react";
 import { Box, ButtonBase, Modal, Typography } from "@mui/material";
 import { CardRegistryId } from "@dice/game-logic";
+import PaimaLogo from "./PaimaLogo";
 
 export const cardHeight = "160px";
 export const cardWidth = "100px";
@@ -29,9 +30,9 @@ function StaticCard({
         flex: "none",
         width: `calc(${scale} * ${cardWidth})`,
         height: `calc(${scale} * ${cardHeight})`,
-        background: "#BBB",
+        backgroundColor: "rgb(18, 39, 31)",
         borderRadius: "8px",
-        border: "1px solid #222",
+        border: "1px solid #777",
         position: "relative",
         "&:not(:first-child)": overlap
           ? {
@@ -41,9 +42,19 @@ function StaticCard({
         ...(transparent ? { opacity: 0 } : ""),
       }}
     >
+      {cardId == null && (
+        <PaimaLogo
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+          }}
+          scale={scale}
+        />
+      )}
       <Typography
         sx={{
-          color: "black",
           fontSize: "2rem",
           lineHeight: "2.5rem",
           position: "absolute",
