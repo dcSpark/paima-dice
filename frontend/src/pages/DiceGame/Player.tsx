@@ -2,7 +2,7 @@ import React from "react";
 import "./DiceGame.scss";
 import { Box, Typography } from "@mui/material";
 import Button from "@src/components/Button";
-import Card from "../CardGame/Card";
+import Card, { cardHeight } from "../CardGame/Card";
 import Deck from "../CardGame/Deck";
 import { LobbyPlayer, LocalCard } from "@dice/game-logic";
 
@@ -25,6 +25,37 @@ export default function Player({
   onEndTurn,
   onPlayCard,
 }: PlayerProps): React.ReactElement {
+  const Hand = (
+    <Box
+      sx={{
+        minHeight: cardHeight,
+        display: "flex",
+      }}
+    >
+      {lobbyPlayer.currentHand.map((card, i) => (
+        <Card
+          key={card.draw}
+          cardId={localDeck?.[card.index].cardId}
+          overlap
+          onPlay={() => onPlayCard(i)}
+        />
+      ))}
+    </Box>
+  );
+  const Board = (
+    <Box
+      sx={{
+        minHeight: cardHeight,
+        display: "flex",
+        gap: 1,
+      }}
+    >
+      {lobbyPlayer.currentBoard.map((card, i) => (
+        <Card key={card.index} cardId={card.cardId} />
+      ))}
+    </Box>
+  );
+
   const isMyTurn = lobbyPlayer.turn === turn;
 
   return (
@@ -95,22 +126,17 @@ export default function Player({
         sx={{
           flex: 1,
           padding: 2,
+          gap: 2,
+          display: "flex",
+          flexDirection: "column",
           background: isMyTurn
             ? "rgba(219, 109, 104, 0.5)"
             : "rgba(119, 109, 104, 0.5)",
-          display: "flex",
           overflow: "auto",
           minWidth: 0,
         }}
       >
-        {lobbyPlayer.currentHand.map((card, i) => (
-          <Card
-            key={card.draw}
-            cardId={localDeck?.[card.index].cardId}
-            overlap
-            onPlay={() => onPlayCard(i)}
-          />
-        ))}
+        {isThisPlayer ? [Board, Hand] : [Hand, Board]}
       </Box>
       <Deck size={lobbyPlayer.currentDeck.length} />
     </Box>

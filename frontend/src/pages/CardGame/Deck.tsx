@@ -36,7 +36,6 @@ export default function Deck({ size }: { size: number }): React.ReactElement {
               >
                 <Typography
                   sx={{
-                    color: "black",
                     fontSize: "2rem",
                     lineHeight: "2.5rem",
                   }}

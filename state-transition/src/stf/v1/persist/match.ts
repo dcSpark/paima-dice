@@ -10,6 +10,7 @@ import type {
 import {
   genPermutation,
   initialCurrentDeck,
+  serializeBoardCard,
   serializeHandCard,
   serializeMove,
 } from '@dice/game-logic';
@@ -96,6 +97,7 @@ export function persistInitialMatchState(
       startingCommitments: player.startingCommitments,
       currentDeck: initialCurrentDeck(),
       currentHand: [],
+      currentBoard: [],
       currentDraw: player.currentDraw,
       turn: newTurnOrder[i],
       points: 0,
@@ -239,6 +241,7 @@ export function persistUpdateMatchState(
     current_deck: player.currentDeck,
     current_hand: player.currentHand.map(serializeHandCard),
     current_draw: player.currentDraw,
+    current_board: player.currentBoard.map(serializeBoardCard),
     points: player.points,
     score: player.score,
     turn: player.turn,

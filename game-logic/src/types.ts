@@ -33,6 +33,7 @@ export type PlayCardTickEvent = {
   kind: typeof TICK_EVENT_KIND.playCard;
   handPosition: number;
   newHand: HandCard[];
+  newBoard: BoardCard[];
 };
 export type ApplyPointsTickEvent = {
   kind: typeof TICK_EVENT_KIND.applyPoints;
@@ -129,6 +130,7 @@ export type LobbyPlayer = {
   readonly startingCommitments: Uint8Array;
   currentDeck: number[]; // indices
   currentHand: HandCard[];
+  currentBoard: BoardCard[];
   currentDraw: number;
   turn: undefined | number;
   points: number;
@@ -161,6 +163,11 @@ export type HandCard = {
   draw: DrawIndex;
 };
 export type SerializedHandCard = string;
+export type BoardCard = {
+  index: CardIndex;
+  cardId: CardRegistryId;
+};
+export type SerializedBoardCard = string;
 
 export type MoveKind = ValuesType<typeof MOVE_KIND>;
 export type Move =

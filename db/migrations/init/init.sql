@@ -67,6 +67,7 @@ CREATE TABLE lobby_player (
   starting_commitments BYTEA NOT NULL,
   current_deck INTEGER[] NOT NULL,
   current_hand TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
+  current_board TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
   current_draw INTEGER NOT NULL DEFAULT 0,
   points INTEGER NOT NULL DEFAULT 0,
   score INTEGER NOT NULL DEFAULT 0,

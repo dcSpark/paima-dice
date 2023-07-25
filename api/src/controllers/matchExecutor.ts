@@ -1,6 +1,7 @@
 import { Controller, Get, Query, Route, ValidateError } from 'tsoa';
 import { requirePool, getLobbyById, getMatchSeeds, getLobbyPlayers } from '@dice/db';
 import {
+  deserializeBoardCard,
   deserializeHandCard,
   deserializeMove,
   isLobbyWithStateProps,
@@ -38,6 +39,7 @@ export class MatchExecutorController extends Controller {
       startingCommitments: raw.starting_commitments,
       currentDeck: raw.current_deck,
       currentHand: raw.current_hand.map(deserializeHandCard),
+      currentBoard: raw.current_board.map(deserializeBoardCard),
       currentDraw: raw.current_draw,
       points: raw.points,
       score: raw.score,
