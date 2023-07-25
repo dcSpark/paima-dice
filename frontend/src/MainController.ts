@@ -3,10 +3,13 @@ import {
   TickEvent,
   LobbyState,
   genBotDeck,
+  genCommitments,
 } from "@dice/game-logic";
+import type { LocalCard } from "@dice/game-logic";
 import * as Paima from "@dice/middleware";
 import { MatchExecutor } from "paima-sdk/paima-executors";
 import { IGetLobbyByIdResult, IGetPaginatedUserLobbiesResult } from "@dice/db";
+import { localDeckCache } from "./GlobalStateContext";
 
 // The MainController is a React component that will be used to control the state of the application
 // It will be used to check if the user has metamask installed and if they are connected to the correct network
@@ -138,9 +141,18 @@ class MainController {
       isHidden,
       isPractice
     );
+
+    // TODO: user's deck
+    const cardIds = genBotDeck();
+    const commitments = await genCommitments(window.crypto, cardIds);
+    const localDeck: LocalCard[] = cardIds.map((cardId, i) => ({
+      cardId,
+      salt: commitments.salt[i],
+    }));
+
     const response = await Paima.default.createLobby(
       creatorNftId,
-      genBotDeck(), // TODO: user's deck
+      commitments.commitments,
       numOfRounds,
       roundLength,
       timePerPlayer,
@@ -153,16 +165,26 @@ class MainController {
       throw new Error("Could not create lobby");
     }
     const lobbyRaw = await this.loadLobbyRaw(response.lobbyID);
+    localDeckCache.set(response.lobbyID, localDeck);
     this.callback(Page.Game, false, lobbyRaw);
   }
 
   async joinLobby(nftId: number, lobbyId: string): Promise<void> {
     await this.enforceWalletConnected();
     this.callback(null, true, null);
+
+    // TODO: user's deck
+    const cardIds = genBotDeck();
+    const commitments = await genCommitments(window.crypto, cardIds);
+    const localDeck: LocalCard[] = cardIds.map((cardId, i) => ({
+      cardId,
+      salt: commitments.salt[i],
+    }));
+
     const response = await Paima.default.joinLobby(
       nftId,
       lobbyId,
-      genBotDeck() // TODO: user's deck
+      commitments.commitments
     );
     if (!response.success) {
       this.callback(null, false, null);
@@ -174,6 +196,7 @@ class MainController {
       this.callback(null, false, null);
       throw new Error("Could not download lobby state from join lobby");
     }
+    localDeckCache.set(resp.lobby.lobby_id, localDeck);
     this.callback(Page.Game, false, resp.lobby);
   }
 

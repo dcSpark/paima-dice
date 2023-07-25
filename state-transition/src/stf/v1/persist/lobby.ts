@@ -2,21 +2,22 @@ import type { CreatedLobbyInput } from '../types.js';
 import type { IUpdateLobbyStateParams, ICreateLobbyParams } from '@dice/db';
 import { createLobby, updateLobbyState } from '@dice/db';
 import Prando from 'paima-sdk/paima-prando';
-import type { LobbyPlayer, LobbyStatus, MatchEnvironment } from '@dice/game-logic';
-import { deserializeDeck, genBotDeck, serializeDeck } from '@dice/game-logic';
+import type { LobbyPlayer, LobbyStatus, LocalCard, MatchEnvironment } from '@dice/game-logic';
+import { genBotDeck, genCommitments, initialCurrentDeck } from '@dice/game-logic';
 import { persistStartMatch } from './match.js';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
 import type { IJoinPlayerToLobbyParams } from '@dice/db/src/insert.queries.js';
 import { joinPlayerToLobby } from '@dice/db/src/insert.queries.js';
 import { PRACTICE_BOT_NFT_ID } from '@dice/utils';
+import crypto from 'crypto';
 
 // Persist creation of a lobby
-export function persistLobbyCreation(
+export async function persistLobbyCreation(
   blockHeight: number,
   inputData: CreatedLobbyInput,
   seed: string,
   randomnessGenerator: Prando
-): SQLUpdate[] {
+): Promise<SQLUpdate[]> {
   const lobby_id = new Prando(seed).nextString(12);
   const lobbyPlayers: LobbyPlayer[] = [];
 
@@ -38,47 +39,55 @@ export function persistLobbyCreation(
   const createLobbyTuple: SQLUpdate = [createLobby, lobbyParams];
 
   // join creator to lobby
-  const joinParams: IJoinPlayerToLobbyParams = {
-    lobby_id,
-    nft_id: inputData.creatorNftId,
-    starting_deck: inputData.creatorDeck,
-    current_deck: inputData.creatorDeck,
-  };
   lobbyPlayers.push({
     nftId: inputData.creatorNftId,
-    startingDeck: deserializeDeck(inputData.creatorDeck),
-    currentDeck: deserializeDeck(inputData.creatorDeck),
+    startingCommitments: inputData.creatorCommitments,
+    currentDeck: initialCurrentDeck(),
     currentHand: [],
     currentDraw: 0,
     points: 0,
     score: 0,
     turn: undefined,
   });
-  const joinCreatorTuple: SQLUpdate = [joinPlayerToLobby, joinParams];
+  const joinCreatorUpdates = persistLobbyJoin({
+    lobby_id,
+    nft_id: inputData.creatorNftId,
+    startingCommitments: inputData.creatorCommitments,
+  });
 
   // TODO: We reference players by nftId, so you can't have more than 1 bot
   const numBots = inputData.isPractice ? lobbyParams.max_players - lobbyPlayers.length : 0;
-  const joinBots: SQLUpdate[] = Array(numBots)
-    .fill(null)
-    .flatMap(() => {
-      const botDeck = genBotDeck();
-      lobbyPlayers.push({
-        nftId: PRACTICE_BOT_NFT_ID,
-        startingDeck: botDeck,
-        currentDeck: botDeck,
-        currentHand: [],
-        currentDraw: 0,
-        points: 0,
-        score: 0,
-        turn: undefined,
-      });
-      return persistLobbyJoin({
-        lobby_id,
-        nft_id: PRACTICE_BOT_NFT_ID,
-        starting_deck: serializeDeck(botDeck),
-        current_deck: serializeDeck(botDeck),
-      });
-    });
+  const joinBots: SQLUpdate[] = (
+    await Promise.all(
+      Array(numBots)
+        .fill(null)
+        .map(async () => {
+          const botDeck = genBotDeck();
+          const commitments = await genCommitments(crypto as any, botDeck);
+          // TODO: store local deck for the bot
+          const localDeck: LocalCard[] = botDeck.map((cardId, i) => ({
+            cardId,
+            salt: commitments.salt[i],
+          }));
+
+          lobbyPlayers.push({
+            nftId: PRACTICE_BOT_NFT_ID,
+            startingCommitments: commitments.commitments,
+            currentDeck: initialCurrentDeck(),
+            currentHand: [],
+            currentDraw: 0,
+            points: 0,
+            score: 0,
+            turn: undefined,
+          });
+          return persistLobbyJoin({
+            lobby_id,
+            nft_id: PRACTICE_BOT_NFT_ID,
+            startingCommitments: commitments.commitments,
+          });
+        })
+    )
+  ).flat();
 
   const closeLobbyUpdates: SQLUpdate[] =
     lobbyPlayers.length < lobbyParams.max_players
@@ -107,14 +116,26 @@ export function persistLobbyCreation(
   console.log(`Created lobby ${lobby_id}`);
   return [
     createLobbyTuple,
-    joinCreatorTuple,
+    ...joinCreatorUpdates,
     ...joinBots,
     ...closeLobbyUpdates,
     ...activateLobbyUpdates,
   ];
 }
 
-export function persistLobbyJoin(params: IJoinPlayerToLobbyParams): SQLUpdate[] {
+export type IJoinPlayerToLobbyRequest = {
+  lobby_id: IJoinPlayerToLobbyParams['lobby_id'];
+  nft_id: IJoinPlayerToLobbyParams['nft_id'];
+  startingCommitments: Uint8Array;
+};
+export function persistLobbyJoin(req: IJoinPlayerToLobbyRequest): SQLUpdate[] {
+  const params: IJoinPlayerToLobbyParams = {
+    lobby_id: req.lobby_id,
+    nft_id: req.nft_id,
+    starting_commitments: Buffer.from(req.startingCommitments),
+    current_deck: initialCurrentDeck(),
+  };
+
   return [[joinPlayerToLobby, params]];
 }
 

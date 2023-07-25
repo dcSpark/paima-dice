@@ -4,11 +4,12 @@ import { Box, Typography } from "@mui/material";
 import Button from "@src/components/Button";
 import Card from "../CardGame/Card";
 import Deck from "../CardGame/Deck";
-import { LobbyPlayer } from "@dice/game-logic";
+import { LobbyPlayer, LocalCard } from "@dice/game-logic";
 
 export type PlayerProps = {
   lobbyPlayer: LobbyPlayer;
   isThisPlayer?: boolean;
+  localDeck?: LocalCard[];
   turn: number;
   onDraw?: () => void;
   onEndTurn?: () => void;
@@ -18,6 +19,7 @@ export type PlayerProps = {
 export default function Player({
   lobbyPlayer,
   isThisPlayer,
+  localDeck,
   turn,
   onDraw,
   onEndTurn,
@@ -101,16 +103,14 @@ export default function Player({
           minWidth: 0,
         }}
       >
-        {lobbyPlayer.currentHand
-          .filter((card) => card.cardId != null)
-          .map((card, i) => (
-            <Card
-              key={card.draw}
-              cardId={card.cardId}
-              overlap
-              onPlay={() => onPlayCard(i)}
-            />
-          ))}
+        {lobbyPlayer.currentHand.map((card, i) => (
+          <Card
+            key={card.draw}
+            cardId={localDeck?.[card.index].cardId}
+            overlap
+            onPlay={() => onPlayCard(i)}
+          />
+        ))}
       </Box>
       <Deck size={lobbyPlayer.currentDeck.length} />
     </Box>

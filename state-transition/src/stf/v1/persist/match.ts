@@ -7,7 +7,12 @@ import type {
   LobbyWithStateProps,
   MatchState,
 } from '@dice/game-logic';
-import { genPermutation, serializeDeck, serializeHand, serializeMove } from '@dice/game-logic';
+import {
+  genPermutation,
+  initialCurrentDeck,
+  serializeHandCard,
+  serializeMove,
+} from '@dice/game-logic';
 import { scheduleZombieRound } from './zombie.js';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
 import {
@@ -88,8 +93,8 @@ export function persistInitialMatchState(
     turn: 0,
     players: players.map((player, i) => ({
       nftId: player.nftId,
-      startingDeck: player.startingDeck,
-      currentDeck: player.startingDeck,
+      startingCommitments: player.startingCommitments,
+      currentDeck: initialCurrentDeck(),
       currentHand: [],
       currentDraw: player.currentDraw,
       turn: newTurnOrder[i],
@@ -231,8 +236,8 @@ export function persistUpdateMatchState(
   const playerParams: IUpdateLobbyPlayerParams[] = newMatchState.players.map(player => ({
     lobby_id: lobbyId,
     nft_id: player.nftId,
-    current_deck: serializeDeck(player.currentDeck),
-    current_hand: serializeHand(player.currentHand),
+    current_deck: player.currentDeck,
+    current_hand: player.currentHand.map(serializeHandCard),
     current_draw: player.currentDraw,
     points: player.points,
     score: player.score,

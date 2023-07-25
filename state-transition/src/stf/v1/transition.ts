@@ -9,19 +9,21 @@ import type {
   LobbyPlayer,
   MatchEnvironment,
   MatchState,
-  SerializedDeck,
   Move,
 } from '@dice/game-logic';
 import {
   initRoundExecutor,
   buildCurrentMatchState,
   extractMatchEnvironment,
-  deserializeDeck,
-  deserializeHand,
   isLobbyWithStateProps,
-  DECK_SIZE,
   serializeMove,
   deserializeMove,
+  DECK_LENGTH,
+  COMMITMENT_LENGTH,
+  initialCurrentDeck,
+  deserializeHandCard,
+  MOVE_KIND,
+  checkCommitment,
 } from '@dice/game-logic';
 import {
   persistUpdateMatchState,
@@ -53,6 +55,7 @@ import { PracticeAI } from './persist/practice-ai';
 import { getOwnedNfts } from 'paima-sdk/paima-utils-backend';
 import type { IGetRoundResult } from '@dice/db/src/select.queries';
 import { getMatch, getRound, getRoundMoves } from '@dice/db/src/select.queries';
+import crypto from 'crypto';
 
 // Create initial player entry after nft mint
 export const mintNft = async (input: NftMintInput): Promise<SQLUpdate[]> => {
@@ -78,8 +81,8 @@ export const createdLobby = async (
     return [];
   }
 
-  if (!(await validateStartingDeck(input.creatorNftId, input.creatorDeck, dbConn))) {
-    console.log('DISCARD: invalid deck');
+  if (!(await validateStartingCommitments(input.creatorNftId, input.creatorCommitments, dbConn))) {
+    console.log('DISCARD: invalid commitments');
     return [];
   }
 
@@ -108,9 +111,9 @@ export const joinedLobby = async (
   }
   const lobbyPlayers: LobbyPlayer[] = rawPlayers.map(player => ({
     nftId: player.nft_id,
-    startingDeck: deserializeDeck(player.starting_deck),
-    currentDeck: deserializeDeck(player.current_deck),
-    currentHand: deserializeHand(player.current_hand),
+    startingCommitments: player.starting_commitments,
+    currentDeck: player.current_deck,
+    currentHand: player.current_hand.map(deserializeHandCard),
     currentDraw: player.current_draw,
     points: player.points,
     score: player.score,
@@ -122,21 +125,20 @@ export const joinedLobby = async (
     return [];
   }
 
-  if (!(await validateStartingDeck(input.nftId, input.deck, dbConn))) {
-    console.log('DISCARD: invalid deck');
+  if (!(await validateStartingCommitments(input.nftId, input.commitments, dbConn))) {
+    console.log('DISCARD: invalid commitments');
     return [];
   }
 
   const joinUpdates = persistLobbyJoin({
     lobby_id: input.lobbyID,
     nft_id: input.nftId,
-    starting_deck: input.deck,
-    current_deck: input.deck,
+    startingCommitments: input.commitments,
   });
   lobbyPlayers.push({
     nftId: input.nftId,
-    startingDeck: deserializeDeck(input.deck),
-    currentDeck: deserializeDeck(input.deck),
+    startingCommitments: input.commitments,
+    currentDeck: initialCurrentDeck(),
     currentHand: [],
     currentDraw: 0,
     points: 0,
@@ -324,7 +326,12 @@ function validateSubmittedMoves(
 
   // Player is supposed to play this turn
   const turnPlayer = players.find(player => player.turn === lobby.current_turn);
-  const turnNft = turnPlayer?.nft_id;
+  if (turnPlayer == null) {
+    console.log('INTERNAL ERROR: no player for turn');
+    return false;
+  }
+
+  const turnNft = turnPlayer.nft_id;
   if (input.nftId !== turnNft) {
     console.log('INVALID MOVE: not players turn');
     return false;
@@ -348,6 +355,19 @@ function validateSubmittedMoves(
   let move: Move;
   try {
     move = deserializeMove(input.move);
+    if (
+      move.kind === MOVE_KIND.playCard &&
+      !checkCommitment(
+        crypto as any,
+        turnPlayer.starting_commitments,
+        move.cardIndex,
+        move.salt,
+        move.cardId
+      )
+    ) {
+      console.log('INVALID MOVE: invalid commitment/reveal');
+      return false;
+    }
   } catch (e) {
     console.log('INVALID MOVE: deserialize failed');
     return false;
@@ -540,20 +560,11 @@ async function checkUserOwns(user: WalletAddress, nftId: number, dbConn: Pool): 
   return walletNfts.some(ownedNftId => Number(ownedNftId) === nftId);
 }
 
-async function validateStartingDeck(
+async function validateStartingCommitments(
   _nftId: number,
-  deck: SerializedDeck,
+  commitments: Uint8Array,
   _dbConn: Pool
 ): Promise<boolean> {
-  try {
-    const deserialized = deserializeDeck(deck);
-    if (deserialized.length !== DECK_SIZE) return false;
-
-    // TODO: every card exists
-    // TODO: user owns all cards
-
-    return true;
-  } catch (_) {
-    return false;
-  }
+  if (commitments.length !== DECK_LENGTH * COMMITMENT_LENGTH) return false;
+  return true;
 }

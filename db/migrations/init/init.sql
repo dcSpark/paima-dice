@@ -64,9 +64,9 @@ CREATE TABLE lobby_player (
   lobby_id TEXT NOT NULL references lobbies(lobby_id),
   -- TODO: should ref global_user_state, but bot does not have an entry
   nft_id INTEGER NOT NULL,
-  starting_deck TEXT NOT NULL,
-  current_deck TEXT NOT NULL,
-  current_hand TEXT NOT NULL DEFAULT '',
+  starting_commitments BYTEA NOT NULL,
+  current_deck INTEGER[] NOT NULL,
+  current_hand TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
   current_draw INTEGER NOT NULL DEFAULT 0,
   points INTEGER NOT NULL DEFAULT 0,
   score INTEGER NOT NULL DEFAULT 0,

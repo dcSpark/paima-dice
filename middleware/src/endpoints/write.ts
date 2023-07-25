@@ -12,8 +12,8 @@ import { buildEndpointErrorFxn, MiddlewareErrorCode } from '../errors';
 import { getLobbyStateWithUser, getNonemptyNewLobbies } from '../helpers/auxiliary-queries';
 import { lobbyWasClosed, userCreatedLobby, userJoinedLobby } from '../helpers/utility-functions';
 import type { CreateLobbySuccessfulResponse } from '../types';
-import type { Deck, Move } from '@dice/game-logic';
-import { serializeDeck, serializeMove } from '@dice/game-logic';
+import type { Move } from '@dice/game-logic';
+import { serializeMove } from '@dice/game-logic';
 
 const RETRY_PERIOD = 1000;
 const RETRIES_COUNT = 8;
@@ -32,7 +32,7 @@ const getUserWallet = (errorFxn: EndpointErrorFxn): Result<string> => {
 
 async function createLobby(
   creatorNftId: number,
-  deck: Deck,
+  commitments: Uint8Array,
   numberOfRounds: number,
   roundLength: number,
   playTimePerPlayer: number,
@@ -45,7 +45,7 @@ async function createLobby(
   conciseBuilder.setPrefix('c');
   conciseBuilder.addValues([
     { value: creatorNftId.toString(10) },
-    { value: serializeDeck(deck) },
+    { value: Buffer.from(commitments).toString('base64') },
     { value: numberOfRounds.toString(10) },
     { value: roundLength.toString(10) },
     { value: playTimePerPlayer.toString(10) },
@@ -98,7 +98,11 @@ async function createLobby(
   }
 }
 
-async function joinLobby(nftId: number, lobbyID: string, deck: Deck): Promise<OldResult> {
+async function joinLobby(
+  nftId: number,
+  lobbyID: string,
+  commitments: Uint8Array
+): Promise<OldResult> {
   const errorFxn = buildEndpointErrorFxn('joinLobby');
 
   const conciseBuilder = builder.initialize();
@@ -106,7 +110,7 @@ async function joinLobby(nftId: number, lobbyID: string, deck: Deck): Promise<Ol
   conciseBuilder.addValues([
     { value: nftId.toString(10) },
     { value: lobbyID, isStateIdentifier: true },
-    { value: serializeDeck(deck) },
+    { value: Buffer.from(commitments).toString('base64') },
   ]);
 
   let currentBlockVar: number;

@@ -3,6 +3,10 @@ import { PreparedQuery } from '@pgtyped/query';
 
 export type lobby_status = 'active' | 'closed' | 'finished' | 'open';
 
+export type numberArray = (number)[];
+
+export type stringArray = (string)[];
+
 /** 'UpdateLobbyState' parameters type */
 export interface IUpdateLobbyStateParams {
   lobby_id: string;
@@ -122,9 +126,9 @@ export const updateLobbyMatchState = new PreparedQuery<IUpdateLobbyMatchStatePar
 
 /** 'UpdateLobbyPlayer' parameters type */
 export interface IUpdateLobbyPlayerParams {
-  current_deck: string;
+  current_deck: numberArray;
   current_draw: number;
-  current_hand: string;
+  current_hand: stringArray;
   lobby_id: string;
   nft_id: number;
   points: number;

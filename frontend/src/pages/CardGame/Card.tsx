@@ -1,12 +1,12 @@
 import React, { Ref, useState } from "react";
 import { Box, ButtonBase, Modal, Typography } from "@mui/material";
-import { CardId } from "@dice/game-logic";
+import { CardRegistryId } from "@dice/game-logic";
 
 export const cardHeight = "160px";
 export const cardWidth = "100px";
 
 export type CardProps = {
-  cardId: undefined | CardId;
+  cardId: undefined | CardRegistryId;
   overlap?: boolean;
   onPlay?: undefined | (() => void);
 };

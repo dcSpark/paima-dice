@@ -1,6 +1,5 @@
-import type { ConciseResult, SerializedDeck, SerializedMove } from '@dice/game-logic';
+import type { ConciseResult, SerializedMove } from '@dice/game-logic';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
-import type { MoveKind } from '@dice/game-logic';
 
 export type ParsedSubmittedInput =
   | NftMintInput
@@ -26,7 +25,7 @@ export interface NftMintInput {
 export interface CreatedLobbyInput {
   input: 'createdLobby';
   creatorNftId: number;
-  creatorDeck: SerializedDeck;
+  creatorCommitments: Uint8Array;
   numOfRounds: number;
   roundLength: number;
   playTimePerPlayer: number;
@@ -37,7 +36,7 @@ export interface CreatedLobbyInput {
 export interface JoinedLobbyInput {
   input: 'joinedLobby';
   nftId: number;
-  deck: SerializedDeck;
+  commitments: Uint8Array;
   lobbyID: string;
 }
 
