@@ -37,6 +37,7 @@ export function buildMatchExecutor({
       startingCommitments: player.startingCommitments,
       currentDeck: initialCurrentDeck(),
       currentHand: [],
+      currentBoard: [],
       currentDraw: 0,
       turn: matchTurnOrder[i],
       points: 0,

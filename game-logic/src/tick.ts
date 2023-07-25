@@ -57,6 +57,13 @@ export function processTick(
             newHand: getTurnPlayer(matchState).currentHand.filter(
               (_, i) => i !== move.handPosition
             ),
+            newBoard: [
+              ...getTurnPlayer(matchState).currentBoard,
+              {
+                index: move.cardIndex,
+                cardId: move.cardId,
+              },
+            ],
           },
         ]
       : [];
@@ -152,6 +159,7 @@ export function applyEvent(matchState: MatchState, event: TickEvent): void {
   if (event.kind === TICK_EVENT_KIND.playCard) {
     const turnPlayerIndex = matchState.players.findIndex(player => player.turn === matchState.turn);
     matchState.players[turnPlayerIndex].currentHand = event.newHand;
+    matchState.players[turnPlayerIndex].currentBoard = event.newBoard;
   }
 
   if (event.kind === TICK_EVENT_KIND.applyPoints) {

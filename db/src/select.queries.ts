@@ -158,6 +158,7 @@ export interface IGetLobbyPlayersParams {
 
 /** 'GetLobbyPlayers' return type */
 export interface IGetLobbyPlayersResult {
+  current_board: stringArray;
   current_deck: numberArray;
   current_draw: number;
   current_hand: stringArray;

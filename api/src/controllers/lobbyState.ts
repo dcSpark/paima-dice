@@ -1,6 +1,7 @@
 import { Controller, Get, Query, Route } from 'tsoa';
 import { getLobbyById, getLobbyPlayers, requirePool } from '@dice/db';
 import {
+  deserializeBoardCard,
   deserializeHandCard,
   deserializeMove,
   isLobbyWithStateProps,
@@ -64,6 +65,7 @@ export class LobbyStatecontroller extends Controller {
       startingCommitments: raw.starting_commitments,
       currentDeck: raw.current_deck,
       currentHand: raw.current_hand.map(deserializeHandCard),
+      currentBoard: raw.current_board.map(deserializeBoardCard),
       currentDraw: raw.current_draw,
       points: raw.points,
       score: raw.score,

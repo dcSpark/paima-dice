@@ -126,6 +126,7 @@ export const updateLobbyMatchState = new PreparedQuery<IUpdateLobbyMatchStatePar
 
 /** 'UpdateLobbyPlayer' parameters type */
 export interface IUpdateLobbyPlayerParams {
+  current_board: stringArray;
   current_deck: numberArray;
   current_draw: number;
   current_hand: stringArray;
@@ -145,7 +146,7 @@ export interface IUpdateLobbyPlayerQuery {
   result: IUpdateLobbyPlayerResult;
 }
 
-const updateLobbyPlayerIR: any = {"usedParamSet":{"points":true,"score":true,"turn":true,"current_deck":true,"current_draw":true,"current_hand":true,"lobby_id":true,"nft_id":true},"params":[{"name":"points","required":true,"transform":{"type":"scalar"},"locs":[{"a":35,"b":42}]},{"name":"score","required":true,"transform":{"type":"scalar"},"locs":[{"a":55,"b":61}]},{"name":"turn","required":false,"transform":{"type":"scalar"},"locs":[{"a":73,"b":77}]},{"name":"current_deck","required":true,"transform":{"type":"scalar"},"locs":[{"a":97,"b":110}]},{"name":"current_draw","required":true,"transform":{"type":"scalar"},"locs":[{"a":130,"b":143}]},{"name":"current_hand","required":true,"transform":{"type":"scalar"},"locs":[{"a":163,"b":176}]},{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":198,"b":207}]},{"name":"nft_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":222,"b":229}]}],"statement":"UPDATE lobby_player\nSET\n  points = :points!,\n  score = :score!,\n  turn = :turn,\n  current_deck = :current_deck!,\n  current_draw = :current_draw!,\n  current_hand = :current_hand!\nWHERE \n  lobby_id = :lobby_id! AND nft_id = :nft_id!"};
+const updateLobbyPlayerIR: any = {"usedParamSet":{"points":true,"score":true,"turn":true,"current_deck":true,"current_draw":true,"current_hand":true,"current_board":true,"lobby_id":true,"nft_id":true},"params":[{"name":"points","required":true,"transform":{"type":"scalar"},"locs":[{"a":35,"b":42}]},{"name":"score","required":true,"transform":{"type":"scalar"},"locs":[{"a":55,"b":61}]},{"name":"turn","required":false,"transform":{"type":"scalar"},"locs":[{"a":73,"b":77}]},{"name":"current_deck","required":true,"transform":{"type":"scalar"},"locs":[{"a":97,"b":110}]},{"name":"current_draw","required":true,"transform":{"type":"scalar"},"locs":[{"a":130,"b":143}]},{"name":"current_hand","required":true,"transform":{"type":"scalar"},"locs":[{"a":163,"b":176}]},{"name":"current_board","required":true,"transform":{"type":"scalar"},"locs":[{"a":197,"b":211}]},{"name":"lobby_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":233,"b":242}]},{"name":"nft_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":257,"b":264}]}],"statement":"UPDATE lobby_player\nSET\n  points = :points!,\n  score = :score!,\n  turn = :turn,\n  current_deck = :current_deck!,\n  current_draw = :current_draw!,\n  current_hand = :current_hand!,\n  current_board = :current_board!\nWHERE \n  lobby_id = :lobby_id! AND nft_id = :nft_id!"};
 
 /**
  * Query generated from SQL:
@@ -157,7 +158,8 @@ const updateLobbyPlayerIR: any = {"usedParamSet":{"points":true,"score":true,"tu
  *   turn = :turn,
  *   current_deck = :current_deck!,
  *   current_draw = :current_draw!,
- *   current_hand = :current_hand!
+ *   current_hand = :current_hand!,
+ *   current_board = :current_board!
  * WHERE 
  *   lobby_id = :lobby_id! AND nft_id = :nft_id!
  * ```
