@@ -1,3 +1,5 @@
+import type { CardRegistry } from './types';
+
 export const COMMITMENT_LENGTH = 16;
 export const DECK_LENGTH = 10;
 
@@ -6,14 +8,24 @@ export const MOVE_KIND = {
   endTurn: 'end',
   drawCard: 'draw',
   playCard: 'play',
+  // mini todo: Many games can target with a hand card too.
+  // It makes sense to separate them, because this one doesn't need a reveal.
+  targetCardWithBoardCard: 'targetB',
 } as const;
 
 export const TICK_EVENT_KIND = {
   tx: 'tx',
   postTx: 'postTx',
   playCard: 'playCard',
+  destroyCard: 'destroyCard',
   applyPoints: 'applyPoints',
   turnEnd: 'turnEnd',
   roundEnd: 'roundEnd',
   matchEnd: 'matchEnd',
 } as const;
+
+export const CARD_REGISTRY: CardRegistry = {
+  0: { defeats: 1 },
+  1: { defeats: 2 },
+  2: { defeats: 0 },
+};

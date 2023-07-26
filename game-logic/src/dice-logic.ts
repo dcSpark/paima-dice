@@ -53,3 +53,9 @@ export function getTurnPlayer(matchState: MatchState): LobbyPlayer {
   if (turnPlayer == null) throw new Error(`getTurnPlayer: missing player for turn`);
   return turnPlayer;
 }
+
+export function getNonTurnPlayer(matchState: MatchState): LobbyPlayer {
+  const nonTurnPlayer = matchState.players.find(player => player.turn !== matchState.turn);
+  if (nonTurnPlayer == null) throw new Error(`getTurnPlayer: missing player for turn`);
+  return nonTurnPlayer;
+}

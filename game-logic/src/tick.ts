@@ -10,9 +10,10 @@ import type {
   PostTxTickEvent,
   TxTickEvent,
   PlayCardTickEvent,
+  DestroyCardTickEvent,
 } from './types';
-import { MOVE_KIND, TICK_EVENT_KIND } from './constants';
-import { deserializeMove, getTurnPlayer, matchResults } from '.';
+import { CARD_REGISTRY, MOVE_KIND, TICK_EVENT_KIND } from './constants';
+import { deserializeMove, getNonTurnPlayer, getTurnPlayer, matchResults } from '.';
 import type { IGetRoundMovesResult } from '@dice/db';
 import { genPostTxEvents } from './cards-logic';
 
@@ -67,9 +68,33 @@ export function processTick(
           },
         ]
       : [];
-
   // We then call `applyEvents` to mutate the `matchState` based off of the event.
   for (const event of playCardEvents) {
+    applyEvent(matchState, event);
+    events.push(event);
+  }
+
+  const destroyCardEvents: DestroyCardTickEvent[] = (() => {
+    if (move.kind !== MOVE_KIND.targetCardWithBoardCard) return [];
+    const turnPlayer = getTurnPlayer(matchState);
+    const nonTurnPlayer = getNonTurnPlayer(matchState);
+    const fromCardId = turnPlayer.currentBoard[move.fromBoardPosition]?.cardId;
+    const toCardId = nonTurnPlayer.currentBoard[move.toBoardPosition]?.cardId;
+    if (fromCardId == null || toCardId == null) return [];
+    const fromCard = CARD_REGISTRY[fromCardId];
+    if (fromCard == null) return [];
+    if (fromCard.defeats !== toCardId) return [];
+    return [
+      {
+        kind: TICK_EVENT_KIND.destroyCard,
+        fromBoardPosition: move.fromBoardPosition,
+        toBoardPosition: move.toBoardPosition,
+        newFromBoard: turnPlayer.currentBoard.filter((_, i) => i !== move.fromBoardPosition),
+        newToBoard: nonTurnPlayer.currentBoard.filter((_, i) => i !== move.toBoardPosition),
+      },
+    ];
+  })();
+  for (const event of destroyCardEvents) {
     applyEvent(matchState, event);
     events.push(event);
   }
@@ -160,6 +185,15 @@ export function applyEvent(matchState: MatchState, event: TickEvent): void {
     const turnPlayerIndex = matchState.players.findIndex(player => player.turn === matchState.turn);
     matchState.players[turnPlayerIndex].currentHand = event.newHand;
     matchState.players[turnPlayerIndex].currentBoard = event.newBoard;
+  }
+
+  if (event.kind === TICK_EVENT_KIND.destroyCard) {
+    const turnPlayerIndex = matchState.players.findIndex(player => player.turn === matchState.turn);
+    const nonTurnPlayerIndex = matchState.players.findIndex(
+      player => player.turn !== matchState.turn
+    );
+    matchState.players[turnPlayerIndex].currentBoard = event.newFromBoard;
+    matchState.players[nonTurnPlayerIndex].currentBoard = event.newToBoard;
   }
 
   if (event.kind === TICK_EVENT_KIND.applyPoints) {
