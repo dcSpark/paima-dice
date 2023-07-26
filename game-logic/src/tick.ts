@@ -75,20 +75,15 @@ export function processTick(
   }
 
   const destroyCardEvents: DestroyCardTickEvent[] = (() => {
-    console.log('HELLO1');
     if (move.kind !== MOVE_KIND.targetCardWithBoardCard) return [];
     const turnPlayer = getTurnPlayer(matchState);
     const nonTurnPlayer = getNonTurnPlayer(matchState);
     const fromCardId = turnPlayer.currentBoard[move.fromBoardPosition]?.cardId;
     const toCardId = nonTurnPlayer.currentBoard[move.toBoardPosition]?.cardId;
-    console.log('HELLO2', fromCardId, toCardId);
     if (fromCardId == null || toCardId == null) return [];
-    console.log('HELLO3');
     const fromCard = CARD_REGISTRY[fromCardId];
     if (fromCard == null) return [];
-    console.log('HELLO4');
     if (fromCard.defeats !== toCardId) return [];
-    console.log('HELLO5');
     return [
       {
         kind: TICK_EVENT_KIND.destroyCard,
