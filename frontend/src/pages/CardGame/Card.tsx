@@ -2,15 +2,10 @@ import React, { Ref, useState } from "react";
 import { Box, ButtonBase, Modal, Typography } from "@mui/material";
 import { CardRegistryId } from "@dice/game-logic";
 import PaimaLogo from "./PaimaLogo";
+import { UseStateResponse } from "@src/utils";
 
 export const cardHeight = "160px";
 export const cardWidth = "100px";
-
-export type CardProps = {
-  cardId: undefined | CardRegistryId;
-  overlap?: boolean;
-  onPlay?: undefined | (() => void);
-};
 
 function StaticCard({
   cardId,
@@ -18,10 +13,14 @@ function StaticCard({
   scale,
   onClick,
   transparent,
-}: CardProps & {
+  glow,
+}: {
+  cardId: undefined | CardRegistryId;
+  overlap?: boolean;
   scale: number;
   onClick?: () => void;
   transparent?: boolean;
+  glow?: boolean;
 }): React.ReactElement {
   return (
     <ButtonBase
@@ -39,7 +38,8 @@ function StaticCard({
               marginLeft: "-60px",
             }
           : {},
-        ...(transparent ? { opacity: 0 } : ""),
+        ...(transparent ? { opacity: 0 } : {}),
+        ...(glow ? { boxShadow: "0px 0px 15px 5px rgba(255,255,255,1)" } : {}),
       }}
     >
       {cardId == null && (
@@ -71,10 +71,16 @@ function StaticCard({
 export default function Card({
   cardId,
   overlap,
-  onPlay,
-}: CardProps): React.ReactElement {
-  const [closeup, setCloseup] = useState(false);
-
+  selectedEffect,
+  selectedState: [selected, setSelected],
+  onConfirm: onConfirm,
+}: {
+  onConfirm?: undefined | (() => void);
+  cardId: undefined | CardRegistryId;
+  overlap?: boolean;
+  selectedState: UseStateResponse<boolean>;
+  selectedEffect: "glow" | "closeup";
+}): React.ReactElement {
   return (
     <>
       <StaticCard
@@ -82,16 +88,22 @@ export default function Card({
         overlap={overlap}
         scale={1}
         onClick={
-          // do not close up on with face-down cards
+          // do not select face-down cards
           cardId == null
             ? undefined
             : () => {
-                setCloseup(true);
+                setSelected(true);
               }
         }
-        transparent={closeup}
+        transparent={selectedEffect === "closeup" && selected}
+        glow={selectedEffect === "glow" && selected}
       />
-      <Modal open={closeup} onClose={() => setCloseup(false)}>
+      <Modal
+        open={selectedEffect === "closeup" && selected}
+        onClose={() => {
+          setSelected(false);
+        }}
+      >
         <Box
           sx={{
             position: "absolute",
@@ -100,7 +112,7 @@ export default function Card({
             transform: "translate(-50%, -50%)",
           }}
         >
-          <StaticCard cardId={cardId} scale={2} onClick={onPlay} />
+          <StaticCard cardId={cardId} scale={2} onClick={onConfirm} />
         </Box>
       </Modal>
     </>

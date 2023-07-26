@@ -89,6 +89,11 @@ export function serializeMove(move: Move): SerializedMove {
     props.push(move.salt);
   }
 
+  if (move.kind === MOVE_KIND.targetCardWithBoardCard) {
+    props.push(move.fromBoardPosition.toString());
+    props.push(move.toBoardPosition.toString());
+  }
+
   return props.join(dbStructPropDelimiter);
 }
 
@@ -102,6 +107,14 @@ export function deserializeMove(move: SerializedMove): Move {
       cardIndex: Number.parseInt(parts[2]),
       cardId: Number.parseInt(parts[3]),
       salt: parts[4],
+    };
+  }
+
+  if (parts[0] === MOVE_KIND.targetCardWithBoardCard) {
+    return {
+      kind: parts[0],
+      fromBoardPosition: Number.parseInt(parts[1]),
+      toBoardPosition: Number.parseInt(parts[2]),
     };
   }
 

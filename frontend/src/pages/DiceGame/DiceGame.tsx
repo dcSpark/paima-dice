@@ -8,6 +8,7 @@ import type {
   PostTxTickEvent,
   Move,
   LocalCard,
+  CardIndex,
 } from "@dice/game-logic";
 import {
   applyEvent,
@@ -20,7 +21,6 @@ import * as Paima from "@dice/middleware";
 import { DiceService } from "./GameLogic";
 import Prando from "paima-sdk/paima-prando";
 import Player from "./Player";
-import { DiceRef } from "./Dice";
 
 interface DiceGameProps {
   lobbyState: LobbyState;
@@ -35,7 +35,7 @@ const DiceGame: React.FC<DiceGameProps> = ({
   selectedNft,
   localDeck,
 }) => {
-  const diceRefs = useRef<Record<number, undefined | DiceRef>>({});
+  const [selectedCard, setSelectedCard] = useState<undefined | CardIndex>();
   const [matchOver, setMatchOver] = useState(false);
   const [caption, setCaption] = useState<undefined | string>();
 
@@ -330,12 +330,41 @@ const DiceGame: React.FC<DiceGameProps> = ({
           gap: 5,
         }}
       >
-        <Player lobbyPlayer={opponent} turn={display.matchState.turn} />
+        <Player
+          lobbyPlayer={opponent}
+          turn={display.matchState.turn}
+          selectedCardState={[selectedCard, setSelectedCard]}
+          onTargetCard={
+            canPlay
+              ? async (index) => {
+                  if (selectedCard == null) return;
+
+                  const fromBoardPosition = thisPlayer.currentBoard.findIndex(
+                    (card) => card.index === selectedCard
+                  );
+                  if (fromBoardPosition === -1) return;
+
+                  const toBoardPosition = opponent.currentBoard.findIndex(
+                    (card) => card.index === index
+                  );
+                  if (toBoardPosition === -1) return;
+
+                  await submit({
+                    kind: MOVE_KIND.targetCardWithBoardCard,
+                    fromBoardPosition,
+                    toBoardPosition,
+                  });
+                  setSelectedCard(undefined);
+                }
+              : undefined
+          }
+        />
         <Player
           lobbyPlayer={thisPlayer}
           isThisPlayer
           localDeck={localDeck}
           turn={display.matchState.turn}
+          selectedCardState={[selectedCard, setSelectedCard]}
           onDraw={
             canRoll
               ? () => {
@@ -350,19 +379,22 @@ const DiceGame: React.FC<DiceGameProps> = ({
                 }
               : undefined
           }
-          onPlayCard={
+          onConfirmCard={
             canPlay
-              ? (handPosition) => {
-                  submit({
+              ? async (index) => {
+                  const handPosition = thisPlayer.currentHand.findIndex(
+                    (card) => card.index === index
+                  );
+                  if (handPosition === -1) return;
+
+                  await submit({
                     kind: MOVE_KIND.playCard,
                     handPosition,
-                    cardIndex: thisPlayer.currentHand[handPosition].index,
-                    salt: localDeck[thisPlayer.currentHand[handPosition].index]
-                      .salt,
-                    cardId:
-                      localDeck[thisPlayer.currentHand[handPosition].index]
-                        .cardId,
+                    cardIndex: index,
+                    salt: localDeck[index].salt,
+                    cardId: localDeck[index].cardId,
                   });
+                  setSelectedCard(undefined);
                 }
               : undefined
           }

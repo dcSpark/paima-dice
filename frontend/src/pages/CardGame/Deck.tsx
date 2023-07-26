@@ -25,7 +25,11 @@ export default function Deck({ size }: { size: number }): React.ReactElement {
               left: `${i * 8}px`,
             }}
           >
-            <Card cardId={undefined} />
+            <Card
+              cardId={undefined}
+              selectedEffect="glow"
+              selectedState={[false, () => {}]}
+            />
             {i === visualCards - 1 && (
               <Box
                 sx={{

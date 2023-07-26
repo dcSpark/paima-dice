@@ -35,6 +35,13 @@ export type PlayCardTickEvent = {
   newHand: HandCard[];
   newBoard: BoardCard[];
 };
+export type DestroyCardTickEvent = {
+  kind: typeof TICK_EVENT_KIND.destroyCard;
+  fromBoardPosition: number;
+  toBoardPosition: number;
+  newFromBoard: BoardCard[];
+  newToBoard: BoardCard[];
+};
 export type ApplyPointsTickEvent = {
   kind: typeof TICK_EVENT_KIND.applyPoints;
   points: number[];
@@ -54,6 +61,7 @@ export type TickEvent =
   | TxTickEvent
   | PostTxTickEvent
   | PlayCardTickEvent
+  | DestroyCardTickEvent
   | ApplyPointsTickEvent
   | TurnEndTickEvent
   | RoundEndTickEvent
@@ -154,6 +162,7 @@ export type CardRegistryId = number;
 export type CardIndex = number;
 /** The sequential position among all cards drawn in some match by some player */
 export type DrawIndex = number;
+
 export type LocalCard = {
   cardId: CardIndex;
   salt: string;
@@ -165,11 +174,23 @@ export type HandCard = {
   draw: DrawIndex;
 };
 export type SerializedHandCard = string;
+
 export type BoardCard = {
   index: CardIndex;
   cardId: CardRegistryId;
 };
 export type SerializedBoardCard = string;
+
+/**
+ * List of cards and their properties.
+ * This gets packaged into backend. It's a bad idea to store skins here.
+ * Make a separate frontend registry instead.
+ */
+export type RegistryCard = {
+  // recall: we're doing rock, paper, scissors
+  defeats: CardRegistryId;
+};
+export type CardRegistry = Record<CardRegistryId, RegistryCard>;
 
 export type MoveKind = ValuesType<typeof MOVE_KIND>;
 export type Move =
@@ -185,5 +206,10 @@ export type Move =
       cardIndex: number;
       cardId: number;
       salt: string;
+    }
+  | {
+      kind: typeof MOVE_KIND.targetCardWithBoardCard;
+      fromBoardPosition: number; // own
+      toBoardPosition: number; // opponent's
     };
 export type SerializedMove = string;

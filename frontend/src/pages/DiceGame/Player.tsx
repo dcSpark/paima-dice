@@ -4,16 +4,19 @@ import { Box, Typography } from "@mui/material";
 import Button from "@src/components/Button";
 import Card, { cardHeight } from "../CardGame/Card";
 import Deck from "../CardGame/Deck";
-import { LobbyPlayer, LocalCard } from "@dice/game-logic";
+import { CardIndex, LobbyPlayer, LocalCard } from "@dice/game-logic";
+import { UseStateResponse } from "@src/utils";
 
 export type PlayerProps = {
   lobbyPlayer: LobbyPlayer;
   isThisPlayer?: boolean;
   localDeck?: LocalCard[];
   turn: number;
+  selectedCardState: UseStateResponse<undefined | CardIndex>;
   onDraw?: () => void;
   onEndTurn?: () => void;
-  onPlayCard?: (handPosition: number) => void;
+  onTargetCard?: (index: CardIndex) => void;
+  onConfirmCard?: (index: CardIndex) => void;
 };
 
 export default function Player({
@@ -21,29 +24,40 @@ export default function Player({
   isThisPlayer,
   localDeck,
   turn,
+  selectedCardState: [selectedCard, setSelectedCard],
   onDraw,
   onEndTurn,
-  onPlayCard,
+  onTargetCard,
+  onConfirmCard,
 }: PlayerProps): React.ReactElement {
   const Hand = (
     <Box
+      key="hand"
       sx={{
         minHeight: cardHeight,
         display: "flex",
       }}
     >
-      {lobbyPlayer.currentHand.map((card, i) => (
+      {lobbyPlayer.currentHand.map((card) => (
         <Card
-          key={card.draw}
+          key={card.index}
           cardId={localDeck?.[card.index].cardId}
           overlap
-          onPlay={() => onPlayCard(i)}
+          onConfirm={() => onConfirmCard?.(card.index)}
+          selectedState={[
+            isThisPlayer && selectedCard === card.index,
+            (val) => {
+              if (isThisPlayer) setSelectedCard(val ? card.index : undefined);
+            },
+          ]}
+          selectedEffect="closeup"
         />
       ))}
     </Box>
   );
   const Board = (
     <Box
+      key="board"
       sx={{
         minHeight: cardHeight,
         display: "flex",
@@ -51,7 +65,18 @@ export default function Player({
       }}
     >
       {lobbyPlayer.currentBoard.map((card, i) => (
-        <Card key={card.index} cardId={card.cardId} />
+        <Card
+          key={card.index}
+          cardId={card.cardId}
+          selectedEffect="glow"
+          selectedState={[
+            isThisPlayer && selectedCard === card.index,
+            (val) => {
+              if (!isThisPlayer) onTargetCard?.(card.index);
+              if (isThisPlayer) setSelectedCard(val ? card.index : undefined);
+            },
+          ]}
+        />
       ))}
     </Box>
   );
