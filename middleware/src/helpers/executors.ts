@@ -39,6 +39,7 @@ export function buildMatchExecutor({
       currentHand: [],
       currentBoard: [],
       currentDraw: 0,
+      botLocalDeck: player.botLocalDeck,
       turn: matchTurnOrder[i],
       points: 0,
       score: 0,

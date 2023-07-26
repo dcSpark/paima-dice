@@ -9,7 +9,12 @@ import type {
   PostTxTickEvent,
 } from './types';
 import Prando from 'paima-sdk/paima-prando';
-import { deserializeBoardCard, deserializeHandCard, deserializeMove } from './helpers';
+import {
+  deserializeBoardCard,
+  deserializeHandCard,
+  deserializeLocalCard,
+  deserializeMove,
+} from './helpers';
 import { COMMITMENT_LENGTH, MOVE_KIND, TICK_EVENT_KIND } from './constants';
 import { getTurnPlayer } from './dice-logic';
 import cryptoRandomString from 'crypto-random-string';
@@ -42,6 +47,7 @@ export function buildCurrentMatchState(
       currentHand: player.current_hand.map(deserializeHandCard),
       currentBoard: player.current_board.map(deserializeBoardCard),
       currentDraw: player.current_draw,
+      botLocalDeck: player.bot_local_deck?.map(deserializeLocalCard),
       turn: player.turn,
       points: player.points,
       score: player.score,

@@ -3,7 +3,12 @@ import type { IUpdateLobbyStateParams, ICreateLobbyParams } from '@dice/db';
 import { createLobby, updateLobbyState } from '@dice/db';
 import Prando from 'paima-sdk/paima-prando';
 import type { LobbyPlayer, LobbyStatus, LocalCard, MatchEnvironment } from '@dice/game-logic';
-import { genBotDeck, genCommitments, initialCurrentDeck } from '@dice/game-logic';
+import {
+  genBotDeck,
+  genCommitments,
+  initialCurrentDeck,
+  serializeLocalCard,
+} from '@dice/game-logic';
 import { persistStartMatch } from './match.js';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
 import type { IJoinPlayerToLobbyParams } from '@dice/db/src/insert.queries.js';
@@ -46,6 +51,7 @@ export async function persistLobbyCreation(
     currentHand: [],
     currentBoard: [],
     currentDraw: 0,
+    botLocalDeck: undefined,
     points: 0,
     score: 0,
     turn: undefined,
@@ -65,7 +71,6 @@ export async function persistLobbyCreation(
         .map(async () => {
           const botDeck = genBotDeck();
           const commitments = await genCommitments(crypto as any, botDeck);
-          // TODO: store local deck for the bot
           const localDeck: LocalCard[] = botDeck.map((cardId, i) => ({
             cardId,
             salt: commitments.salt[i],
@@ -78,6 +83,7 @@ export async function persistLobbyCreation(
             currentHand: [],
             currentBoard: [],
             currentDraw: 0,
+            botLocalDeck: localDeck,
             points: 0,
             score: 0,
             turn: undefined,
@@ -86,6 +92,7 @@ export async function persistLobbyCreation(
             lobby_id,
             nft_id: PRACTICE_BOT_NFT_ID,
             startingCommitments: commitments.commitments,
+            botLocalDeck: localDeck.map(serializeLocalCard),
           });
         })
     )
@@ -129,6 +136,7 @@ export type IJoinPlayerToLobbyRequest = {
   lobby_id: IJoinPlayerToLobbyParams['lobby_id'];
   nft_id: IJoinPlayerToLobbyParams['nft_id'];
   startingCommitments: Uint8Array;
+  botLocalDeck?: IJoinPlayerToLobbyParams['bot_local_deck'];
 };
 export function persistLobbyJoin(req: IJoinPlayerToLobbyRequest): SQLUpdate[] {
   const params: IJoinPlayerToLobbyParams = {
@@ -136,6 +144,7 @@ export function persistLobbyJoin(req: IJoinPlayerToLobbyRequest): SQLUpdate[] {
     nft_id: req.nft_id,
     starting_commitments: Buffer.from(req.startingCommitments),
     current_deck: initialCurrentDeck(),
+    bot_local_deck: req.botLocalDeck ?? null,
   };
 
   return [[joinPlayerToLobby, params]];

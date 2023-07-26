@@ -25,6 +25,7 @@ import {
   MOVE_KIND,
   checkCommitment,
   deserializeBoardCard,
+  deserializeLocalCard,
 } from '@dice/game-logic';
 import {
   persistUpdateMatchState,
@@ -117,6 +118,7 @@ export const joinedLobby = async (
     currentHand: player.current_hand.map(deserializeHandCard),
     currentBoard: player.current_board.map(deserializeBoardCard),
     currentDraw: player.current_draw,
+    botLocalDeck: player.bot_local_deck?.map(deserializeLocalCard),
     points: player.points,
     score: player.score,
     turn: player.turn ?? undefined,
@@ -144,6 +146,7 @@ export const joinedLobby = async (
     currentHand: [],
     currentBoard: [],
     currentDraw: 0,
+    botLocalDeck: undefined,
     points: 0,
     score: 0,
     turn: undefined,

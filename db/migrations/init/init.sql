@@ -69,6 +69,8 @@ CREATE TABLE lobby_player (
   current_hand TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
   current_board TEXT[] NOT NULL DEFAULT ARRAY[]::TEXT[],
   current_draw INTEGER NOT NULL DEFAULT 0,
+  -- local deck in case this is a bot player
+  bot_local_deck TEXT[] DEFAULT NULL,
   points INTEGER NOT NULL DEFAULT 0,
   score INTEGER NOT NULL DEFAULT 0,
   turn INTEGER

@@ -158,6 +158,7 @@ export interface IGetLobbyPlayersParams {
 
 /** 'GetLobbyPlayers' return type */
 export interface IGetLobbyPlayersResult {
+  bot_local_deck: stringArray | null;
   current_board: stringArray;
   current_deck: numberArray;
   current_draw: number;
