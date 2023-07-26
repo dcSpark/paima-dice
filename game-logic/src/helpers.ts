@@ -2,9 +2,11 @@ import type Prando from 'paima-sdk/paima-prando';
 import type {
   BoardCard,
   HandCard,
+  LocalCard,
   Move,
   SerializedBoardCard,
   SerializedHandCard,
+  SerializedLocalCard,
   SerializedMove,
 } from './types';
 import { DECK_LENGTH, MOVE_KIND } from './constants';
@@ -62,6 +64,18 @@ export function deserializeBoardCard(card: SerializedBoardCard): BoardCard {
   return {
     index: Number.parseInt(props[0]),
     cardId: Number.parseInt(props[1]),
+  };
+}
+
+export function serializeLocalCard(card: LocalCard): SerializedLocalCard {
+  return [card.cardId.toString(), card.salt].join(dbStructPropDelimiter);
+}
+
+export function deserializeLocalCard(card: SerializedLocalCard): LocalCard {
+  const props = card.split(dbStructPropDelimiter);
+  return {
+    cardId: Number.parseInt(props[0]),
+    salt: props[1],
   };
 }
 

@@ -132,6 +132,7 @@ export type LobbyPlayer = {
   currentHand: HandCard[];
   currentBoard: BoardCard[];
   currentDraw: number;
+  botLocalDeck: undefined | LocalCard[]; // only defined for bot player
   turn: undefined | number;
   points: number;
   score: number;
@@ -157,6 +158,7 @@ export type LocalCard = {
   cardId: CardIndex;
   salt: string;
 };
+export type SerializedLocalCard = string;
 
 export type HandCard = {
   index: CardIndex;

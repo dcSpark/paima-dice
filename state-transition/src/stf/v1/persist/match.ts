@@ -99,6 +99,7 @@ export function persistInitialMatchState(
       currentHand: [],
       currentBoard: [],
       currentDraw: player.currentDraw,
+      botLocalDeck: player.botLocalDeck,
       turn: newTurnOrder[i],
       points: 0,
       score: 0,
