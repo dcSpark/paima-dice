@@ -2,7 +2,7 @@ import type { Pool } from 'pg';
 import Prando from 'paima-sdk/paima-prando';
 import { SCHEDULED_DATA_ADDRESS, type WalletAddress } from 'paima-sdk/paima-utils';
 import type { IGetLobbyPlayersResult, IGetRoundMovesResult } from '@dice/db';
-import { getLobbyById, getUserStats, getLobbyPlayers } from '@dice/db';
+import { getLobbyById, getUserStats, getLobbyPlayers, getOwnedNft } from '@dice/db';
 import type {
   LobbyWithStateProps,
   ConciseResult,
@@ -26,6 +26,7 @@ import {
   checkCommitment,
   deserializeBoardCard,
   deserializeLocalCard,
+  genCardPack,
 } from '@dice/game-logic';
 import {
   persistUpdateMatchState,
@@ -42,6 +43,7 @@ import {
 } from './persist';
 import { isValidMove } from '@dice/game-logic';
 import type {
+  CardPackBuyInput,
   ClosedLobbyInput,
   CreatedLobbyInput,
   JoinedLobbyInput,
@@ -51,13 +53,14 @@ import type {
   SubmittedMovesInput,
 } from './types.js';
 import { isUserStats, isZombieRound } from './types.js';
-import { NFT_NAME, PRACTICE_BOT_NFT_ID } from '@dice/utils';
+import { CARD_PACK_NFT_NAME, NFT_NAME, PRACTICE_BOT_NFT_ID } from '@dice/utils';
 import { getBlockHeight, type SQLUpdate } from 'paima-sdk/paima-db';
 import { PracticeAI } from './persist/practice-ai';
-import { getOwnedNfts } from 'paima-sdk/paima-utils-backend';
 import type { IGetRoundResult } from '@dice/db/src/select.queries';
 import { getMatch, getRound, getRoundMoves } from '@dice/db/src/select.queries';
 import crypto from 'crypto';
+import { newCardPack, type INewCardPackParams } from '@dice/db/src/insert.queries';
+import { getNftOwner } from 'paima-sdk/paima-utils-backend';
 
 // Create initial player entry after nft mint
 export const mintNft = async (input: NftMintInput): Promise<SQLUpdate[]> => {
@@ -67,6 +70,34 @@ export const mintNft = async (input: NftMintInput): Promise<SQLUpdate[]> => {
     console.log(`DISCARD: error in nft mint ${e}`);
     return [];
   }
+};
+
+export const cardPackBuy = async (
+  input: CardPackBuyInput,
+  dbConn: Pool,
+  randomnessGenerator: Prando
+): Promise<SQLUpdate[]> => {
+  const tokenId = BigInt(Number.parseInt(input.tokenId));
+  const owner = await getNftOwner(dbConn, CARD_PACK_NFT_NAME, tokenId);
+  if (owner == null) {
+    console.log('DISCARD: no owner');
+    return [];
+  }
+
+  const nft = await getOwnedNft(dbConn, NFT_NAME, owner);
+  if (nft == null) {
+    console.log('DISCARD: user does not own any nft');
+    return [];
+  }
+
+  const newPackProps: INewCardPackParams = {
+    token_id: Number.parseInt(input.tokenId),
+    owner_nft_id: nft,
+    cards: genCardPack(randomnessGenerator),
+  };
+  const newPackUpdates: SQLUpdate[] = [[newCardPack, newPackProps]];
+
+  return [...newPackUpdates];
 };
 
 // State transition when a create lobby input is processed
@@ -562,8 +593,7 @@ async function fetchPrandoSeed(
 }
 
 async function checkUserOwns(user: WalletAddress, nftId: number, dbConn: Pool): Promise<boolean> {
-  const walletNfts = await getOwnedNfts(dbConn, NFT_NAME, user);
-  return walletNfts.some(ownedNftId => Number(ownedNftId) === nftId);
+  return (await getOwnedNft(dbConn, NFT_NAME, user)) === nftId;
 }
 
 async function validateStartingCommitments(

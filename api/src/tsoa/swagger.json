@@ -643,18 +643,15 @@
 		},
 		"/nfts/wallet": {
 			"get": {
-				"operationId": "GetWalletNFTs",
+				"operationId": "GetWalletNFT",
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
 								"schema": {
-									"items": {
-										"type": "number",
-										"format": "double"
-									},
-									"type": "array"
+									"type": "number",
+									"format": "double"
 								}
 							}
 						}
@@ -878,6 +875,35 @@
 						"in": "query",
 						"name": "count",
 						"required": false,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/user/packs": {
+			"get": {
+				"operationId": "Get",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Response"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "nftId",
+						"required": true,
 						"schema": {
 							"format": "double",
 							"type": "number"

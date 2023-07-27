@@ -9,6 +9,7 @@ export const GAME_NAME = 'Paima Dice';
 // that table can have an 'isBot' flag
 export const PRACTICE_BOT_NFT_ID = -1;
 export const NFT_NAME = 'Dice NFT contract';
+export const CARD_PACK_NFT_NAME = 'Card pack contract';
 
 /** Large number that should be safe anywhere */
 export const SAFE_NUMBER = 2 ** 31 - 1;

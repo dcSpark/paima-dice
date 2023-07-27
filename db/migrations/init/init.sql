@@ -75,3 +75,9 @@ CREATE TABLE lobby_player (
   score INTEGER NOT NULL DEFAULT 0,
   turn INTEGER
 );
+
+CREATE TABLE card_packs (
+  token_id INTEGER NOT NULL PRIMARY KEY,
+  owner_nft_id INTEGER NOT NULL references global_user_state(nft_id),
+  cards INTEGER[] NOT NULL
+);

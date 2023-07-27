@@ -69,7 +69,7 @@ export async function persistLobbyCreation(
       Array(numBots)
         .fill(null)
         .map(async () => {
-          const botDeck = genBotDeck();
+          const botDeck = genBotDeck(randomnessGenerator);
           const commitments = await genCommitments(crypto as any, botDeck);
           const localDeck: LocalCard[] = botDeck.map((cardId, i) => ({
             cardId,

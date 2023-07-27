@@ -138,3 +138,8 @@ WHERE
   lobby_id = :lobby_id! AND
   match_within_lobby = :match_within_lobby!
 ORDER BY match_round.round_within_match ASC;
+
+/* @name getOwnedPacks */
+SELECT *
+FROM card_packs
+WHERE owner_nft_id = :owner_nft_id!;

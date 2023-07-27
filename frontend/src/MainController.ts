@@ -5,7 +5,7 @@ import {
   genBotDeck,
   genCommitments,
 } from "@dice/game-logic";
-import type { LocalCard } from "@dice/game-logic";
+import type { CardRegistryId, LocalCard } from "@dice/game-logic";
 import * as Paima from "@dice/middleware";
 import { MatchExecutor } from "paima-sdk/paima-executors";
 import { IGetLobbyByIdResult, IGetPaginatedUserLobbiesResult } from "@dice/db";
@@ -23,6 +23,7 @@ export enum Page {
   OpenLobbies = "/open_lobbies",
   Game = "/game",
   MyGames = "/my_games",
+  BuyPacks = "/buy_packs",
 }
 
 // This is a class that will be used to control the state of the application
@@ -76,8 +77,8 @@ class MainController {
     }
   }
 
-  async fetchNfts(address: string): Promise<undefined | number[]> {
-    const response = await Paima.default.getNftsForWallet(address);
+  async fetchNft(address: string): Promise<undefined | number> {
+    const response = await Paima.default.getNftForWallet(address);
     console.log("fetch nfts response: ", response);
     if (!response.success) return;
     return response.result;
@@ -125,6 +126,7 @@ class MainController {
 
   async createLobby(
     creatorNftId: number,
+    creatorDeck: CardRegistryId[],
     numOfRounds: number,
     roundLength: number,
     timePerPlayer: number,
@@ -142,10 +144,8 @@ class MainController {
       isPractice
     );
 
-    // TODO: user's deck
-    const cardIds = genBotDeck();
-    const commitments = await genCommitments(window.crypto, cardIds);
-    const localDeck: LocalCard[] = cardIds.map((cardId, i) => ({
+    const commitments = await genCommitments(window.crypto, creatorDeck);
+    const localDeck: LocalCard[] = creatorDeck.map((cardId, i) => ({
       cardId,
       salt: commitments.salt[i],
     }));
@@ -169,14 +169,16 @@ class MainController {
     this.callback(Page.Game, false, lobbyRaw);
   }
 
-  async joinLobby(nftId: number, lobbyId: string): Promise<void> {
+  async joinLobby(
+    nftId: number,
+    deck: CardRegistryId[],
+    lobbyId: string
+  ): Promise<void> {
     await this.enforceWalletConnected();
     this.callback(null, true, null);
 
-    // TODO: user's deck
-    const cardIds = genBotDeck();
-    const commitments = await genCommitments(window.crypto, cardIds);
-    const localDeck: LocalCard[] = cardIds.map((cardId, i) => ({
+    const commitments = await genCommitments(window.crypto, deck);
+    const localDeck: LocalCard[] = deck.map((cardId, i) => ({
       cardId,
       salt: commitments.salt[i],
     }));

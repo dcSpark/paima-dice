@@ -15,7 +15,8 @@
   "dependencies": {
     "@pgtyped/cli": "^1.0.2",
     "@pgtyped/query": "^1.0.1",
-    "pg": "^8.7.3"
+    "pg": "^8.7.3",
+    "utility-types": "3.10.0"
   },
   "devDependencies": {
     "@types/pg": "^8.6.5"

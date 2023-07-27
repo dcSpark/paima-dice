@@ -30,6 +30,8 @@ module.exports = [
           "SERVER_ONLY_MODE",
           "NATIVE_PROXY",
           "NFT",
+          "CARD_PACK_NATIVE_PROXY",
+          "CARD_PACK_NFT",
         ].map((key) => [key, process.env[key]])
       )
     ),

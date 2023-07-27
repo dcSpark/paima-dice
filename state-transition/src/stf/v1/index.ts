@@ -11,6 +11,7 @@ import {
   scheduledData,
   practiceMoves,
   mintNft,
+  cardPackBuy,
 } from './transition';
 import type { SQLUpdate } from 'paima-sdk/paima-db';
 
@@ -29,6 +30,8 @@ export default async function (
   switch (parsed.input) {
     case 'nftMint':
       return mintNft(parsed);
+    case 'cardPackBuy':
+      return cardPackBuy(parsed, dbConn, randomnessGenerator);
     case 'createdLobby':
       return createdLobby(user, blockHeight, parsed, dbConn, randomnessGenerator);
     case 'joinedLobby':

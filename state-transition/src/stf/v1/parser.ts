@@ -1,6 +1,7 @@
 import type { ParserRecord } from 'paima-sdk/paima-utils-backend';
 import { PaimaParser } from 'paima-sdk/paima-utils-backend';
 import type {
+  CardPackBuyInput,
   ClosedLobbyInput,
   CreatedLobbyInput,
   JoinedLobbyInput,
@@ -15,6 +16,7 @@ import { SAFE_NUMBER } from '@dice/utils';
 
 const myGrammar = `
 nftMint             = nftmint|address|tokenId
+cardPackBuy         = cardpack|address|tokenId
 createdLobby        = c|creatorNftId|creatorCommitments|numOfRounds|roundLength|playTimePerPlayer|isHidden?|isPractice?
 joinedLobby         = j|nftId|*lobbyID|commitments
 closedLobby         = cs|*lobbyID
@@ -25,6 +27,10 @@ userScheduledData   = u|*user|result
 `;
 
 const nftMint: ParserRecord<NftMintInput> = {
+  address: PaimaParser.WalletAddress(),
+  tokenId: PaimaParser.NumberParser(),
+};
+const cardPackBuy: ParserRecord<CardPackBuyInput> = {
   address: PaimaParser.WalletAddress(),
   tokenId: PaimaParser.NumberParser(),
 };
@@ -71,6 +77,7 @@ const userScheduledData: ParserRecord<UserStats> = {
 
 const parserCommands: Record<string, ParserRecord<ParsedSubmittedInput>> = {
   nftMint,
+  cardPackBuy,
   createdLobby,
   joinedLobby,
   closedLobby,

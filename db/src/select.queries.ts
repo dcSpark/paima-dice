@@ -812,3 +812,34 @@ const getMatchSeedsIR: any = {"usedParamSet":{"lobby_id":true,"match_within_lobb
 export const getMatchSeeds = new PreparedQuery<IGetMatchSeedsParams,IGetMatchSeedsResult>(getMatchSeedsIR);
 
 
+/** 'GetOwnedPacks' parameters type */
+export interface IGetOwnedPacksParams {
+  owner_nft_id: number;
+}
+
+/** 'GetOwnedPacks' return type */
+export interface IGetOwnedPacksResult {
+  cards: numberArray;
+  owner_nft_id: number;
+  token_id: number;
+}
+
+/** 'GetOwnedPacks' query type */
+export interface IGetOwnedPacksQuery {
+  params: IGetOwnedPacksParams;
+  result: IGetOwnedPacksResult;
+}
+
+const getOwnedPacksIR: any = {"usedParamSet":{"owner_nft_id":true},"params":[{"name":"owner_nft_id","required":true,"transform":{"type":"scalar"},"locs":[{"a":46,"b":59}]}],"statement":"SELECT *\nFROM card_packs\nWHERE owner_nft_id = :owner_nft_id!"};
+
+/**
+ * Query generated from SQL:
+ * ```
+ * SELECT *
+ * FROM card_packs
+ * WHERE owner_nft_id = :owner_nft_id!
+ * ```
+ */
+export const getOwnedPacks = new PreparedQuery<IGetOwnedPacksParams,IGetOwnedPacksResult>(getOwnedPacksIR);
+
+

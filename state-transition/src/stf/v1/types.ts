@@ -3,6 +3,7 @@ import type { WalletAddress } from 'paima-sdk/paima-utils';
 
 export type ParsedSubmittedInput =
   | NftMintInput
+  | CardPackBuyInput
   | CreatedLobbyInput
   | JoinedLobbyInput
   | ClosedLobbyInput
@@ -17,6 +18,13 @@ export interface InvalidInput {
 
 export interface NftMintInput {
   input: 'nftMint';
+  tokenId: string;
+  // contract address
+  address: WalletAddress;
+}
+
+export interface CardPackBuyInput {
+  input: 'cardPackBuy';
   tokenId: string;
   // contract address
   address: WalletAddress;

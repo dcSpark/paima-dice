@@ -8,14 +8,24 @@ import ConnectingModal from "./ConnectingModal";
 import { PaimaNotice } from "./components/PaimaNotice";
 import { OasysNotice } from "./components/PaimaNotice";
 import { Box } from "@mui/material";
-import { LocalCard } from "@dice/game-logic";
+import { CardRegistryId, LocalCard } from "@dice/game-logic";
+import { IGetOwnedPacksResult } from "@dice/db/build/select.queries";
 
 export const localDeckCache: Map<string, LocalCard[]> = new Map();
 
 type GlobalState = {
   connectedWallet?: WalletAddress;
-  nfts?: number[];
-  selectedNftState: UseStateResponse<undefined | number>;
+  selectedNftState: UseStateResponse<{
+    loading: boolean;
+    nft: undefined | number;
+  }>;
+  collection:
+    | undefined
+    | {
+        raw: IGetOwnedPacksResult[];
+        packs: CardRegistryId[][];
+        cards: CardRegistryId[];
+      };
 };
 
 export const GlobalStateContext = createContext<GlobalState>(
@@ -31,35 +41,77 @@ export function GlobalStateProvider({
   const [connectedWallet, setConnectedWallet] = useState<
     undefined | WalletAddress
   >();
-  const [nfts, setNfts] = useState<undefined | number[]>();
-  const [selectedNft, setSelectedNft] = useState<undefined | number>();
+  const [selectedNft, setSelectedNft] = useState<{
+    loading: boolean;
+    nft: undefined | number;
+  }>({
+    loading: true,
+    nft: undefined,
+  });
+  const [collection, setCollection] = useState<
+    | undefined
+    | {
+        raw: IGetOwnedPacksResult[];
+        packs: CardRegistryId[][];
+        cards: CardRegistryId[];
+      }
+  >();
 
   useEffect(() => {
     // poll owned nfts
-    const interval = setInterval(async () => {
+    const fetch = async () => {
       if (connectedWallet == null) return;
 
-      const newNfts = await mainController.fetchNfts(connectedWallet);
-      setNfts(newNfts);
-      if (newNfts?.length > 0) {
-        // only set a single NFT for this game
-        setSelectedNft(newNfts[0]);
-      } else {
-        setSelectedNft(undefined);
+      const result = await Paima.default.getNftForWallet(connectedWallet);
+      if (result.success && result.result !== selectedNft.nft) {
+        setSelectedNft({
+          loading: false,
+          nft: result.result,
+        });
       }
-    }, 5000);
+    };
+    fetch();
+    const interval = setInterval(fetch, 5000);
     return () => clearInterval(interval);
   }, [mainController, connectedWallet]);
 
   useEffect(() => {
+    // poll collection
+    const fetch = async () => {
+      if (selectedNft.nft == null) return;
+
+      const result = await Paima.default.getUserPacks(selectedNft.nft);
+      if (result.success) {
+        const raw = result.result;
+        const packs = raw.map((pack) => pack.cards);
+        const cards = packs.flat();
+        setCollection({
+          raw,
+          packs,
+          cards,
+        });
+      } else {
+        setCollection(undefined);
+      }
+    };
+    fetch();
+    const interval = setInterval(fetch, 5000);
+    return () => {
+      clearInterval(interval);
+    };
+  }, [mainController, selectedNft]);
+
+  useEffect(() => {
     // poll connection to wallet
-    const interval = setInterval(async () => {
+    const fetch = async () => {
       const connectResult = await Paima.default.userWalletLogin("metamask");
       const newWallet = connectResult.success
         ? connectResult.result.walletAddress
         : undefined;
       setConnectedWallet(newWallet);
-    }, 2000);
+    };
+    fetch();
+    const interval = setInterval(fetch, 2000);
     return () => clearInterval(interval);
   }, [connectedWallet, mainController]);
 
@@ -77,10 +129,10 @@ export function GlobalStateProvider({
   const value = React.useMemo<GlobalState>(
     () => ({
       connectedWallet: lastConnectedWallet,
-      nfts,
       selectedNftState: [selectedNft, setSelectedNft],
+      collection,
     }),
-    [lastConnectedWallet, nfts, selectedNft, setSelectedNft]
+    [lastConnectedWallet, selectedNft, setSelectedNft]
   );
 
   return (

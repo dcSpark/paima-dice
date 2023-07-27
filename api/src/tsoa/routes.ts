@@ -21,6 +21,8 @@ import { RoundStatusController } from './../controllers/roundStatus';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { SearchOpenLobbiesController } from './../controllers/searchOpenLobbies';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { UserController } from './../controllers/user';
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { UserLobbiesController } from './../controllers/userLobbies';
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 import { UserLobbiesBlockheightController } from './../controllers/userLobbiesBlockheight';
@@ -272,9 +274,9 @@ export function RegisterRoutes(app: express.Router) {
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
         app.get('/nfts/wallet',
             ...(fetchMiddlewares<RequestHandler>(LobbyNFTController)),
-            ...(fetchMiddlewares<RequestHandler>(LobbyNFTController.prototype.getWalletNFTs)),
+            ...(fetchMiddlewares<RequestHandler>(LobbyNFTController.prototype.getWalletNFT)),
 
-            function LobbyNFTController_getWalletNFTs(request: any, response: any, next: any) {
+            function LobbyNFTController_getWalletNFT(request: any, response: any, next: any) {
             const args = {
                     wallet: {"in":"query","name":"wallet","required":true,"dataType":"string"},
             };
@@ -288,7 +290,7 @@ export function RegisterRoutes(app: express.Router) {
                 const controller = new LobbyNFTController();
 
 
-              const promise = controller.getWalletNFTs.apply(controller, validatedArgs as any);
+              const promise = controller.getWalletNFT.apply(controller, validatedArgs as any);
               promiseHandler(controller, promise, response, undefined, next);
             } catch (err) {
                 return next(err);
@@ -419,6 +421,31 @@ export function RegisterRoutes(app: express.Router) {
                 validatedArgs = getValidatedArgs(args, request, response);
 
                 const controller = new SearchOpenLobbiesController();
+
+
+              const promise = controller.get.apply(controller, validatedArgs as any);
+              promiseHandler(controller, promise, response, undefined, next);
+            } catch (err) {
+                return next(err);
+            }
+        });
+        // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+        app.get('/user/packs',
+            ...(fetchMiddlewares<RequestHandler>(UserController)),
+            ...(fetchMiddlewares<RequestHandler>(UserController.prototype.get)),
+
+            function UserController_get(request: any, response: any, next: any) {
+            const args = {
+                    nftId: {"in":"query","name":"nftId","required":true,"dataType":"double"},
+            };
+
+            // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request, response);
+
+                const controller = new UserController();
 
 
               const promise = controller.get.apply(controller, validatedArgs as any);

@@ -44,6 +44,7 @@ const OpenLobbies: React.FC = () => {
   const mainController: MainController = useContext(AppContext);
   const {
     selectedNftState: [selectedNft],
+    collection,
   } = useGlobalStateContext();
   const [lobbies, setLobbies] = useState<LobbyState[]>([]);
   const [page, setPage] = useState(0);
@@ -51,7 +52,7 @@ const OpenLobbies: React.FC = () => {
   const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
-    mainController.getOpenLobbies(selectedNft).then((lobbies) => {
+    mainController.getOpenLobbies(selectedNft.nft).then((lobbies) => {
       setLobbies(lobbies);
     });
   }, []);
@@ -66,7 +67,7 @@ const OpenLobbies: React.FC = () => {
   };
 
   const searchForHiddenLobby = async (query: string) => {
-    const results = await mainController.searchLobby(selectedNft, query, 0);
+    const results = await mainController.searchLobby(selectedNft.nft, query, 0);
     if (results == null || results.length === 0) return;
     const newLobbies = results.filter(
       (result) => !lobbies.some((lobby) => lobby.lobby_id === result.lobby_id)
@@ -82,7 +83,7 @@ const OpenLobbies: React.FC = () => {
   };
 
   const handleLobbiesRefresh = async () => {
-    const lobbies = await mainController.getOpenLobbies(selectedNft);
+    const lobbies = await mainController.getOpenLobbies(selectedNft.nft);
 
     setPage(0);
     setSearchText("");
@@ -138,7 +139,9 @@ const OpenLobbies: React.FC = () => {
                               <Button
                                 onClick={() =>
                                   mainController.joinLobby(
-                                    selectedNft,
+                                    selectedNft.nft,
+                                    // TODO: select cards, make sure you have enough
+                                    collection.cards.slice(0, 10),
                                     lobby.lobby_id
                                   )
                                 }
