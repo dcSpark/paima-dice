@@ -55,7 +55,7 @@ const ActionButton: React.FC<{ lobby: IGetPaginatedUserLobbiesResult }> = (
     lobbyId: string
   ) => {
     if (action === "Close") {
-      mainController.closeLobby(selectedNft, lobbyId);
+      mainController.closeLobby(selectedNft.nft, lobbyId);
     } else if (action === "Enter") {
       mainController.moveToJoinedLobby(lobbyId);
     }
@@ -101,7 +101,7 @@ const MyGames: React.FC = () => {
   const [searchText, setSearchText] = useState("");
 
   useEffect(() => {
-    mainController.getMyGames(selectedNft).then((lobbies) => {
+    mainController.getMyGames(selectedNft.nft).then((lobbies) => {
       setLobbies(lobbies);
     });
   }, []);
@@ -114,7 +114,7 @@ const MyGames: React.FC = () => {
   };
 
   const handleLobbiesRefresh = async () => {
-    const lobbies = await mainController.getMyGames(selectedNft);
+    const lobbies = await mainController.getMyGames(selectedNft.nft);
 
     setPage(0);
     setSearchText("");
@@ -132,7 +132,7 @@ const MyGames: React.FC = () => {
     value: unknown
   ) => {
     if (id === "lobby_creator" && typeof value === "number") {
-      return value === selectedNft ? "Yes" : "No";
+      return value === selectedNft.nft ? "Yes" : "No";
     }
     if (id === "created_at" && typeof value === "string") {
       return formatDate(value);

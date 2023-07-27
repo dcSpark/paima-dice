@@ -44,6 +44,7 @@ export {
   IExecutedRoundParams,
   IUpdateLobbyPlayerParams,
 } from './update.queries.js';
+export * from './helpers.js';
 import type Pool from 'pg';
 import { creds, requirePool } from './pgPool.js';
 export { requirePool, creds };

@@ -1,30 +1,25 @@
-import React, { useContext, useState } from "react";
-import {
-  Box,
-  CircularProgress,
-  MenuItem,
-  Select,
-  Typography,
-} from "@mui/material";
+import React, { useContext } from "react";
+import { Box, CircularProgress } from "@mui/material";
 import MainController, { Page } from "@src/MainController";
 import { useNavigate } from "react-router-dom";
 import Button from "@src/components/Button";
 import Wrapper from "@src/components/Wrapper";
 import Logo from "@src/components/Logo";
 import { buyNft } from "@src/services/contract";
-import * as Paima from "@dice/middleware";
 import { useGlobalStateContext } from "@src/GlobalStateContext";
 import { LoadingButton } from "@mui/lab";
-import { Dice, DiceRef } from "./DiceGame/Dice";
 import { AppContext } from "@src/main";
 
 const NoNFTMenu = () => {
-  const { connectedWallet, nfts } = useGlobalStateContext();
+  const {
+    connectedWallet,
+    selectedNftState: [selectedNft],
+  } = useGlobalStateContext();
   const [isBuying, setIsBuying] = React.useState<boolean>(false);
   // if user successfully submitted a tx, keep loading until we fetch the nft
   const [buyDone, setBuyDone] = React.useState<boolean>(false);
 
-  if (!connectedWallet || nfts == null)
+  if (!connectedWallet || selectedNft.loading)
     return (
       <Box
         sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}
@@ -101,6 +96,12 @@ const HasNFTMenu = () => {
       >
         My Games
       </Button>
+      <Button
+        sx={(theme) => ({ backgroundColor: theme.palette.menuButton.main })}
+        onClick={() => navigate(Page.BuyPacks)}
+      >
+        Buy Packs
+      </Button>
     </>
   );
 };
@@ -126,7 +127,7 @@ const MainMenu = () => {
             gap: "24px",
           }}
         >
-          {selectedNft != null ? <HasNFTMenu /> : <NoNFTMenu />}
+          {selectedNft.nft != null ? <HasNFTMenu /> : <NoNFTMenu />}
         </Box>
       </Wrapper>
     </>

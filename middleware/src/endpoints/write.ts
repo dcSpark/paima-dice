@@ -6,6 +6,7 @@ import {
   postConciselyEncodedData,
   getActiveAddress,
   PaimaMiddlewareErrorCode,
+  postConciseData,
 } from 'paima-sdk/paima-mw-core';
 
 import { buildEndpointErrorFxn, MiddlewareErrorCode } from '../errors';

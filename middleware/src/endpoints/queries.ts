@@ -24,6 +24,7 @@ import {
   backendQueryRoundStatus,
   backendQuerySearchLobby,
   backendQueryUserLobbies,
+  backendQueryUserPacks,
   backendQueryUserStats,
 } from '../helpers/query-constructors';
 import type {
@@ -37,6 +38,7 @@ import type {
 } from '../types';
 import type { WalletAddress } from 'paima-sdk/paima-utils';
 import type { IGetPaginatedUserLobbiesResult } from '@dice/db';
+import type { IGetOwnedPacksResult } from '@dice/db/build/select.queries';
 
 async function getLobbyRaw(lobbyID: string): Promise<PackedLobbyRaw | FailedResult> {
   const errorFxn = buildEndpointErrorFxn('getLobbyRaw');
@@ -314,8 +316,8 @@ async function getMatchExecutor(
   }
 }
 
-async function getNftsForWallet(wallet: WalletAddress): Promise<Result<number[]>> {
-  const errorFxn = buildEndpointErrorFxn('getNftsForLobby');
+async function getNftForWallet(wallet: WalletAddress): Promise<Result<undefined | number>> {
+  const errorFxn = buildEndpointErrorFxn('getNftForLobby');
 
   let res: Response;
   try {
@@ -326,10 +328,32 @@ async function getNftsForWallet(wallet: WalletAddress): Promise<Result<number[]>
   }
 
   try {
-    const nfts = (await res.json()) as number[];
+    const nft = (await res.json()) as { nft: undefined | number };
     return {
       success: true,
-      result: nfts,
+      result: nft.nft,
+    };
+  } catch (err) {
+    return errorFxn(PaimaMiddlewareErrorCode.INVALID_RESPONSE_FROM_BACKEND, err);
+  }
+}
+
+async function getUserPacks(nftId: number): Promise<Result<IGetOwnedPacksResult[]>> {
+  const errorFxn = buildEndpointErrorFxn('getUserPacks');
+
+  let res: Response;
+  try {
+    const query = backendQueryUserPacks(nftId);
+    res = await fetch(query);
+  } catch (err) {
+    return errorFxn(PaimaMiddlewareErrorCode.ERROR_QUERYING_BACKEND_ENDPOINT, err);
+  }
+
+  try {
+    const packs = (await res.json()) as { packs: IGetOwnedPacksResult[] };
+    return {
+      success: true,
+      result: packs.packs,
     };
   } catch (err) {
     return errorFxn(PaimaMiddlewareErrorCode.INVALID_RESPONSE_FROM_BACKEND, err);
@@ -347,5 +371,6 @@ export const queryEndpoints = {
   getNewLobbies,
   getRoundExecutor,
   getMatchExecutor,
-  getNftsForWallet,
+  getNftForWallet,
+  getUserPacks,
 };

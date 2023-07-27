@@ -2,6 +2,7 @@ import type { CardRegistry } from './types';
 
 export const COMMITMENT_LENGTH = 16;
 export const DECK_LENGTH = 10;
+export const PACK_LENGTH = 5;
 
 // Values must match move_kind in db. No need for a type check, it will cause errors somewhere.
 export const MOVE_KIND = {
@@ -29,3 +30,5 @@ export const CARD_REGISTRY: CardRegistry = {
   1: { defeats: 2 },
   2: { defeats: 0 },
 };
+
+export const CARD_IDS = Object.keys(CARD_REGISTRY).map(key => Number.parseInt(key));

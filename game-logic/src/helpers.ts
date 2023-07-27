@@ -9,7 +9,7 @@ import type {
   SerializedLocalCard,
   SerializedMove,
 } from './types';
-import { DECK_LENGTH, MOVE_KIND } from './constants';
+import { CARD_IDS, DECK_LENGTH, MOVE_KIND, PACK_LENGTH } from './constants';
 
 /**
  * Generate Fisher-Yates shuffle of range 0 to size.
@@ -30,10 +30,19 @@ export function initialCurrentDeck(): number[] {
   return Array.from(Array(DECK_LENGTH).keys());
 }
 
-export function genBotDeck(): number[] {
+export function genExistingCardId(randomnessGenerator: Prando): number {
+  return CARD_IDS[randomnessGenerator.nextInt(0, CARD_IDS.length - 1)];
+}
+
+export function genBotDeck(randomnessGenerator: Prando): number[] {
   return initialCurrentDeck().map(() => {
-    // TODO: select from existing cards
-    return Math.floor(Math.random() * 3);
+    return genExistingCardId(randomnessGenerator);
+  });
+}
+
+export function genCardPack(randomnessGenerator: Prando): number[] {
+  return Array.from(Array(PACK_LENGTH).keys()).map(() => {
+    return genExistingCardId(randomnessGenerator);
   });
 }
 

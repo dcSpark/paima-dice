@@ -122,3 +122,11 @@ export function backendQueryNftsForWallet(wallet: WalletAddress): string {
   };
   return buildBackendQuery(endpoint, options);
 }
+
+export function backendQueryUserPacks(nftId: number): string {
+  const endpoint = 'user/packs';
+  const options = {
+    nftId,
+  };
+  return buildBackendQuery(endpoint, options);
+}
