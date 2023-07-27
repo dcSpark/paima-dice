@@ -41,6 +41,7 @@ export class MatchExecutorController extends Controller {
       currentHand: raw.current_hand.map(deserializeHandCard),
       currentBoard: raw.current_board.map(deserializeBoardCard),
       currentDraw: raw.current_draw,
+      botLocalDeck: undefined,
       points: raw.points,
       score: raw.score,
       turn: raw.turn ?? undefined,
